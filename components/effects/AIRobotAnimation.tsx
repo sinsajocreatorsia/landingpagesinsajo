@@ -4,12 +4,36 @@ import { motion } from 'framer-motion'
 
 export default function AIRobotAnimation() {
   return (
-    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 pointer-events-none opacity-20 md:opacity-30 hidden md:block">
+    <motion.div
+      drag
+      dragMomemtum={false}
+      dragElastic={0.1}
+      dragConstraints={{
+        top: 0,
+        left: 0,
+        right: window.innerWidth - 250,
+        bottom: window.innerHeight - 400
+      }}
+      initial={{ x: 100, y: 200 }}
+      className="fixed w-48 h-48 md:w-64 md:h-64 opacity-50 md:opacity-60 z-30 cursor-grab active:cursor-grabbing hidden md:block"
+      whileHover={{ opacity: 1, scale: 1.05 }}
+      whileTap={{ scale: 0.95, cursor: 'grabbing' }}
+    >
+      {/* Tooltip - Arrástrrame */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 1, 0] }}
+        transition={{ duration: 3, delay: 2, repeat: 2 }}
+        className="absolute -top-8 left-1/2 -translate-x-1/2 bg-cyan-400/90 text-white text-xs px-3 py-1 rounded-lg whitespace-nowrap pointer-events-none"
+      >
+        👋 Drag me!
+      </motion.div>
+
       {/* Cuerpo del robot */}
       <motion.div
         className="relative w-full h-full"
         animate={{
-          y: [-20, 20, -20],
+          y: [-10, 10, -10],
         }}
         transition={{
           duration: 4,
@@ -19,7 +43,7 @@ export default function AIRobotAnimation() {
       >
         {/* Cabeza */}
         <motion.div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-br from-cyan-400/30 to-purple-600/30 backdrop-blur-sm border-2 border-cyan-400/50"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-br from-cyan-400/40 to-purple-600/40 backdrop-blur-sm border-2 border-cyan-400/60"
           animate={{
             rotate: [-5, 5, -5],
           }}
@@ -70,9 +94,9 @@ export default function AIRobotAnimation() {
         </motion.div>
 
         {/* Cuerpo */}
-        <div className="absolute top-28 md:top-36 left-1/2 -translate-x-1/2 w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-purple-600/30 to-cyan-400/30 backdrop-blur-sm border-2 border-purple-600/50">
+        <div className="absolute top-28 md:top-36 left-1/2 -translate-x-1/2 w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-purple-600/40 to-cyan-400/40 backdrop-blur-sm border-2 border-purple-600/60">
           {/* Panel de control */}
-          <div className="absolute inset-3 md:inset-4 border border-cyan-400/30 rounded-lg p-2">
+          <div className="absolute inset-3 md:inset-4 border border-cyan-400/40 rounded-lg p-2">
             <motion.div
               className="grid grid-cols-3 gap-1 md:gap-2"
               animate={{
@@ -86,7 +110,7 @@ export default function AIRobotAnimation() {
               {[...Array(9)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-1.5 md:h-2 bg-cyan-400/50 rounded-full"
+                  className="h-1.5 md:h-2 bg-cyan-400/60 rounded-full"
                   animate={{
                     scaleX: [0.5, 1, 0.5],
                   }}
@@ -103,7 +127,7 @@ export default function AIRobotAnimation() {
 
         {/* Brazos */}
         <motion.div
-          className="absolute top-32 md:top-40 -left-6 md:-left-8 w-12 h-2 md:w-16 md:h-3 rounded-full bg-gradient-to-r from-cyan-400/30 to-transparent"
+          className="absolute top-32 md:top-40 -left-6 md:-left-8 w-12 h-2 md:w-16 md:h-3 rounded-full bg-gradient-to-r from-cyan-400/40 to-transparent"
           animate={{
             rotate: [-20, 20, -20],
           }}
@@ -113,7 +137,7 @@ export default function AIRobotAnimation() {
           }}
         />
         <motion.div
-          className="absolute top-32 md:top-40 -right-6 md:-right-8 w-12 h-2 md:w-16 md:h-3 rounded-full bg-gradient-to-l from-cyan-400/30 to-transparent"
+          className="absolute top-32 md:top-40 -right-6 md:-right-8 w-12 h-2 md:w-16 md:h-3 rounded-full bg-gradient-to-l from-cyan-400/40 to-transparent"
           animate={{
             rotate: [20, -20, 20],
           }}
@@ -127,7 +151,7 @@ export default function AIRobotAnimation() {
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400/50"
+            className="absolute w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400/60"
             style={{
               left: `${Math.cos((i * Math.PI * 2) / 8) * 120 + 50}%`,
               top: `${Math.sin((i * Math.PI * 2) / 8) * 120 + 50}%`,
@@ -147,7 +171,7 @@ export default function AIRobotAnimation() {
 
       {/* Glow effect */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-600/20 rounded-full blur-3xl"
+        className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-600/30 rounded-full blur-3xl pointer-events-none"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.6, 0.3],
@@ -157,6 +181,6 @@ export default function AIRobotAnimation() {
           repeat: Infinity,
         }}
       />
-    </div>
+    </motion.div>
   )
 }
