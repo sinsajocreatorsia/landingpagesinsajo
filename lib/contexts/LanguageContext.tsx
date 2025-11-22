@@ -17,16 +17,15 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
-  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    // Always default to English - clear any old Spanish preference
     const saved = localStorage.getItem('language') as Language
-    if (saved) {
-      setLanguageState(saved)
-    } else {
-      // Set default to English and save to localStorage
+    if (!saved || saved !== 'en') {
       localStorage.setItem('language', 'en')
+      setLanguageState('en')
+    } else {
+      setLanguageState(saved)
     }
   }, [])
 
@@ -36,11 +35,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }
 
   const t = language === 'en' ? en : es
-
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return null
-  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
