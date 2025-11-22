@@ -113,7 +113,6 @@ export default function Header() {
             >
               SINSAJO
             </motion.h1>
-            <p className="text-xs text-gray-400">CREATORS</p>
           </div>
         </motion.div>
 

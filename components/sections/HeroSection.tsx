@@ -60,12 +60,35 @@ export default function HeroSection() {
           {/* Logo */}
           <motion.div
             className="flex items-center gap-3 mb-8"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            animate={{
+              y: [0, -10, 0],
+              scale: [1, 1.05, 1]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] flex items-center justify-center">
-              <Rocket className="w-8 h-8 text-white" />
-            </div>
+            <motion.div
+              className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] flex items-center justify-center"
+              animate={{
+                boxShadow: [
+                  "0 0 20px rgba(245, 158, 11, 0.4)",
+                  "0 0 40px rgba(6, 182, 212, 0.6)",
+                  "0 0 20px rgba(124, 58, 237, 0.4)",
+                  "0 0 40px rgba(245, 158, 11, 0.6)",
+                  "0 0 20px rgba(245, 158, 11, 0.4)"
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <motion.div
+                animate={{
+                  rotate: [0, -5, 5, -5, 0],
+                  y: [0, -2, 0, -2, 0]
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Rocket className="w-8 h-8 text-white" />
+              </motion.div>
+            </motion.div>
             <div>
               <h3 className="text-2xl font-bold gradient-text">SINSAJO</h3>
               <p className="text-sm text-gray-400">CREATORS</p>
