@@ -79,9 +79,9 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
           >
-            Agentes de IA que Trabajan{' '}
+            {t.hero.headline}{' '}
             <span className="gradient-text">
-              Mientras Tu Duermes
+              {t.hero.headlineHighlight}
             </span>
           </motion.h1>
 
@@ -92,9 +92,9 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl md:text-2xl text-gray-300 mb-8"
           >
-            Automatiza atencion al cliente, califica leads y cierra ventas 24/7.
+            {t.hero.subheadline}
             <br />
-            <span className="text-[#F59E0B]">Sin contratar personal. Sin limites. Sin descanso.</span>
+            <span className="text-[#F59E0B]">{t.hero.subheadlineHighlight}</span>
           </motion.p>
 
           {/* Stats Bar */}
@@ -106,15 +106,15 @@ export default function HeroSection() {
           >
             <div className="glass p-4 rounded-lg text-center neon-border">
               <div className="text-3xl font-bold gradient-text">80%</div>
-              <div className="text-sm text-gray-400">Menos Costos</div>
+              <div className="text-sm text-gray-400">{t.hero.stats.lessCosts}</div>
             </div>
             <div className="glass p-4 rounded-lg text-center neon-border">
               <div className="text-3xl font-bold gradient-text">10x</div>
-              <div className="text-sm text-gray-400">Mas Clientes</div>
+              <div className="text-sm text-gray-400">{t.hero.stats.moreClients}</div>
             </div>
             <div className="glass p-4 rounded-lg text-center neon-border">
               <div className="text-3xl font-bold gradient-text">24/7</div>
-              <div className="text-sm text-gray-400">Disponibilidad</div>
+              <div className="text-sm text-gray-400">{t.hero.stats.availability}</div>
             </div>
           </motion.div>
         </motion.div>
@@ -135,19 +135,19 @@ export default function HeroSection() {
               <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-10 h-10 text-green-400" />
               </div>
-              <h3 className="text-3xl font-bold mb-4">Gracias!</h3>
+              <h3 className="text-3xl font-bold mb-4">{t.hero.form.successTitle}</h3>
               <p className="text-gray-300 text-lg">
-                Nos pondremos en contacto contigo pronto para agendar tu demo personalizada.
+                {t.hero.form.successMessage}
               </p>
             </motion.div>
           ) : (
             <div className="glass-dark p-8 rounded-2xl neon-border">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="w-6 h-6 text-[#F59E0B]" />
-                <h3 className="text-3xl font-bold gradient-text">Agenda tu Demo Gratuita</h3>
+                <h3 className="text-3xl font-bold gradient-text">{t.hero.form.title}</h3>
               </div>
               <p className="text-gray-400 mb-6">
-                Descubre como un agente de IA puede transformar tu negocio
+                {t.hero.form.subtitle}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -156,7 +156,7 @@ export default function HeroSection() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Nombre completo *"
+                  placeholder={t.hero.form.name}
                   required
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
                 />
@@ -166,7 +166,7 @@ export default function HeroSection() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Email corporativo *"
+                  placeholder={t.hero.form.email}
                   required
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
                 />
@@ -176,7 +176,7 @@ export default function HeroSection() {
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
-                  placeholder="Empresa *"
+                  placeholder={t.hero.form.company}
                   required
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
                 />
@@ -186,7 +186,7 @@ export default function HeroSection() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="WhatsApp/Telefono *"
+                  placeholder={t.hero.form.phone}
                   required
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
                 />
@@ -195,7 +195,7 @@ export default function HeroSection() {
                   name="challenge"
                   value={formData.challenge}
                   onChange={handleChange}
-                  placeholder="Cual es tu mayor desafio? *"
+                  placeholder={t.hero.form.challenge}
                   required
                   rows={3}
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all resize-none"
