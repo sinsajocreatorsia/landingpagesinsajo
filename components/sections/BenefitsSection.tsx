@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Clock, DollarSign, Heart, Zap, Target, TrendingUp } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import AIRobotAnimation from '@/components/effects/AIRobotAnimation'
 
 export default function BenefitsSection() {
   const { t } = useLanguage()
@@ -41,7 +42,8 @@ export default function BenefitsSection() {
   ]
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-[#0A1628]/50 to-transparent">
+    <section className="relative py-20 px-4 bg-gradient-to-b from-[#0A1628]/50 to-transparent overflow-hidden">
+      <AIRobotAnimation />
       <div className="max-w-7xl mx-auto">
         {/* Headline */}
         <motion.div

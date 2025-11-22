@@ -15,6 +15,40 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = leadSchema.parse(body)
 
+    // Send email via Web3Forms
+    const emailContent = `
+NUEVO LEAD - Sinsajo Creators
+
+Nombre: ${validatedData.name}
+Email: ${validatedData.email}
+Empresa: ${validatedData.company}
+Teléfono: ${validatedData.phone}
+Desafío: ${validatedData.challenge}
+
+Fecha: ${new Date().toLocaleString()}
+    `
+
+    // Send email (Web3Forms)
+    if (process.env.WEB3FORMS_KEY) {
+      try {
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: process.env.WEB3FORMS_KEY,
+            subject: '🚀 Nuevo Lead - Sinsajo Creators',
+            from_name: 'Landing Page Sinsajo',
+            email: 'sales@sinsajocreators.com',
+            message: emailContent,
+            replyto: validatedData.email,
+          })
+        })
+      } catch (emailError) {
+        console.error('Web3Forms error (non-blocking):', emailError)
+        // Continue even if email fails - Supabase is primary storage
+      }
+    }
+
     // Save lead to Supabase
     const { data, error } = await supabase
       .from('leads')

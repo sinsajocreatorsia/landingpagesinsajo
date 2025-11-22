@@ -103,9 +103,9 @@ export default function Header() {
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] blur-xl opacity-50 animate-pulse"></div>
           </div>
 
-          <div>
+          <div className="flex flex-col">
             <motion.h1
-              className="text-2xl font-bold gradient-text"
+              className="text-xl md:text-2xl font-bold gradient-text leading-tight"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -113,6 +113,7 @@ export default function Header() {
             >
               SINSAJO
             </motion.h1>
+            <span className="text-[10px] md:text-xs text-gray-400 tracking-wider">CREATORS</span>
           </div>
         </motion.div>
 

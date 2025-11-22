@@ -20,10 +20,12 @@ export default function FAQSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            {t.faq.headline}{' '}
-            <span className="gradient-text">{t.faq.headlineHighlight}</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            {t.faq.headline}
           </h2>
+          <p className="text-xl md:text-2xl text-cyan-400 mt-2 font-light italic">
+            {t.faq.headlineHighlight}
+          </p>
         </motion.div>
 
         {/* FAQ Accordion */}
