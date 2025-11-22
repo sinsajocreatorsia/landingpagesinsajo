@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, X, Send, User } from 'lucide-react'
-import { useLanguage } from '@/lib/contexts/LanguageContext'
+import { X, Send } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -12,12 +11,10 @@ interface Message {
 }
 
 export default function ChatWidget() {
-  const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [hasGreeted, setHasGreeted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom
@@ -28,22 +25,6 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
-
-  // Auto-greeting after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasGreeted && messages.length === 0) {
-        setMessages([{
-          role: 'assistant',
-          content: t.chat.greeting,
-          timestamp: new Date()
-        }])
-        setHasGreeted(true)
-      }
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [hasGreeted, messages.length, t.chat.greeting])
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,7 +65,7 @@ export default function ChatWidget() {
       console.error('Error sending message:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: t.chat.error,
+        content: 'Hi! I\'m Hanna. I\'m currently being configured. Meanwhile, reach us at sales@sinsajocreators.com or WhatsApp: +1 (609) 288-5466',
         timestamp: new Date()
       }])
     } finally {
@@ -94,146 +75,174 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Chat Button */}
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 relative"
-            style={{ boxShadow: '0 0 30px rgba(124, 58, 237, 0.6), 0 0 50px rgba(168, 85, 247, 0.3)' }}
+      {/* Botón flotante - DRAGGABLE */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0.1}
+        dragConstraints={{
+          top: typeof window !== 'undefined' ? -window.innerHeight + 200 : -600,
+          left: typeof window !== 'undefined' ? -window.innerWidth + 100 : -1000,
+          right: 0,
+          bottom: 0
+        }}
+        className="fixed bottom-6 right-6 z-[9999]"
+        style={{ touchAction: 'none' }}
+      >
+        <motion.button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Indicador Online */}
+          <motion.div
+            className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white z-10"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            {/* Pulsing rings to indicate active chat */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7]"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.5, 0, 0.5]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              className="absolute inset-0 bg-green-400 rounded-full"
+              animate={{ scale: [1, 1.5], opacity: [1, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             />
+          </motion.div>
+
+          {/* Avatar Hanna */}
+          <div className="w-full h-full flex items-center justify-center text-3xl">
+            👩‍💼
+          </div>
+
+          {/* Badge de notificación */}
+          {!isOpen && messages.length === 0 && (
             <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-br from-[#A855F7] to-[#C084FC]"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.3, 0, 0.3]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              }}
-            />
+              className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              1
+            </motion.div>
+          )}
+        </motion.button>
 
-            <MessageCircle className="w-8 h-8 text-white relative z-10" />
-
-            {/* Active status indicator - green dot */}
-            <motion.span
-              className="absolute top-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white z-20"
-              animate={{
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-
-            {/* Notification badge for new messages */}
-            {messages.length > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold z-20"
-              >
-                {messages.length}
-              </motion.span>
-            )}
-          </motion.button>
+        {/* Tooltip */}
+        {!isOpen && (
+          <motion.div
+            className="absolute bottom-20 right-0 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 1 }}
+          >
+            💬 Chat with Hanna
+            <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
+          </motion.div>
         )}
-      </AnimatePresence>
+      </motion.div>
 
-      {/* Chat Window */}
+      {/* Ventana del Chat */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            className="fixed bottom-6 right-6 z-50 w-[380px] h-[600px] glass-dark rounded-2xl shadow-2xl flex flex-col overflow-hidden neon-border"
+            initial={{ opacity: 0, scale: 0.8, y: 100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 100 }}
+            transition={{ type: 'spring', damping: 25 }}
+            className="fixed bottom-28 right-6 w-[380px] h-[600px] bg-[#0A1628] rounded-2xl shadow-2xl z-[9998] flex flex-col overflow-hidden border border-cyan-400/30"
+            style={{ maxWidth: 'calc(100vw - 3rem)', maxHeight: 'calc(100vh - 10rem)' }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#7C3AED] to-[#A855F7] p-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-purple-600 to-cyan-500 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                  {/* Online status indicator */}
-                  <motion.span
-                    className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-2xl">
+                    👩‍💼
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">{t.chat.title}</h3>
-                  <div className="flex items-center gap-1.5">
-                    <motion.div
-                      className="w-2 h-2 bg-green-400 rounded-full"
-                      animate={{
-                        opacity: [1, 0.5, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    />
-                    <p className="text-xs text-white/90 font-medium">{t.chat.status}</p>
-                  </div>
+                  <h3 className="text-white font-bold text-lg">Hanna</h3>
+                  <p className="text-white/80 text-sm">AI & Marketing Specialist</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-white" />
+                <X size={24} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message, index) => (
+            <div className="flex-1 p-4 overflow-y-auto bg-[#0A1628] space-y-4">
+              {/* Mensaje inicial de Hanna */}
+              {messages.length === 0 && (
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className="flex gap-2"
                 >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
+                    👩‍💼
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-cyan-400/20 max-w-[85%]">
+                    <p className="text-white text-sm mb-2">
+                      👋 Hi! I'm <strong>Hanna</strong>, your AI and Marketing specialist at Sinsajo Creators.
+                    </p>
+                    <p className="text-gray-300 text-sm mb-3">
+                      I'm here to help you discover how AI agents can transform your business 🚀
+                    </p>
+                    <p className="text-gray-200 text-sm mb-4">
+                      What's your biggest challenge with customer service or sales?
+                    </p>
+
+                    {/* Botones de contacto rápido */}
+                    <div className="space-y-2">
+                      <a
+                        href="https://wa.me/16092885466?text=Hi!%20I'm%20interested%20in%20Sinsajo%20AI%20agents"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-sm rounded-lg transition-all"
+                      >
+                        <span>💬</span>
+                        <span>WhatsApp Direct</span>
+                      </a>
+                      <a
+                        href="mailto:sales@sinsajocreators.com?subject=Interested%20in%20Sinsajo%20AI%20Agents"
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-all"
+                      >
+                        <span>📧</span>
+                        <span>Email Sales Team</span>
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Mensajes de conversación */}
+              {messages.map((msg, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                >
+                  {msg.role === 'assistant' && (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
+                      👩‍💼
+                    </div>
+                  )}
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white'
-                        : 'bg-white/10 text-gray-200'
+                    className={`rounded-2xl p-3 max-w-[80%] ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white rounded-tr-none'
+                        : 'bg-white/10 backdrop-blur-sm text-white rounded-tl-none border border-cyan-400/20'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-line">{message.content}</p>
-                    <p className={`text-xs mt-1 ${message.role === 'user' ? 'text-white/70' : 'text-gray-400'}`}>
-                      {message.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-xs text-white/60 mt-1">
+                      {msg.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </motion.div>
@@ -243,13 +252,16 @@ export default function ChatWidget() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex justify-start"
+                  className="flex justify-start gap-2"
                 >
-                  <div className="bg-white/10 p-3 rounded-lg">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
+                    👩‍💼
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-cyan-400/20">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 </motion.div>
@@ -259,28 +271,43 @@ export default function ChatWidget() {
             </div>
 
             {/* Input */}
-            <form onSubmit={sendMessage} className="p-4 border-t border-white/10">
+            <form onSubmit={sendMessage} className="p-4 border-t border-cyan-400/20 bg-[#0A1628]">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={t.chat.placeholder}
+                  placeholder="Type your message..."
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/50 transition-all disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-white/5 border border-cyan-400/30 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400 text-sm"
                 />
                 <button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform"
+                  disabled={!input.trim() || isLoading}
+                  className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white flex items-center justify-center hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-5 h-5 text-white" />
+                  <Send size={20} />
                 </button>
               </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Powered by Claude AI
+              </p>
             </form>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Responsive - Mobile adjustments */}
+      <style jsx global>{`
+        @media (max-width: 640px) {
+          .fixed.bottom-28.right-6 {
+            width: calc(100vw - 2rem) !important;
+            right: 1rem !important;
+            left: 1rem !important;
+            max-height: calc(100vh - 8rem) !important;
+          }
+        }
+      `}</style>
     </>
   )
 }
