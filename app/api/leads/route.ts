@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { supabase } from '@/lib/supabase'
 
 const leadSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -14,20 +15,32 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = leadSchema.parse(body)
 
-    // Here you would typically:
-    // 1. Save to database
-    // 2. Send email notification
-    // 3. Add to CRM
-    // 4. Trigger automation workflows
+    // Save lead to Supabase
+    const { data, error } = await supabase
+      .from('leads')
+      .insert([
+        {
+          name: validatedData.name,
+          email: validatedData.email,
+          company: validatedData.company,
+          phone: validatedData.phone,
+          challenge: validatedData.challenge,
+          created_at: new Date().toISOString(),
+        }
+      ])
+      .select()
 
-    console.log('New lead captured:', validatedData)
+    if (error) {
+      console.error('Supabase error:', error)
+      throw new Error('Failed to save lead to database')
+    }
 
-    // For now, just return success
-    // In production, integrate with your email service or CRM
+    console.log('New lead captured:', data)
 
     return NextResponse.json({
       success: true,
-      message: 'Lead captured successfully'
+      message: 'Lead captured successfully',
+      data: data
     })
   } catch (error: any) {
     console.error('Error capturing lead:', error)
