@@ -1,0 +1,227 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Sun, Moon, Globe } from 'lucide-react'
+import Image from 'next/image'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
+import { useTheme } from '@/lib/contexts/ThemeContext'
+
+export default function Header() {
+  const { language, setLanguage, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
+  const [showVideo, setShowVideo] = useState(true)
+  const [scrolled, setScrolled] = useState(false)
+
+  // Logo animation: Show video for 3s, then static image for 27s, repeat every 30s
+  useEffect(() => {
+    const playAnimation = () => {
+      setShowVideo(true)
+      setTimeout(() => {
+        setShowVideo(false)
+      }, 3000) // Show video for 3 seconds
+    }
+
+    // Play on mount
+    playAnimation()
+
+    // Repeat every 30 seconds
+    const interval = setInterval(() => {
+      playAnimation()
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'glass-dark shadow-2xl border-b border-white/10'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <motion.div
+          className="flex items-center gap-3"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="relative w-14 h-14">
+            <AnimatePresence mode="wait">
+              {showVideo ? (
+                <motion.div
+                  key="video"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover rounded-full"
+                  >
+                    <source src="/images/sinsajo-animation.mp4" type="video/mp4" />
+                  </video>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="image"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/sinsajo-logo-1.png"
+                    alt="Sinsajo Creators"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Glow effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] blur-xl opacity-50 animate-pulse"></div>
+          </div>
+
+          <div>
+            <motion.h1
+              className="text-2xl font-bold gradient-text"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{ duration: 5, repeat: Infinity }}
+            >
+              SINSAJO
+            </motion.h1>
+            <p className="text-xs text-gray-400">CREATORS</p>
+          </div>
+        </motion.div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-3">
+          {/* Language Toggle */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative"
+          >
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="glass px-4 py-2 rounded-lg flex items-center gap-2 border border-white/20 hover:border-[#F59E0B]/50 transition-all duration-300 group"
+            >
+              <Globe className="w-5 h-5 text-[#06B6D4] group-hover:text-[#F59E0B] transition-colors" />
+              <span className="font-semibold text-white uppercase text-sm">
+                {language}
+              </span>
+            </button>
+
+            {/* Tooltip */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileHover={{ opacity: 1, y: 0 }}
+              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/90 rounded-lg text-xs text-white whitespace-nowrap pointer-events-none"
+            >
+              {language === 'en' ? t.language.spanish : t.language.english}
+            </motion.div>
+          </motion.div>
+
+          {/* Theme Toggle */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative"
+          >
+            <button
+              onClick={toggleTheme}
+              className="glass w-12 h-12 rounded-lg flex items-center justify-center border border-white/20 hover:border-[#F59E0B]/50 transition-all duration-300 group relative overflow-hidden"
+            >
+              <AnimatePresence mode="wait">
+                {theme === 'dark' ? (
+                  <motion.div
+                    key="moon"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Moon className="w-5 h-5 text-[#06B6D4] group-hover:text-[#F59E0B] transition-colors" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="sun"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Sun className="w-5 h-5 text-[#F59E0B] group-hover:text-[#06B6D4] transition-colors" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Animated background */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-[#F59E0B]/20 to-[#06B6D4]/20 rounded-lg"
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+            </button>
+
+            {/* Tooltip */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileHover={{ opacity: 1, y: 0 }}
+              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/90 rounded-lg text-xs text-white whitespace-nowrap pointer-events-none"
+            >
+              {theme === 'dark' ? t.theme.light : t.theme.dark}
+            </motion.div>
+          </motion.div>
+
+          {/* CTA Button (mobile hidden) */}
+          <motion.a
+            href="#hero"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="hidden md:block btn-primary text-sm px-6 py-2 rounded-lg"
+          >
+            {t.hero.form.button.replace(' Ahora', '').replace(' Now', '')}
+          </motion.a>
+        </div>
+      </div>
+
+      {/* Progress bar on scroll */}
+      <motion.div
+        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[#F59E0B] via-[#06B6D4] to-[#7C3AED]"
+        style={{
+          scaleX: scrolled ? 1 : 0,
+          transformOrigin: 'left',
+        }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: scrolled ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+    </motion.header>
+  )
+}
