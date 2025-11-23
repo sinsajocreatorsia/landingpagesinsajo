@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send } from 'lucide-react'
+import { X, Send, MessageCircle } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -108,10 +108,8 @@ export default function ChatWidget() {
             />
           </motion.div>
 
-          {/* Avatar Hanna */}
-          <div className="w-full h-full flex items-center justify-center text-3xl">
-            👩‍💼
-          </div>
+          {/* Message Icon */}
+          <MessageCircle size={32} className="text-white" />
 
           {/* Badge de notificación */}
           {!isOpen && messages.length === 0 && (
@@ -156,9 +154,11 @@ export default function ChatWidget() {
             <div className="bg-gradient-to-r from-purple-600 to-cyan-500 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-2xl">
-                    👩‍💼
-                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces"
+                    alt="Hanna - AI Specialist"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-white"
+                  />
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                 </div>
                 <div>
@@ -183,9 +183,11 @@ export default function ChatWidget() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
-                    👩‍💼
-                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces"
+                    alt="Hanna"
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-cyan-400/20 max-w-[85%]">
                     <p className="text-white text-sm mb-2">
                       👋 Hi! I'm <strong>Hanna</strong>, your AI and Marketing specialist at Sinsajo Creators.
@@ -229,9 +231,11 @@ export default function ChatWidget() {
                   className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
                   {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
-                      👩‍💼
-                    </div>
+                    <img
+                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces"
+                      alt="Hanna"
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                    />
                   )}
                   <div
                     className={`rounded-2xl p-3 max-w-[80%] ${
@@ -254,9 +258,11 @@ export default function ChatWidget() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center text-sm flex-shrink-0">
-                    👩‍💼
-                  </div>
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces"
+                    alt="Hanna"
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-cyan-400/20">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>

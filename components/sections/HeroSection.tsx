@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Rocket, TrendingUp, Clock, Zap } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import AIRobotAnimation from '@/components/effects/AIRobotAnimation'
 
 export default function HeroSection() {
   const { t } = useLanguage()
@@ -57,56 +58,21 @@ export default function HeroSection() {
           transition={{ duration: 0.8 }}
           className="text-left"
         >
-          {/* Logo with Slogan */}
+          {/* AI Robot Showcase */}
           <motion.div
             className="relative mb-8"
-            animate={{
-              y: [-10, 10, -10],
-              rotate: [-2, 2, -2]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
           >
-            {/* Rocket Logo */}
-            <div className="relative w-24 h-24 md:w-32 md:h-32 mx-auto">
-              <motion.div
-                className="w-full h-full rounded-full bg-gradient-to-br from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] flex items-center justify-center relative"
-                animate={{
-                  boxShadow: [
-                    "0 0 20px rgba(245, 158, 11, 0.4)",
-                    "0 0 40px rgba(6, 182, 212, 0.6)",
-                    "0 0 20px rgba(124, 58, 237, 0.4)",
-                    "0 0 40px rgba(245, 158, 11, 0.6)",
-                    "0 0 20px rgba(245, 158, 11, 0.4)"
-                  ]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <motion.div
-                  animate={{
-                    rotate: [0, -5, 5, -5, 0],
-                    y: [0, -2, 0, -2, 0]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Rocket className="w-12 h-12 md:w-16 md:h-16 text-white" />
-                </motion.div>
-              </motion.div>
-
-              {/* Trail effect behind rocket */}
-              <motion.div
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-24 bg-gradient-to-b from-cyan-400/50 to-transparent blur-xl"
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
+            {/* Humanoid Robot */}
+            <div className="w-64 h-80 mx-auto mb-6">
+              <AIRobotAnimation variant="showcase" />
             </div>
 
             {/* Animated Slogan */}
             <motion.div
-              className="mt-6 text-center"
+              className="text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -133,7 +99,7 @@ export default function HeroSection() {
                 transition={{ duration: 2, repeat: Infinity }}
               >
                 <span className="text-cyan-400 text-lg md:text-xl">✨</span>
-                <span className="text-[#F59E0B] text-xs md:text-sm tracking-wider font-semibold">Powered by AI</span>
+                <span className="text-[#F59E0B] text-xs md:text-sm tracking-wider font-semibold">Your AI Agent Working 24/7</span>
                 <span className="text-cyan-400 text-lg md:text-xl">✨</span>
               </motion.div>
             </motion.div>

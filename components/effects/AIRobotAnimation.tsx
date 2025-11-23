@@ -1,9 +1,18 @@
 'use client'
 import { motion } from 'framer-motion'
 
-export default function AIRobotAnimation() {
+interface AIRobotAnimationProps {
+  variant?: 'decorative' | 'showcase'
+}
+
+export default function AIRobotAnimation({ variant = 'decorative' }: AIRobotAnimationProps) {
+  const isShowcase = variant === 'showcase'
+  const opacity = isShowcase ? 'opacity-80' : 'opacity-10 md:opacity-15'
+  const size = isShowcase ? 'w-64 h-80' : 'w-80 h-96'
+  const positioning = isShowcase ? 'relative mx-auto' : 'absolute right-0 top-1/2 -translate-y-1/2 hidden lg:block'
+
   return (
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-80 h-96 pointer-events-none opacity-10 md:opacity-15 hidden lg:block">
+    <div className={`${positioning} ${size} pointer-events-none ${opacity}`}>
       {/* Robot humanoide estilo Optimus */}
       <motion.div
         className="relative w-full h-full"
