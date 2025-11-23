@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Bot, CheckCircle2, Calendar, DollarSign, Globe, MessageSquare } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
-import TeslaOptimusRobot from '@/components/effects/TeslaOptimusRobot'
+import HannaAIAnimation from '@/components/effects/HannaAIAnimation'
 
 export default function SolutionSection() {
   const { t } = useLanguage()
@@ -58,7 +58,7 @@ export default function SolutionSection() {
           className="glass-dark p-8 md:p-12 rounded-2xl mb-12 neon-border"
         >
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Premium Tesla Optimus Robot */}
+            {/* Left Column - Professional Hanna AI Animation */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -66,8 +66,8 @@ export default function SolutionSection() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="flex justify-center"
             >
-              <div className="w-80 h-96">
-                <TeslaOptimusRobot />
+              <div className="w-96 h-[500px]">
+                <HannaAIAnimation />
               </div>
             </motion.div>
 
