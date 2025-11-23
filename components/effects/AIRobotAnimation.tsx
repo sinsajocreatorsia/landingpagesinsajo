@@ -6,7 +6,7 @@ export default function AIRobotAnimation() {
   return (
     <motion.div
       drag
-      dragMomemtum={false}
+      dragMomentum={false}
       dragElastic={0.1}
       dragConstraints={{
         top: 0,
