@@ -50,7 +50,7 @@ export default function HannaAIAnimation() {
       >
         <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-cyan-400/30 shadow-2xl">
           <Image
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=faces"
+            src="/images/hanna-ai.png"
             alt="Hanna - AI & Marketing Specialist"
             fill
             className="object-cover"
