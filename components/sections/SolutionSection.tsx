@@ -64,9 +64,9 @@ export default function SolutionSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex justify-center"
+              className="flex justify-center items-center"
             >
-              <div className="w-96 h-[500px]">
+              <div className="w-full max-w-md h-[550px]">
                 <HannaAIAnimation />
               </div>
             </motion.div>

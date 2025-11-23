@@ -36,11 +36,11 @@ export default function HannaAIAnimation() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-purple-500/20 rounded-full" />
       </motion.div>
 
-      {/* Imagen de Hanna con animación flotante */}
+      {/* Imagen de Hanna con animación flotante y saludo */}
       <motion.div
-        className="relative z-10 w-64 h-64"
+        className="relative z-10 w-80 h-96"
         animate={{
-          y: [-15, 15, -15],
+          y: [-10, 10, -10],
         }}
         transition={{
           duration: 5,
@@ -48,12 +48,12 @@ export default function HannaAIAnimation() {
           ease: "easeInOut"
         }}
       >
-        <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-cyan-400/30 shadow-2xl">
+        <div className="relative w-full h-full rounded-3xl overflow-hidden border-4 border-cyan-400/30 shadow-2xl bg-gradient-to-b from-cyan-500/10 to-purple-500/10">
           <Image
             src="/images/hanna-ai.png"
             alt="Hanna - AI & Marketing Specialist"
             fill
-            className="object-cover"
+            className="object-contain"
             priority
           />
 
@@ -67,6 +67,25 @@ export default function HannaAIAnimation() {
               duration: 3,
               repeat: Infinity,
               ease: "linear",
+            }}
+          />
+
+          {/* Brillo en el borde */}
+          <motion.div
+            className="absolute inset-0 rounded-3xl"
+            style={{
+              boxShadow: '0 0 60px rgba(6, 182, 212, 0.3) inset',
+            }}
+            animate={{
+              boxShadow: [
+                '0 0 60px rgba(6, 182, 212, 0.3) inset',
+                '0 0 80px rgba(139, 92, 246, 0.5) inset',
+                '0 0 60px rgba(6, 182, 212, 0.3) inset',
+              ],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
             }}
           />
         </div>
