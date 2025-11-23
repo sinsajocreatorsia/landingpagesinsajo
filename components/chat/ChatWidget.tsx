@@ -90,6 +90,7 @@ export default function ChatWidget() {
         style={{ touchAction: 'none' }}
       >
         <motion.button
+          data-chat-widget="true"
           onClick={() => setIsOpen(!isOpen)}
           className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing"
           whileHover={{ scale: 1.05 }}

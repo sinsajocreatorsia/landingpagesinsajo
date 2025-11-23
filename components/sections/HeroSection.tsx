@@ -42,7 +42,7 @@ export default function HeroSection() {
           name: formData.name,
           email: formData.email,
           company: formData.company,
-          phone: formData.phone,
+          phone: formData.phone || 'Not provided',
           message: formData.challenge,
           from_name: 'Sinsajo Landing Page',
           subject: '🚀 New Demo Request from Landing Page',
@@ -284,9 +284,9 @@ export default function HeroSection() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder={t.hero.form.phone}
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all"
+                  placeholder="Phone Number (optional)"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 />
 
                 <textarea
@@ -330,9 +330,20 @@ export default function HeroSection() {
                   </motion.div>
                 )}
 
-                <p className="text-center text-sm text-gray-400">
-                  {t.hero.form.orChat}
-                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const chatButton = document.querySelector('[data-chat-widget]') as HTMLElement
+                    if (chatButton) chatButton.click()
+                  }}
+                  className="w-full text-center text-sm text-gray-400 hover:text-cyan-400 transition-colors cursor-pointer bg-transparent border-none"
+                >
+                  Or{' '}
+                  <span className="text-cyan-400 hover:text-cyan-300 underline">
+                    chat with Hanna
+                  </span>
+                  , our AI expert
+                </button>
               </form>
             </div>
           )}
