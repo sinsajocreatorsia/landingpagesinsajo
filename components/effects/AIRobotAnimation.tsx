@@ -11,8 +11,8 @@ export default function AIRobotAnimation() {
       dragConstraints={{
         top: 0,
         left: 0,
-        right: window.innerWidth - 250,
-        bottom: window.innerHeight - 400
+        right: typeof window !== 'undefined' ? window.innerWidth - 250 : 1200,
+        bottom: typeof window !== 'undefined' ? window.innerHeight - 400 : 800
       }}
       initial={{ x: 100, y: 200 }}
       className="fixed w-48 h-48 md:w-64 md:h-64 opacity-50 md:opacity-60 z-30 cursor-grab active:cursor-grabbing hidden md:block"
