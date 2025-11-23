@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Bot, CheckCircle2, Calendar, DollarSign, Globe, MessageSquare } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import TeslaOptimusRobot from '@/components/effects/TeslaOptimusRobot'
 
 export default function SolutionSection() {
   const { t } = useLanguage()
@@ -48,7 +49,7 @@ export default function SolutionSection() {
           </h2>
         </motion.div>
 
-        {/* Visual Representation */}
+        {/* Visual Representation - Meet Your New Team */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -56,19 +57,30 @@ export default function SolutionSection() {
           transition={{ duration: 0.8 }}
           className="glass-dark p-8 md:p-12 rounded-2xl mb-12 neon-border"
         >
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] flex items-center justify-center mb-4">
-                <Bot className="w-16 h-16 text-white" />
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left Column - Premium Tesla Optimus Robot */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex justify-center"
+            >
+              <div className="w-80 h-96">
+                <TeslaOptimusRobot />
               </div>
-              <p className="text-center text-gray-400">{t.solution.subtitle}</p>
-            </div>
+            </motion.div>
 
+            {/* Right Column - Text and Benefits */}
             <div className="text-center md:text-left">
-              <h3 className="text-2xl font-bold mb-4">
-                {t.solution.intro}
+              <h3 className="text-3xl md:text-4xl font-bold mb-6 gradient-text">
+                Meet Your New Team
               </h3>
-              <div className="space-y-3">
+              <p className="text-xl text-gray-300 mb-6">
+                While you sleep, eat or enjoy your family,<br />
+                your AI agents:
+              </p>
+              <div className="space-y-4">
                 {features.map((feature, index) => (
                   <motion.div
                     key={index}
@@ -76,12 +88,12 @@ export default function SolutionSection() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="flex items-center gap-3"
+                    className="flex items-start gap-3"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-5 h-5 text-green-400" />
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <feature.icon className="w-6 h-6 text-cyan-400" />
                     </div>
-                    <p className="text-gray-300">{feature.text}</p>
+                    <p className="text-gray-300 text-lg">{feature.text}</p>
                   </motion.div>
                 ))}
               </div>

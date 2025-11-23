@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Rocket, TrendingUp, Clock, Zap } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
-import TeslaOptimusRobot from '@/components/effects/TeslaOptimusRobot'
 
 export default function HeroSection() {
   const { t } = useLanguage()
@@ -17,6 +16,7 @@ export default function HeroSection() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -28,20 +28,48 @@ export default function HeroSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError('')
 
     try {
-      const response = await fetch('/api/leads', {
+      // Send directly to Web3Forms
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: '4f88d91a-eb37-4f27-b034-0f31161d286c',
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          phone: formData.phone,
+          message: formData.challenge,
+          from_name: 'Sinsajo Landing Page',
+          subject: '🚀 New Demo Request from Landing Page',
+        }),
       })
 
-      if (response.ok) {
+      const data = await response.json()
+
+      if (response.ok && data.success) {
         setIsSuccess(true)
         setFormData({ name: '', email: '', company: '', phone: '', challenge: '' })
+
+        // Reset success message after 5 seconds
+        setTimeout(() => {
+          setIsSuccess(false)
+        }, 5000)
+      } else {
+        throw new Error(data.message || 'Failed to send message')
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
+      console.error('Form submission error:', error)
+      setError(error instanceof Error ? error.message : 'Failed to send. Please try again.')
+
+      // Clear error after 5 seconds
+      setTimeout(() => {
+        setError('')
+      }, 5000)
     } finally {
       setIsSubmitting(false)
     }
@@ -165,14 +193,14 @@ export default function HeroSection() {
             <span className="text-[#F59E0B]">{t.hero.subheadlineHighlight}</span>
           </motion.p>
 
-          {/* Stats Bar with Robot */}
+          {/* Stats Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mb-8"
           >
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4">
               <div className="glass p-4 rounded-lg text-center neon-border">
                 <div className="text-3xl font-bold gradient-text">80%</div>
                 <div className="text-sm text-gray-400">{t.hero.stats.lessCosts}</div>
@@ -186,31 +214,6 @@ export default function HeroSection() {
                 <div className="text-sm text-gray-400">{t.hero.stats.availability}</div>
               </div>
             </div>
-
-            {/* Tesla Optimus Robot Section */}
-            <motion.div
-              className="glass-dark p-6 rounded-2xl neon-border"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <div className="flex items-center justify-center gap-6">
-                {/* Robot */}
-                <div className="w-32 h-40 flex-shrink-0">
-                  <TeslaOptimusRobot />
-                </div>
-
-                {/* Text */}
-                <div className="flex-1">
-                  <p className="text-lg md:text-xl font-bold text-white mb-1">
-                    Your AI agent working
-                  </p>
-                  <p className="text-3xl md:text-4xl font-bold gradient-text">
-                    24/7
-                  </p>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -296,13 +299,36 @@ export default function HeroSection() {
                   className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-[#F59E0B]/50 transition-all resize-none"
                 />
 
-                <button
+                <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full text-lg font-bold py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                  className="btn-primary w-full text-lg font-bold py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  {isSubmitting ? t.hero.form.buttonLoading : t.hero.form.button}
-                </button>
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {t.hero.form.buttonLoading}
+                    </span>
+                  ) : (
+                    t.hero.form.button
+                  )}
+                </motion.button>
+
+                {/* Error Message */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-400 text-center text-sm"
+                  >
+                    ❌ {error}
+                  </motion.div>
+                )}
 
                 <p className="text-center text-sm text-gray-400">
                   {t.hero.form.orChat}
