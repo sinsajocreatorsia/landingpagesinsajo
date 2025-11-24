@@ -65,7 +65,7 @@ export default function ChatWidget() {
       console.error('Error sending message:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Hi! I\'m Hanna. I\'m currently being configured. Meanwhile, reach us at sales@sinsajocreators.com or WhatsApp: +1 (609) 288-5466',
+        content: 'Hi! I\'m Hanna. I\'m currently being configured. Meanwhile, reach us at sinsajo.creators@gmail.com or WhatsApp: +1 (609) 288-5466',
         timestamp: new Date()
       }])
     } finally {
@@ -212,7 +212,7 @@ export default function ChatWidget() {
                         <span>WhatsApp Direct</span>
                       </a>
                       <a
-                        href="mailto:sales@sinsajocreators.com?subject=Interested%20in%20Sinsajo%20AI%20Agents"
+                        href="mailto:sinsajo.creators@gmail.com?subject=Interested%20in%20Sinsajo%20AI%20Agents"
                         className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-all"
                       >
                         <span>📧</span>

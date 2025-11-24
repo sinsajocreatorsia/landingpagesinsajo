@@ -46,6 +46,7 @@ export default function HeroSection() {
           message: formData.challenge,
           from_name: 'Sinsajo Landing Page',
           subject: '🚀 New Demo Request from Landing Page',
+          to: 'sinsajo.creators@gmail.com',
         }),
       })
 

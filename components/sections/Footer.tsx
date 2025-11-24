@@ -66,8 +66,8 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-1 flex-shrink-0 text-[#F59E0B]" />
-                <a href="mailto:sales@sinsajocreators.com" className="hover:text-[#F59E0B] transition-colors">
-                  sales@sinsajocreators.com
+                <a href="mailto:sinsajo.creators@gmail.com" className="hover:text-[#F59E0B] transition-colors">
+                  sinsajo.creators@gmail.com
                 </a>
               </li>
               <li className="flex items-start gap-2">
