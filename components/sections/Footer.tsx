@@ -1,8 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Rocket, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react'
+import { Mail, Phone, MapPin, Facebook, Instagram } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import Image from 'next/image'
 
 export default function Footer() {
   const { t } = useLanguage()
@@ -12,9 +13,14 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* Column 1 - About */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F59E0B] via-[#06B6D4] to-[#7C3AED] flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative w-12 h-12">
+                <Image
+                  src="/images/sinsajo-logo-1.png"
+                  alt="Sinsajo Creators"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <div>
                 <h3 className="text-lg font-bold gradient-text">SINSAJO</h3>
@@ -41,18 +47,18 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-blue-500/20 transition-colors group"
+                className="w-10 h-10 rounded-lg bg-[#1877F2]/20 flex items-center justify-center hover:bg-[#1877F2]/30 transition-colors"
               >
-                <Facebook className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
+                <Facebook className="w-5 h-5 text-[#1877F2]" />
               </a>
               <a
                 href="https://www.instagram.com/sinsajocreators/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-pink-500/20 transition-colors group"
+                className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#F58529]/20 via-[#DD2A7B]/20 to-[#8134AF]/20 flex items-center justify-center hover:from-[#F58529]/30 hover:via-[#DD2A7B]/30 hover:to-[#8134AF]/30 transition-all"
               >
-                <Instagram className="w-5 h-5 text-gray-400 group-hover:text-pink-400" />
+                <Instagram className="w-5 h-5 text-[#E1306C]" />
               </a>
             </div>
           </div>
@@ -83,8 +89,8 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-1 flex-shrink-0 text-[#F59E0B]" />
-                <a href="mailto:sinsajo.creators@gmail.com" className="hover:text-[#F59E0B] transition-colors">
-                  sinsajo.creators@gmail.com
+                <a href="mailto:sales@sinsajocreators.com" className="hover:text-[#F59E0B] transition-colors">
+                  sales@sinsajocreators.com
                 </a>
               </li>
               <li className="flex items-start gap-2">

@@ -102,17 +102,18 @@ export default function ChatWidget() {
           {/* Message Icon */}
           <MessageCircle size={28} className="text-white" />
 
-          {/* Badge de notificación */}
-          {!isOpen && messages.length === 0 && (
+          {/* Indicador Online */}
+          <motion.div
+            className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <motion.div
-              className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              1
-            </motion.div>
-          )}
+              className="absolute inset-0 bg-green-400 rounded-full"
+              animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.div>
         </motion.button>
 
         {/* Tooltip - Solo aparece con hover */}

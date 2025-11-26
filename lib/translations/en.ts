@@ -15,7 +15,7 @@ export const en = {
       title: "Schedule Your Free Demo",
       subtitle: "Discover how an AI agent can transform your business",
       name: "Full Name *",
-      email: "Corporate Email *",
+      email: "Email *",
       company: "Company *",
       phone: "WhatsApp/Phone *",
       challenge: "What's your biggest challenge? *",

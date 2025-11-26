@@ -15,7 +15,7 @@ export const es = {
       title: "Agenda tu Demo Gratuita",
       subtitle: "Descubre como un agente de IA puede transformar tu negocio",
       name: "Nombre completo *",
-      email: "Email corporativo *",
+      email: "Email *",
       company: "Empresa *",
       phone: "WhatsApp/Telefono *",
       challenge: "Cual es tu mayor desafio? *",
