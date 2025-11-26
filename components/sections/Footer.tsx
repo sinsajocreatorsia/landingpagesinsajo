@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Rocket, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'
+import { Rocket, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 export default function Footer() {
@@ -37,32 +37,22 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/sinsajocreators"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
+                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-blue-500/20 transition-colors group"
               >
-                <Facebook className="w-5 h-5 text-gray-400 hover:text-[#F59E0B]" />
+                <Facebook className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
               </a>
               <a
-                href="#"
-                aria-label="Follow us on Twitter"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
-              >
-                <Twitter className="w-5 h-5 text-gray-400 hover:text-[#F59E0B]" />
-              </a>
-              <a
-                href="#"
-                aria-label="Follow us on LinkedIn"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
-              >
-                <Linkedin className="w-5 h-5 text-gray-400 hover:text-[#F59E0B]" />
-              </a>
-              <a
-                href="#"
+                href="https://www.instagram.com/sinsajocreators/"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
+                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-pink-500/20 transition-colors group"
               >
-                <Instagram className="w-5 h-5 text-gray-400 hover:text-[#F59E0B]" />
+                <Instagram className="w-5 h-5 text-gray-400 group-hover:text-pink-400" />
               </a>
             </div>
           </div>
