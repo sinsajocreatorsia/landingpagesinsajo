@@ -19,6 +19,10 @@ export const metadata: Metadata = {
   title: "SINSAJO CREATORS - AI Agents that Work While You Sleep",
   description: "Automate customer service, qualify leads and close sales 24/7 with personalized AI agents. Reduce costs 80%, scale without limits. Free demo.",
   keywords: ["AI agents", "automation", "chatbot", "artificial intelligence", "customer service", "sales automation"],
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     title: "SINSAJO CREATORS - AI Agents for Your Business",
     description: "Automate customer service, qualify leads and close sales 24/7. Reduce costs 80%.",
