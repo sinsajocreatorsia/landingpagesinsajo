@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
 import { processMessage, formatMessage } from '@/lib/utils/messageFormatter'
+import { useLanguage } from '@/lib/contexts/LanguageContext'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -12,7 +13,36 @@ interface Message {
   isHtml?: boolean
 }
 
+const chatTexts = {
+  en: {
+    subtitle: 'AI Specialist',
+    hoverTooltip: '💬 Chat with Hanna',
+    placeholder: 'Type your message...',
+    typingIndicator: 'Hanna is typing',
+    errorMessage: 'Hi! I\'m Hanna. I\'m having technical issues. Meanwhile, contact us at sales@sinsajocreators.com or WhatsApp: +1 (609) 288-5466',
+    initialGreeting: {
+      line1: 'Hi! I\'m <strong>Hanna</strong>, AI automation specialist at Sinsajo Creators.',
+      line2: 'I\'m here to help you discover how AI agents can transform your business.',
+      line3: 'Tell me, what do you do?'
+    }
+  },
+  es: {
+    subtitle: 'Especialista en IA',
+    hoverTooltip: '💬 Chatea con Hanna',
+    placeholder: 'Escribe tu mensaje...',
+    typingIndicator: 'Hanna está escribiendo',
+    errorMessage: 'Hola! Soy Hanna. Estoy teniendo problemas técnicos. Mientras tanto, escríbenos a sales@sinsajocreators.com o WhatsApp: +1 (609) 288-5466',
+    initialGreeting: {
+      line1: 'Hola! Soy <strong>Hanna</strong>, especialista en automatización con IA de Sinsajo Creators.',
+      line2: 'Estoy aquí para ayudarte a descubrir cómo los agentes de IA pueden transformar tu negocio.',
+      line3: 'Cuéntame, ¿a qué te dedicas?'
+    }
+  }
+}
+
 export default function ChatWidget() {
+  const { language } = useLanguage()
+  const texts = chatTexts[language]
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -82,7 +112,8 @@ export default function ChatWidget() {
           messages: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content
-          }))
+          })),
+          language: language
         })
       })
 
@@ -97,7 +128,7 @@ export default function ChatWidget() {
       setIsLoading(false)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Hola! Soy Hanna. Estoy teniendo problemas tecnicos. Mientras tanto, escribenos a sales@sinsajocreators.com o WhatsApp: +1 (609) 288-5466',
+        content: texts.errorMessage,
         timestamp: new Date()
       }])
     }
@@ -151,7 +182,7 @@ export default function ChatWidget() {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.2 }}
             >
-              💬 Chatea con Hanna
+              {texts.hoverTooltip}
               <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
             </motion.div>
           )}
@@ -182,7 +213,7 @@ export default function ChatWidget() {
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">Hanna</h3>
-                  <p className="text-white/80 text-sm">Especialista en IA</p>
+                  <p className="text-white/80 text-sm">{texts.subtitle}</p>
                 </div>
               </div>
               <button
@@ -208,14 +239,12 @@ export default function ChatWidget() {
                     className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-cyan-400/20 max-w-[85%]">
-                    <p className="text-white text-sm mb-2">
-                      Hola! Soy <strong>Hanna</strong>, especialista en automatizacion con IA de Sinsajo Creators.
-                    </p>
+                    <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: texts.initialGreeting.line1 }} />
                     <p className="text-gray-300 text-sm mb-3">
-                      Estoy aqui para ayudarte a descubrir como los agentes de IA pueden transformar tu negocio.
+                      {texts.initialGreeting.line2}
                     </p>
                     <p className="text-gray-200 text-sm">
-                      Cuentame, ¿a que te dedicas?
+                      {texts.initialGreeting.line3}
                     </p>
                   </div>
                 </motion.div>
@@ -295,7 +324,7 @@ export default function ChatWidget() {
                   />
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-cyan-400/20">
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-xs">Hanna esta escribiendo</span>
+                      <span className="text-gray-400 text-xs">{texts.typingIndicator}</span>
                       <div className="flex gap-1">
                         <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                         <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -316,7 +345,7 @@ export default function ChatWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Escribe tu mensaje..."
+                  placeholder={texts.placeholder}
                   disabled={isLoading || isTyping}
                   className="flex-1 px-4 py-3 bg-white/5 border border-cyan-400/30 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400 text-sm"
                 />
