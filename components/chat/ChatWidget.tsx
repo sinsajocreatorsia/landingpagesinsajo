@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
+import { processMessage, formatMessage } from '@/lib/utils/messageFormatter'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  isHtml?: boolean
 }
 
 export default function ChatWidget() {
@@ -15,17 +17,48 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, isTyping])
+
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+  const sendProgressiveMessages = async (fullMessage: string) => {
+    const parts = processMessage(fullMessage)
+
+    for (let i = 0; i < parts.length; i++) {
+      const { formattedText, delay } = parts[i]
+
+      // Show typing indicator
+      setIsTyping(true)
+
+      // Wait for "typing" time
+      await sleep(delay)
+
+      // Hide typing and add message
+      setIsTyping(false)
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: formattedText,
+        timestamp: new Date(),
+        isHtml: true
+      }])
+
+      // Small pause between messages
+      if (i < parts.length - 1) {
+        await sleep(400 + Math.random() * 500)
+      }
+    }
+  }
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,29 +87,25 @@ export default function ChatWidget() {
       })
 
       const data = await response.json()
+      setIsLoading(false)
 
       if (data.message) {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: data.message,
-          timestamp: new Date()
-        }])
+        await sendProgressiveMessages(data.message)
       }
     } catch (error) {
       console.error('Error sending message:', error)
+      setIsLoading(false)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'Hi! I\'m Hanna. I\'m currently being configured. Meanwhile, reach us at sinsajo.creators@gmail.com or WhatsApp: +1 (609) 288-5466',
+        content: 'Hola! Soy Hanna. Estoy teniendo problemas tecnicos. Mientras tanto, escribenos a sales@sinsajocreators.com o WhatsApp: +1 (609) 288-5466',
         timestamp: new Date()
       }])
-    } finally {
-      setIsLoading(false)
     }
   }
 
   return (
     <>
-      {/* Botón flotante - DRAGGABLE */}
+      {/* Floating Button - DRAGGABLE */}
       <motion.div
         drag
         dragMomentum={false}
@@ -99,10 +128,7 @@ export default function ChatWidget() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {/* Message Icon */}
           <MessageCircle size={28} className="text-white" />
-
-          {/* Indicador Online */}
           <motion.div
             className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"
             animate={{ scale: [1, 1.2, 1] }}
@@ -116,7 +142,6 @@ export default function ChatWidget() {
           </motion.div>
         </motion.button>
 
-        {/* Tooltip - Solo aparece con hover */}
         <AnimatePresence>
           {!isOpen && isHovered && (
             <motion.div
@@ -126,14 +151,14 @@ export default function ChatWidget() {
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.2 }}
             >
-              💬 Chat with Hanna
+              💬 Chatea con Hanna
               <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
 
-      {/* Ventana del Chat */}
+      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -157,7 +182,7 @@ export default function ChatWidget() {
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">Hanna</h3>
-                  <p className="text-white/80 text-sm">AI & Marketing Specialist</p>
+                  <p className="text-white/80 text-sm">Especialista en IA</p>
                 </div>
               </div>
               <button
@@ -170,7 +195,7 @@ export default function ChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto bg-[#0A1628] space-y-4">
-              {/* Mensaje inicial de Hanna */}
+              {/* Initial message */}
               {messages.length === 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -184,39 +209,19 @@ export default function ChatWidget() {
                   />
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-cyan-400/20 max-w-[85%]">
                     <p className="text-white text-sm mb-2">
-                      👋 Hi! I'm <strong>Hanna</strong>, your AI and Marketing specialist at Sinsajo Creators.
+                      Hola! Soy <strong>Hanna</strong>, especialista en automatizacion con IA de Sinsajo Creators.
                     </p>
                     <p className="text-gray-300 text-sm mb-3">
-                      I'm here to help you discover how AI agents can transform your business 🚀
+                      Estoy aqui para ayudarte a descubrir como los agentes de IA pueden transformar tu negocio.
                     </p>
-                    <p className="text-gray-200 text-sm mb-4">
-                      What's your biggest challenge with customer service or sales?
+                    <p className="text-gray-200 text-sm">
+                      Cuentame, ¿a que te dedicas?
                     </p>
-
-                    {/* Botones de contacto rápido */}
-                    <div className="space-y-2">
-                      <a
-                        href="https://wa.me/16092885466?text=Hi!%20I'm%20interested%20in%20Sinsajo%20AI%20agents"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-3 py-2 bg-green-500 hover:bg-green-600 text-white text-sm rounded-lg transition-all"
-                      >
-                        <span>💬</span>
-                        <span>WhatsApp Direct</span>
-                      </a>
-                      <a
-                        href="mailto:sinsajo.creators@gmail.com?subject=Interested%20in%20Sinsajo%20AI%20Agents"
-                        className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-all"
-                      >
-                        <span>📧</span>
-                        <span>Email Sales Team</span>
-                      </a>
-                    </div>
                   </div>
                 </motion.div>
               )}
 
-              {/* Mensajes de conversación */}
+              {/* Conversation messages */}
               {messages.map((msg, idx) => (
                 <motion.div
                   key={idx}
@@ -238,14 +243,22 @@ export default function ChatWidget() {
                         : 'bg-white/10 backdrop-blur-sm text-white rounded-tl-none border border-cyan-400/20'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    {msg.isHtml ? (
+                      <div
+                        className="text-sm whitespace-pre-wrap chat-message"
+                        dangerouslySetInnerHTML={{ __html: msg.content }}
+                      />
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    )}
                     <p className="text-xs text-white/60 mt-1">
-                      {msg.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      {msg.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </motion.div>
               ))}
 
+              {/* Loading indicator */}
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -267,6 +280,32 @@ export default function ChatWidget() {
                 </motion.div>
               )}
 
+              {/* Typing indicator */}
+              {isTyping && !isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-start gap-2"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=faces"
+                    alt="Hanna"
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-cyan-400/20">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400 text-xs">Hanna esta escribiendo</span>
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -277,28 +316,38 @@ export default function ChatWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message..."
-                  disabled={isLoading}
+                  placeholder="Escribe tu mensaje..."
+                  disabled={isLoading || isTyping}
                   className="flex-1 px-4 py-3 bg-white/5 border border-cyan-400/30 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400 text-sm"
                 />
                 <button
                   type="submit"
-                  disabled={!input.trim() || isLoading}
+                  disabled={!input.trim() || isLoading || isTyping}
                   className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 text-white flex items-center justify-center hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send size={20} />
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Powered by Claude AI
+                Powered by Sinsajo Creators
               </p>
             </form>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Responsive - Mobile adjustments */}
+      {/* Styles for HTML messages */}
       <style jsx global>{`
+        .chat-message a {
+          color: #8B5CF6;
+          text-decoration: underline;
+        }
+        .chat-message a:hover {
+          color: #A78BFA;
+        }
+        .chat-message b {
+          color: #8B5CF6;
+        }
         @media (max-width: 640px) {
           .fixed.bottom-28.right-6 {
             width: calc(100vw - 2rem) !important;
