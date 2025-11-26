@@ -15,27 +15,27 @@ interface Message {
 
 const chatTexts = {
   en: {
-    subtitle: 'AI Specialist',
+    subtitle: 'AI Business Advisor',
     hoverTooltip: '💬 Chat with Hanna',
     placeholder: 'Type your message...',
     typingIndicator: 'Hanna is typing',
     errorMessage: 'Hi! I\'m Hanna. I\'m having technical issues. Meanwhile, contact us at sales@sinsajocreators.com or WhatsApp: +1 (609) 288-5466',
     initialGreeting: {
-      line1: 'Hi! I\'m <strong>Hanna</strong>, AI automation specialist at Sinsajo Creators.',
-      line2: 'I\'m here to help you discover how AI agents can transform your business.',
-      line3: 'Tell me, what do you do?'
+      line1: 'Hey! I\'m <strong>Hanna</strong> 👋',
+      line2: 'I\'m an AI business advisor at Sinsajo Creators. I help companies like yours automate processes and scale with intelligent agents.',
+      line3: 'What industry are you in? I\'d love to learn about your business.'
     }
   },
   es: {
-    subtitle: 'Especialista en IA',
+    subtitle: 'Asesora de Negocios IA',
     hoverTooltip: '💬 Chatea con Hanna',
     placeholder: 'Escribe tu mensaje...',
     typingIndicator: 'Hanna está escribiendo',
     errorMessage: 'Hola! Soy Hanna. Estoy teniendo problemas técnicos. Mientras tanto, escríbenos a sales@sinsajocreators.com o WhatsApp: +1 (609) 288-5466',
     initialGreeting: {
-      line1: 'Hola! Soy <strong>Hanna</strong>, especialista en automatización con IA de Sinsajo Creators.',
-      line2: 'Estoy aquí para ayudarte a descubrir cómo los agentes de IA pueden transformar tu negocio.',
-      line3: 'Cuéntame, ¿a qué te dedicas?'
+      line1: '¡Hola! Soy <strong>Hanna</strong> 👋',
+      line2: 'Soy asesora de negocios especializada en IA en Sinsajo Creators. Ayudo a empresas como la tuya a automatizar procesos y escalar con agentes inteligentes.',
+      line3: '¿En qué industria estás? Me encantaría conocer tu negocio.'
     }
   }
 }
