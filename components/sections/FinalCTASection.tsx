@@ -7,7 +7,7 @@ import { useLanguage } from '@/lib/contexts/LanguageContext'
 export default function FinalCTASection() {
   const { t } = useLanguage()
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-[#0A1628]/50 to-[#0A1628] grid-pattern">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-[#0A1628]/50 to-[#0A1628] grid-pattern">
       <div className="max-w-4xl mx-auto text-center">
         {/* Main Headline */}
         <motion.div

@@ -19,7 +19,7 @@ export default function AgentTypesSection() {
   const [expandedAgent, setExpandedAgent] = useState<number | null>(null)
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-transparent via-[#0A1628]/30 to-transparent">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-transparent via-[#0A1628]/30 to-transparent">
       <div className="max-w-7xl mx-auto">
 
         {/* Headline */}
@@ -158,7 +158,7 @@ export default function AgentTypesSection() {
             <p className="text-xl text-gray-400">{t.agentTypes.otherAgents.subtitle}</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {t.agentTypes.otherAgents.agents.map((agent, index) => {
               const Icon = iconMap[agent.icon as keyof typeof iconMap]
               const isExpanded = expandedAgent === index
@@ -170,7 +170,7 @@ export default function AgentTypesSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass-dark p-6 rounded-xl neon-border hover:scale-105 transition-all duration-300 cursor-pointer"
+                  className="glass-dark p-8 rounded-xl neon-border hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                   onClick={() => setExpandedAgent(isExpanded ? null : index)}
                 >
                   <div className="flex items-start gap-4 mb-4">
@@ -233,9 +233,9 @@ export default function AgentTypesSection() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left p-4 text-gray-400">Feature</th>
-                  <th className="text-center p-4 text-red-400">Without AI</th>
-                  <th className="text-center p-4 text-green-400">With WhatsApp Agent</th>
+                  <th className="text-left py-4 px-5 text-gray-400 font-semibold">Feature</th>
+                  <th className="text-center py-4 px-5 text-red-400 font-semibold">Without AI</th>
+                  <th className="text-center py-4 px-5 text-green-400 font-semibold">With WhatsApp Agent</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,14 +248,14 @@ export default function AgentTypesSection() {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     className="border-b border-white/5"
                   >
-                    <td className="p-4 font-semibold text-white">{point.feature}</td>
-                    <td className="p-4 text-center">
+                    <td className="py-4 px-5 font-semibold text-white">{point.feature}</td>
+                    <td className="py-4 px-5 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <X className="w-4 h-4 text-red-500" />
                         <span className="text-gray-400">{point.without}</span>
                       </div>
                     </td>
-                    <td className="p-4 text-center">
+                    <td className="py-4 px-5 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
                         <span className="text-white font-semibold">{point.with}</span>

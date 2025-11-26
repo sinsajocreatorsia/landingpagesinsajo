@@ -32,7 +32,7 @@ export default function SocialProofSection() {
   ]
 
   return (
-    <section className="relative py-20 px-4">
+    <section className="relative px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Headline */}
         <motion.div
@@ -49,7 +49,7 @@ export default function SocialProofSection() {
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
           {t.socialProof.stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -57,7 +57,7 @@ export default function SocialProofSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass-dark p-6 rounded-xl text-center neon-border"
+              className="glass-dark p-8 rounded-xl text-center neon-border"
             >
               <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">{stat.number}</div>
               <div className="text-gray-400">{stat.label}</div>
@@ -74,7 +74,7 @@ export default function SocialProofSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass-dark p-6 rounded-xl neon-border"
+              className="glass-dark p-8 rounded-xl neon-border"
             >
               {/* Rating */}
               <div className="flex gap-1 mb-4">

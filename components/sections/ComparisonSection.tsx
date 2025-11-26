@@ -8,7 +8,7 @@ export default function ComparisonSection() {
   const { t } = useLanguage()
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-[#0A1628]/50 to-transparent">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-[#0A1628]/50 to-transparent">
       <div className="max-w-5xl mx-auto">
         {/* Headline */}
         <motion.div

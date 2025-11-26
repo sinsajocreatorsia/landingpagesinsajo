@@ -8,7 +8,7 @@ export default function TechnologySection() {
   const { t } = useLanguage()
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-transparent to-[#0A1628]/50">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-transparent to-[#0A1628]/50">
       <div className="max-w-6xl mx-auto">
         {/* Headline */}
         <motion.div
@@ -25,13 +25,13 @@ export default function TechnologySection() {
         </motion.div>
 
         {/* 3 Columns */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="glass-dark p-6 rounded-xl neon-border text-center"
+            className="glass-dark p-8 rounded-xl neon-border text-center"
           >
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#F59E0B]/20 to-[#06B6D4]/20 flex items-center justify-center mx-auto mb-4">
               <Blocks className="w-8 h-8 text-[#F59E0B]" />
@@ -46,7 +46,7 @@ export default function TechnologySection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="glass-dark p-6 rounded-xl neon-border text-center"
+            className="glass-dark p-8 rounded-xl neon-border text-center"
           >
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#06B6D4]/20 to-[#7C3AED]/20 flex items-center justify-center mx-auto mb-4">
               <Cpu className="w-8 h-8 text-[#06B6D4]" />
@@ -61,7 +61,7 @@ export default function TechnologySection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="glass-dark p-6 rounded-xl neon-border text-center"
+            className="glass-dark p-8 rounded-xl neon-border text-center"
           >
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#7C3AED]/20 to-[#F59E0B]/20 flex items-center justify-center mx-auto mb-4">
               <BarChart className="w-8 h-8 text-[#7C3AED]" />

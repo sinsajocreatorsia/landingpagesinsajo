@@ -23,13 +23,21 @@ export default function Home() {
 
         <ProblemSection />
         <SolutionSection />
-        <AgentTypesSection />
-        <BenefitsSection />
-        <UseCasesSection />
+        <div id="agents">
+          <AgentTypesSection />
+        </div>
+        <div id="benefits">
+          <BenefitsSection />
+        </div>
+        <div id="cases">
+          <UseCasesSection />
+        </div>
         <TechnologySection />
         <SocialProofSection />
         <ComparisonSection />
-        <FAQSection />
+        <div id="faq">
+          <FAQSection />
+        </div>
         <FinalCTASection />
         <Footer />
       </ClientWrapper>

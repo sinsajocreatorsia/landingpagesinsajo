@@ -9,6 +9,26 @@
   --accent-purple: #7C3AED;
   --background: #000000;
   --foreground: #ffffff;
+
+  /* Spacing Variables */
+  --section-spacing: 100px;
+  --section-spacing-mobile: 60px;
+  --card-gap: 32px;
+  --card-padding: 32px;
+  --card-padding-mobile: 24px;
+
+  /* Typography */
+  --font-size-body: 18px;
+  --font-size-body-mobile: 16px;
+  --line-height-body: 1.65;
+  --max-line-width: 65ch;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --section-spacing: var(--section-spacing-mobile);
+    --card-padding: var(--card-padding-mobile);
+  }
 }
 
 /* Tailwind v4 Theme Configuration */
@@ -38,8 +58,42 @@ body {
   background: linear-gradient(135deg, #0A1628 0%, #000000 100%);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-size-body-mobile);
+  }
+}
+
+/* Section Base Styles */
+section {
+  padding-top: var(--section-spacing);
+  padding-bottom: var(--section-spacing);
+}
+
+/* Card Grid Improvements */
+.card-grid {
+  gap: var(--card-gap);
+}
+
+.card {
+  padding: var(--card-padding);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Paragraph max width for readability */
+.prose-content p {
+  max-width: var(--max-line-width);
 }
 
 /* Light Mode */
@@ -325,4 +379,45 @@ html {
 ::selection {
   background: rgba(246, 158, 11, 0.3);
   color: white;
+}
+
+/* Accessibility - Focus States */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Skip Link for Screen Readers */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-gold);
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  z-index: 9999;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

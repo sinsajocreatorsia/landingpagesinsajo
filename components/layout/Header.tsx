@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sun, Moon, Globe } from 'lucide-react'
+import { Sun, Moon, Globe, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 import { useTheme } from '@/lib/contexts/ThemeContext'
@@ -12,6 +12,14 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme()
   const [showVideo, setShowVideo] = useState(true)
   const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const navLinks = [
+    { href: '#agents', label: language === 'en' ? 'Agents' : 'Agentes' },
+    { href: '#benefits', label: language === 'en' ? 'Benefits' : 'Beneficios' },
+    { href: '#cases', label: language === 'en' ? 'Use Cases' : 'Casos de Uso' },
+    { href: '#faq', label: 'FAQ' },
+  ]
 
   // Logo animation: Show video for 3s, then static image for 27s, repeat every 30s
   useEffect(() => {
@@ -117,6 +125,20 @@ export default function Header() {
           </div>
         </motion.div>
 
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="relative text-gray-300 hover:text-white transition-colors font-medium group"
+            >
+              {link.label}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#F59E0B] to-[#06B6D4] transition-all duration-300 group-hover:w-full" />
+            </a>
+          ))}
+        </nav>
+
         {/* Controls */}
         <div className="flex items-center gap-3">
           {/* Language Toggle */}
@@ -208,8 +230,56 @@ export default function Header() {
           >
             {t.hero.form.button.replace(' Ahora', '').replace(' Now', '')}
           </motion.a>
+
+          {/* Mobile Menu Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden glass w-12 h-12 rounded-lg flex items-center justify-center border border-white/20"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6 text-white" />
+            ) : (
+              <Menu className="w-6 h-6 text-white" />
+            )}
+          </motion.button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:hidden glass-dark border-t border-white/10"
+          >
+            <nav className="max-w-7xl mx-auto px-4 py-6 flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-gray-300 hover:text-white transition-colors font-medium py-2 border-b border-white/5"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <a
+                href="#hero"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn-primary text-center py-3 rounded-lg mt-2"
+              >
+                {t.hero.form.button.replace(' Ahora', '').replace(' Now', '')}
+              </a>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Progress bar on scroll */}
       <motion.div

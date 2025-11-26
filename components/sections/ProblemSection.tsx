@@ -31,7 +31,7 @@ export default function ProblemSection() {
   ]
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-transparent to-[#0A1628]/50">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-transparent to-[#0A1628]/50">
       <div className="max-w-6xl mx-auto">
         {/* Headline */}
         <motion.div
@@ -51,7 +51,7 @@ export default function ProblemSection() {
         </motion.div>
 
         {/* Pain Points Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
           {problems.map((problem, index) => (
             <motion.div
               key={index}
@@ -59,7 +59,7 @@ export default function ProblemSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass-dark p-6 rounded-xl neon-border hover:scale-105 transition-transform duration-300"
+              className="glass-dark p-8 rounded-xl neon-border hover:scale-[1.02] transition-all duration-300"
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center flex-shrink-0">

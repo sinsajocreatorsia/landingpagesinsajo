@@ -41,7 +41,7 @@ export default function BenefitsSection() {
   ]
 
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-b from-[#0A1628]/50 to-transparent">
+    <section className="relative px-4 md:px-6 bg-gradient-to-b from-[#0A1628]/50 to-transparent">
       <div className="max-w-7xl mx-auto">
         {/* Headline */}
         <motion.div
@@ -58,7 +58,7 @@ export default function BenefitsSection() {
         </motion.div>
 
         {/* Benefits Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {benefits.map((benefit, index) => (
             <motion.div
               key={index}
@@ -66,7 +66,7 @@ export default function BenefitsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="glass-dark p-6 rounded-xl neon-border hover:scale-105 transition-all duration-300 group"
+              className="glass-dark p-8 rounded-xl neon-border hover:scale-[1.02] transition-all duration-300 group"
             >
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#F59E0B]/20 to-[#06B6D4]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <benefit.icon className="w-7 h-7 text-[#F59E0B]" />

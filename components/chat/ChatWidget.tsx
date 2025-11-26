@@ -99,21 +99,8 @@ export default function ChatWidget() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {/* Indicador Online */}
-          <motion.div
-            className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white z-10"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-green-400 rounded-full"
-              animate={{ scale: [1, 1.5], opacity: [1, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          </motion.div>
-
           {/* Message Icon */}
-          <MessageCircle size={32} className="text-white" />
+          <MessageCircle size={28} className="text-white" />
 
           {/* Badge de notificación */}
           {!isOpen && messages.length === 0 && (
