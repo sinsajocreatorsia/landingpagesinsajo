@@ -15,6 +15,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom
@@ -92,6 +93,8 @@ export default function ChatWidget() {
         <motion.button
           data-chat-widget="true"
           onClick={() => setIsOpen(!isOpen)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -125,19 +128,21 @@ export default function ChatWidget() {
           )}
         </motion.button>
 
-        {/* Tooltip */}
-        {!isOpen && (
-          <motion.div
-            className="absolute bottom-20 right-0 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: 1 }}
-          >
-            💬 Chat with Hanna
-            <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
-          </motion.div>
-        )}
+        {/* Tooltip - Solo aparece con hover */}
+        <AnimatePresence>
+          {!isOpen && isHovered && (
+            <motion.div
+              className="absolute bottom-20 right-0 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              💬 Chat with Hanna
+              <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Ventana del Chat */}
