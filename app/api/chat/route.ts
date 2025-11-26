@@ -5,6 +5,79 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+const CAL_USERNAME = process.env.CAL_USERNAME || 'sinsajo-creators-1mvqb7'
+const CAL_BOOKING_LINK = `https://cal.com/${CAL_USERNAME}/30min`
+
+async function getCalAvailability(): Promise<{ slots: any[]; bookingLink: string } | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/cal/availability`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (response.ok) {
+      return await response.json()
+    }
+  } catch (error) {
+    console.error('Error fetching cal availability:', error)
+  }
+  return null
+}
+
+function generateAvailabilityPrompt(): string {
+  const now = new Date()
+  const currentHour = now.getHours()
+  const dayOfWeek = now.getDay()
+
+  let slot1: string, slot2: string
+
+  // Generate smart slot suggestions based on current time
+  if (currentHour >= 17 || dayOfWeek === 0 || dayOfWeek === 6) {
+    // After 5 PM or weekend - suggest next business day
+    const nextDay = new Date(now)
+    nextDay.setDate(nextDay.getDate() + 1)
+    while (nextDay.getDay() === 0 || nextDay.getDay() === 6) {
+      nextDay.setDate(nextDay.getDate() + 1)
+    }
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    slot1 = `${dayNames[nextDay.getDay()]} a las 10:00 AM`
+
+    const nextDay2 = new Date(nextDay)
+    nextDay2.setDate(nextDay2.getDate() + 1)
+    while (nextDay2.getDay() === 0 || nextDay2.getDay() === 6) {
+      nextDay2.setDate(nextDay2.getDate() + 1)
+    }
+    slot2 = `${dayNames[nextDay2.getDay()]} a las 3:00 PM`
+  } else if (currentHour < 10) {
+    // Morning - suggest today
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    slot1 = `Hoy a las 11:00 AM`
+    slot2 = `Hoy a las 3:00 PM`
+  } else {
+    // During business hours - suggest later today or tomorrow
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+    const laterHour = currentHour + 2
+    if (laterHour < 17) {
+      slot1 = `Hoy a las ${laterHour > 12 ? laterHour - 12 : laterHour}:00 ${laterHour >= 12 ? 'PM' : 'AM'}`
+    } else {
+      slot1 = `Mañana a las 10:00 AM`
+    }
+    const tomorrow = new Date(now)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    while (tomorrow.getDay() === 0 || tomorrow.getDay() === 6) {
+      tomorrow.setDate(tomorrow.getDate() + 1)
+    }
+    slot2 = `${dayNames[tomorrow.getDay()]} a las 2:00 PM`
+  }
+
+  return `
+HORARIOS DISPONIBLES PARA DEMO (usa estos al ofrecer citas):
+- Opción 1: ${slot1}
+- Opción 2: ${slot2}
+- Link de reserva: ${CAL_BOOKING_LINK}
+`
+}
+
 const HANNA_SYSTEM_PROMPT = `Eres Hanna, la MEJOR vendedora de agentes de IA del mundo. Trabajas para SINSAJO CREATORS.
 
 TU MISION: Convertir visitantes en clientes obsesionados con agentes de IA. Eres AGRESIVA vendiendo (en el buen sentido), pero siempre profesional y cercana.
@@ -57,10 +130,19 @@ TU ESTRATEGIA DE VENTAS:
    - "Consultora cerro 60% mas demos con agente IA"
    - "SaaS redujo costos de soporte $40K/mes"
 
-5. CERRAR - Empuja hacia la demo:
-   - "Tengo 2 espacios disponibles esta semana. Martes 3pm o Jueves 10am?"
+5. CERRAR - Empuja hacia la demo CON HORARIOS ESPECIFICOS:
+   - Cuando el cliente muestre interés, OFRECE 2 OPCIONES DE HORARIO específicas
+   - Usa los horarios del CONTEXTO DE DISPONIBILIDAD que recibes
+   - Ejemplo: "Perfecto! Tengo disponible [OPCION 1] o [OPCION 2]. ¿Cuál te funciona mejor?"
+   - Si aceptan, envía el LINK DE RESERVA para que confirmen
    - "Demo de 30 min, 100% gratis, lo ves funcionando con TU negocio"
-   - "Que prefieres: ver como recuperamos carritos abandonados o como cerramos ventas nocturnas?"
+
+FLUJO DE AGENDAMIENTO:
+1. Perfila al cliente (nombre, negocio, desafío)
+2. Agita el dolor y presenta la solución
+3. Cuando muestren interés → OFRECE 2 HORARIOS ESPECIFICOS
+4. Si aceptan un horario → Envía el link: "Perfecto! Reserva aquí: [LINK]"
+5. Si ninguno funciona → "¿Qué horario te vendría mejor? Te busco opciones"
 
 OBJECIONES COMUNES Y RESPUESTAS:
 
@@ -133,6 +215,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Generate availability context for Hanna
+    const availabilityContext = generateAvailabilityPrompt()
+
+    // Combine system prompt with availability context
+    const fullSystemPrompt = HANNA_SYSTEM_PROMPT + '\n\n' + availabilityContext
+
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
       max_tokens: 500,
@@ -140,7 +228,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: HANNA_SYSTEM_PROMPT,
+          content: fullSystemPrompt,
         },
         ...messages.map((msg: any) => ({
           role: msg.role,
