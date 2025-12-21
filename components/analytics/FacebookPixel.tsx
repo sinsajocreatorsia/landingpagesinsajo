@@ -2,6 +2,7 @@
 
 import Script from 'next/script'
 
+// Facebook Pixel ID for tracking ads from Facebook/Instagram
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID
 
 export default function FacebookPixel() {
