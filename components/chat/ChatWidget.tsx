@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
 import { processMessage, formatMessage } from '@/lib/utils/messageFormatter'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
+import { fbEvents } from '@/components/analytics/FacebookPixel'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -49,6 +50,8 @@ export default function ChatWidget() {
   const [isLoading, setIsLoading] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [hasTrackedChatOpen, setHasTrackedChatOpen] = useState(false)
+  const [hasTrackedFirstMessage, setHasTrackedFirstMessage] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -58,6 +61,17 @@ export default function ChatWidget() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, isTyping])
+
+  // Track when user opens the chat for the first time
+  const handleOpenChat = () => {
+    if (!isOpen) {
+      if (!hasTrackedChatOpen) {
+        fbEvents.chatStarted()
+        setHasTrackedChatOpen(true)
+      }
+    }
+    setIsOpen(!isOpen)
+  }
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -103,6 +117,12 @@ export default function ChatWidget() {
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
+
+    // Track first message as a Lead
+    if (!hasTrackedFirstMessage) {
+      fbEvents.lead({ content_name: 'Chat First Message', content_category: 'Chat Lead' })
+      setHasTrackedFirstMessage(true)
+    }
 
     try {
       const response = await fetch('/api/chat', {
@@ -152,7 +172,7 @@ export default function ChatWidget() {
       >
         <motion.button
           data-chat-widget="true"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleOpenChat}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className="relative w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500 shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing flex items-center justify-center"

@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/lib/contexts/LanguageContext";
 import { ThemeProvider } from "@/lib/contexts/ThemeContext";
 import Header from "@/components/layout/Header";
+import FacebookPixel from "@/components/analytics/FacebookPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <FacebookPixel />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
