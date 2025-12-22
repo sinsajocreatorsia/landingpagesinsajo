@@ -2,7 +2,7 @@
 
 import Script from 'next/script'
 
-// Google Analytics Measurement ID
+// Google Analytics Measurement ID (G-G9B8YDFLCP)
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
 export default function GoogleAnalytics() {
