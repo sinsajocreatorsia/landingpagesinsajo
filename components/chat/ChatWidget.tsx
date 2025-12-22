@@ -6,6 +6,7 @@ import { X, Send, MessageCircle } from 'lucide-react'
 import { processMessage, formatMessage } from '@/lib/utils/messageFormatter'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 import { fbEvents } from '@/components/analytics/FacebookPixel'
+import { gaEvents } from '@/components/analytics/GoogleAnalytics'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -67,6 +68,7 @@ export default function ChatWidget() {
     if (!isOpen) {
       if (!hasTrackedChatOpen) {
         fbEvents.chatStarted()
+        gaEvents.chatStarted()
         setHasTrackedChatOpen(true)
       }
     }
@@ -121,6 +123,7 @@ export default function ChatWidget() {
     // Track first message as a Lead
     if (!hasTrackedFirstMessage) {
       fbEvents.lead({ content_name: 'Chat First Message', content_category: 'Chat Lead' })
+      gaEvents.chatLead()
       setHasTrackedFirstMessage(true)
     }
 

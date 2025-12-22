@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/lib/contexts/LanguageContext";
 import { ThemeProvider } from "@/lib/contexts/ThemeContext";
 import Header from "@/components/layout/Header";
 import FacebookPixel from "@/components/analytics/FacebookPixel";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <GoogleAnalytics />
         <FacebookPixel />
       </head>
       <body
