@@ -1,5 +1,33 @@
 const SINSAJO_PURPLE = '#8B5CF6'
 
+// Allowed domains for security - only these domains will be converted to clickable links
+const ALLOWED_DOMAINS = [
+  'cal.com',
+  'wa.me',
+  'whatsapp.com',
+  'screatorsai.com',
+  'sinsajocreators.com'
+]
+
+/**
+ * Validates if a URL is safe to render as a link
+ * Prevents malicious URLs like javascript:, data:, etc.
+ */
+function isValidUrl(urlString: string): boolean {
+  try {
+    const url = new URL(urlString)
+    // Only allow http and https protocols
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return false
+    }
+    // Check if domain is in allowed list
+    const hostname = url.hostname.toLowerCase()
+    return ALLOWED_DOMAINS.some(domain => hostname.includes(domain))
+  } catch {
+    return false
+  }
+}
+
 export function formatMessage(text: string): string {
   let formatted = text
 
@@ -9,20 +37,26 @@ export function formatMessage(text: string): string {
     `<b style="color: ${SINSAJO_PURPLE};">$1</b>`
   )
 
-  // Replace URLs with clickable links
+  // Replace URLs with clickable links (only for allowed domains)
   formatted = formatted.replace(
     /(https?:\/\/[^\s<]+)/g,
     (url) => {
+      // Validate URL is safe before converting to link
+      if (!isValidUrl(url)) {
+        // Return URL as plain text for unknown/suspicious domains
+        return url
+      }
+
       // Check if it's a cal.com link
       if (url.includes('cal.com')) {
-        return `<a href="${url}" target="_blank" style="color: ${SINSAJO_PURPLE}; text-decoration: underline;">📅 Agenda tu demo</a>`
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: ${SINSAJO_PURPLE}; text-decoration: underline;">📅 Agenda tu demo</a>`
       }
       // Check if it's a WhatsApp link
-      if (url.includes('wa.me')) {
-        return `<a href="${url}" target="_blank" style="color: #25D366; text-decoration: underline;">💬 WhatsApp</a>`
+      if (url.includes('wa.me') || url.includes('whatsapp.com')) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #25D366; text-decoration: underline;">💬 WhatsApp</a>`
       }
-      // Generic link
-      return `<a href="${url}" target="_blank" style="color: ${SINSAJO_PURPLE}; text-decoration: underline;">${url}</a>`
+      // Generic link (only for allowed domains)
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: ${SINSAJO_PURPLE}; text-decoration: underline;">${url}</a>`
     }
   )
 
