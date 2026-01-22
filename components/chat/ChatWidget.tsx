@@ -3,10 +3,23 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
+import DOMPurify from 'isomorphic-dompurify'
 import { processMessage, formatMessage } from '@/lib/utils/messageFormatter'
 import { useLanguage } from '@/lib/contexts/LanguageContext'
 import { fbEvents } from '@/components/analytics/FacebookPixel'
 import { gaEvents } from '@/components/analytics/GoogleAnalytics'
+
+// Configuración segura de DOMPurify - solo permite tags seguros
+const sanitizeHtml = (dirty: string): string => {
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'a', 'br', 'p', 'span'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ['target', 'rel'],
+    FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'input', 'img', 'svg'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
+  })
+}
 
 interface Message {
   role: 'user' | 'assistant'
@@ -262,7 +275,7 @@ export default function ChatWidget() {
                     className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-cyan-400/20 max-w-[85%]">
-                    <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: texts.initialGreeting.line1 }} />
+                    <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(texts.initialGreeting.line1) }} />
                     <p className="text-gray-300 text-sm mb-3">
                       {texts.initialGreeting.line2}
                     </p>
@@ -298,7 +311,7 @@ export default function ChatWidget() {
                     {msg.isHtml ? (
                       <div
                         className="text-sm whitespace-pre-wrap chat-message"
-                        dangerouslySetInnerHTML={{ __html: msg.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.content) }}
                       />
                     ) : (
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>

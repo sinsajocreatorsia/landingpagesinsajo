@@ -1,9 +1,24 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp, rateLimits } from '@/lib/utils/rateLimit'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// OpenRouter configuration - compatible with OpenAI SDK
+// Using GPT-4o-mini for best cost/quality balance for conversational sales
+const openrouter = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.screatorsai.com',
+    'X-Title': 'Sinsajo Creators - Hanna AI'
+  }
 })
+
+// Model selection - GPT-4o-mini offers excellent conversational quality at low cost
+// Alternative models available via OpenRouter:
+// - 'openai/gpt-4o' - Best quality, higher cost
+// - 'anthropic/claude-3.5-sonnet' - Excellent for nuanced conversation
+// - 'anthropic/claude-3-haiku' - Fast and affordable
+const AI_MODEL = 'openai/gpt-4o-mini'
 
 const CAL_USERNAME = process.env.CAL_USERNAME || 'sinsajo-creators-1mvqb7'
 const CAL_BOOKING_LINK = `https://cal.com/${CAL_USERNAME}/30min`
@@ -404,9 +419,26 @@ REMEMBER: Your goal is to CLOSE demos. Connect emotionally, identify the pain, a
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - 20 messages per minute per IP
+    const clientIp = getClientIp(request)
+    const rateLimit = checkRateLimit(clientIp, rateLimits.chat)
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a moment.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimit.resetAt.toString()
+          }
+        }
+      )
+    }
+
     const { messages, language = 'en' } = await request.json()
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }
@@ -422,8 +454,8 @@ export async function POST(request: NextRequest) {
     // Combine system prompt with availability context
     const fullSystemPrompt = basePrompt + '\n\n' + availabilityContext
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+    const response = await openrouter.chat.completions.create({
+      model: AI_MODEL,
       max_tokens: 500,
       temperature: 0.9,
       messages: [
