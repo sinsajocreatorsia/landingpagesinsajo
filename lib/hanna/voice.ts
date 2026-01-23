@@ -3,6 +3,10 @@
  * Provides text-to-speech and speech-to-text capabilities for Hanna
  */
 
+// Type declarations for Web Speech API (browser-only APIs)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionType = any
+
 // Voice configuration for Hanna
 const HANNA_VOICE_CONFIG = {
   lang: 'es-ES',
@@ -115,16 +119,16 @@ export function isSpeaking(): boolean {
  * Speech Recognition wrapper for voice input
  */
 export class VoiceRecognition {
-  private recognition: SpeechRecognition | null = null
+  private recognition: SpeechRecognitionType | null = null
   private isListening = false
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const SpeechRecognition =
-        window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: typeof SpeechRecognition }).webkitSpeechRecognition
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
-      if (SpeechRecognition) {
-        this.recognition = new SpeechRecognition()
+      if (SpeechRecognitionAPI) {
+        this.recognition = new SpeechRecognitionAPI()
         this.recognition.continuous = false
         this.recognition.interimResults = true
         this.recognition.lang = 'es-ES'
