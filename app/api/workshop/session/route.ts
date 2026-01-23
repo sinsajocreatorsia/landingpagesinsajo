@@ -26,12 +26,15 @@ export async function GET(request: Request) {
       )
     }
 
-    // Find registration in database
-    const { data: registration } = await supabaseAdmin
+    // Find registration in database (using type assertion to bypass strict typing)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: registrationData } = await (supabaseAdmin as any)
       .from('workshop_registrations')
       .select('id, full_name, email')
       .eq('payment_id', sessionId)
       .single()
+
+    const registration = registrationData as { id: string; full_name: string; email: string } | null
 
     return NextResponse.json({
       registrationId: registration?.id || null,
