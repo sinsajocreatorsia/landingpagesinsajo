@@ -34,16 +34,6 @@ export type {
   WorkshopSetting,
   AnalyticsEvent,
   ChatMessage,
+  Lead,
+  LeadInsert,
 } from './database.types'
-
-// Legacy Lead type for backward compatibility
-export interface Lead {
-  id?: string
-  name: string
-  email: string
-  company: string
-  phone: string
-  challenge: string
-  created_at?: string
-  updated_at?: string
-}
