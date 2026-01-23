@@ -1,14 +1,25 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-// Use OpenRouter for AI inference
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-})
+// Use OpenRouter for AI inference - lazy initialization
+let openaiClient: OpenAI | null = null
 
-// Use OpenRouter model - claude-3.5-sonnet via OpenRouter
-const MODEL = 'anthropic/claude-3.5-sonnet:beta'
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    const apiKey = process.env.OPENROUTER_API_KEY
+    if (!apiKey) {
+      throw new Error('OPENROUTER_API_KEY is not configured')
+    }
+    openaiClient = new OpenAI({
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey,
+    })
+  }
+  return openaiClient
+}
+
+// Use a fast, reliable model on OpenRouter
+const MODEL = 'openai/gpt-4o-mini'
 
 const HANNA_SYSTEM_PROMPT = `Eres Hanna, la asistente de IA de Sinsajo Creators, una empresa enfocada en ayudar a empresarias de habla hispana a dominar la inteligencia artificial para sus negocios.
 
@@ -95,7 +106,8 @@ export async function POST(request: Request) {
     })
 
     // Call OpenRouter API
-    const completion = await openai.chat.completions.create({
+    const client = getOpenAIClient()
+    const completion = await client.chat.completions.create({
       model: MODEL,
       messages,
       temperature: 0.7,
