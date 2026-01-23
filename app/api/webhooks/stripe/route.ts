@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -34,26 +31,76 @@ export async function POST(request: Request) {
     )
   }
 
-  // Manejar evento de pago completado
+  // Handle checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
-    // Guardar en Supabase si las credenciales están configuradas
-    if (supabaseUrl && supabaseServiceKey) {
-      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    try {
+      // Create registration in database
+      const { data: registration, error: regError } = await supabaseAdmin
+        .from('workshop_registrations')
+        .insert({
+          email: session.customer_email || session.metadata?.customer_email || '',
+          full_name: session.metadata?.customer_name || '',
+          phone: session.metadata?.customer_phone || null,
+          country: session.metadata?.customer_country || null,
+          payment_status: 'completed',
+          payment_method: 'stripe',
+          payment_id: session.id,
+          amount_paid: (session.amount_total || 0) / 100,
+          currency: session.currency?.toUpperCase() || 'USD',
+          registration_status: 'registered',
+          utm_source: session.metadata?.utm_source || null,
+          utm_medium: session.metadata?.utm_medium || null,
+          utm_campaign: session.metadata?.utm_campaign || null,
+        })
+        .select()
+        .single()
 
-      await supabase.from('workshop_registrations').insert({
-        email: session.customer_email,
-        name: session.metadata?.customer_name,
-        payment_method: 'stripe',
-        payment_id: session.id,
-        amount: (session.amount_total || 0) / 100,
-        status: 'completed',
-        workshop_date: '2026-03-07',
-      })
+      if (regError) {
+        console.error('Supabase registration error:', regError)
+      } else {
+        console.log('Registration created:', registration?.id)
+
+        // Log confirmation email (will be sent by email service)
+        await supabaseAdmin.from('email_logs').insert({
+          registration_id: registration?.id,
+          email_type: 'confirmation',
+          recipient_email: session.customer_email || '',
+          subject: 'Confirmación de registro - IA para Empresarias Exitosas',
+          status: 'pending',
+        })
+      }
+    } catch (dbError) {
+      console.error('Database error:', dbError)
     }
 
     console.log('Payment completed for:', session.customer_email)
+  }
+
+  // Handle checkout.session.expired event
+  if (event.type === 'checkout.session.expired') {
+    const session = event.data.object as Stripe.Checkout.Session
+    console.log('Checkout session expired for:', session.customer_email)
+  }
+
+  // Handle payment failed event
+  if (event.type === 'payment_intent.payment_failed') {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent
+    console.log('Payment failed:', paymentIntent.id, paymentIntent.last_payment_error?.message)
+  }
+
+  // Handle refund event
+  if (event.type === 'charge.refunded') {
+    const charge = event.data.object as Stripe.Charge
+
+    // Update registration status
+    await supabaseAdmin
+      .from('workshop_registrations')
+      .update({ payment_status: 'refunded' })
+      .eq('payment_id', charge.payment_intent as string)
+
+    console.log('Refund processed for charge:', charge.id)
   }
 
   return NextResponse.json({ received: true })

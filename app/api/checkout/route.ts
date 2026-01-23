@@ -5,9 +5,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: Request) {
   try {
-    const { email, name, price, workshopName } = await request.json()
+    const { email, name, phone, country, price, workshopName, utm_source, utm_medium, utm_campaign } = await request.json()
 
-    // Validación
+    // Validation
     if (!email || !name) {
       return NextResponse.json(
         { error: 'Email y nombre son requeridos' },
@@ -16,8 +16,9 @@ export async function POST(request: Request) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.screatorsai.com'
+    const workshopPrice = Math.round((parseFloat(price) || 100) * 100) // Convert to cents
 
-    // Crear sesión de checkout
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -25,11 +26,11 @@ export async function POST(request: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: workshopName || 'Latina Smart-Scaling Workshop',
-              description: 'Workshop exclusivo de estrategia AI para fundadoras latinas - 7 de Marzo 2026',
+              name: workshopName || 'IA para Empresarias Exitosas - Workshop',
+              description: 'Workshop exclusivo de estrategia AI para empresarias de habla hispana - 7 de Marzo 2026',
               images: [`${baseUrl}/images/workshop-og.png`],
             },
-            unit_amount: Math.round((parseFloat(price) || 100) * 100), // Convertir a centavos
+            unit_amount: workshopPrice,
           },
           quantity: 1,
         },
@@ -41,12 +42,20 @@ export async function POST(request: Request) {
       metadata: {
         customer_name: name,
         customer_email: email,
-        product: 'latina-smart-scaling-workshop',
+        customer_phone: phone || '',
+        customer_country: country || '',
+        product: 'ia-empresarias-exitosas-workshop',
         workshop_date: '2026-03-07',
+        utm_source: utm_source || '',
+        utm_medium: utm_medium || '',
+        utm_campaign: utm_campaign || '',
       },
-      // Opciones adicionales
+      // Additional options
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
+      phone_number_collection: {
+        enabled: true,
+      },
     })
 
     return NextResponse.json({

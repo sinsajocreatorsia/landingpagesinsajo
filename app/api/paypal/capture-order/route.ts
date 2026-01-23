@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 
 const PAYPAL_API = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
   : 'https://api-m.sandbox.paypal.com'
-
-// Supabase client with service role for server-side operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 async function getPayPalAccessToken() {
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
@@ -34,7 +30,7 @@ async function getPayPalAccessToken() {
 
 export async function POST(request: Request) {
   try {
-    const { orderID, email, name } = await request.json()
+    const { orderID, email, name, phone, country, utm_source, utm_medium, utm_campaign } = await request.json()
 
     if (!orderID) {
       return NextResponse.json(
@@ -58,20 +54,52 @@ export async function POST(request: Request) {
 
     const data = await response.json()
 
-    // Si el pago fue exitoso, guardar en Supabase
-    if (data.status === 'COMPLETED' && supabaseUrl && supabaseServiceKey) {
-      const supabase = createClient(supabaseUrl, supabaseServiceKey)
-      const captureAmount = data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
+    // If payment was successful, save to Supabase
+    if (data.status === 'COMPLETED') {
+      try {
+        const captureAmount = data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
+        const payerEmail = data.payer?.email_address || email
 
-      await supabase.from('workshop_registrations').insert({
-        email: email,
-        name: name,
-        payment_method: 'paypal',
-        payment_id: orderID,
-        amount: parseFloat(captureAmount) || 100,
-        status: 'completed',
-        workshop_date: '2026-03-07',
-      })
+        // Create registration in database
+        const { data: registration, error: regError } = await supabaseAdmin
+          .from('workshop_registrations')
+          .insert({
+            email: payerEmail,
+            full_name: name || `${data.payer?.name?.given_name || ''} ${data.payer?.name?.surname || ''}`.trim(),
+            phone: phone || null,
+            country: country || data.payer?.address?.country_code || null,
+            payment_status: 'completed',
+            payment_method: 'paypal',
+            payment_id: orderID,
+            amount_paid: parseFloat(captureAmount) || 100,
+            currency: 'USD',
+            registration_status: 'registered',
+            utm_source: utm_source || null,
+            utm_medium: utm_medium || null,
+            utm_campaign: utm_campaign || null,
+          })
+          .select()
+          .single()
+
+        if (regError) {
+          console.error('Supabase registration error:', regError)
+        } else {
+          console.log('Registration created:', registration?.id)
+
+          // Log confirmation email
+          await supabaseAdmin.from('email_logs').insert({
+            registration_id: registration?.id,
+            email_type: 'confirmation',
+            recipient_email: payerEmail,
+            subject: 'Confirmación de registro - IA para Empresarias Exitosas',
+            status: 'pending',
+          })
+        }
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+      }
+
+      console.log('PayPal payment completed for:', email)
     }
 
     return NextResponse.json(data)
