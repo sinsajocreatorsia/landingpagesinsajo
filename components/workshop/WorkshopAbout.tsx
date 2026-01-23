@@ -1,27 +1,50 @@
-import { Target, Lightbulb, XCircle } from 'lucide-react'
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { Target, Lightbulb, XCircle, Clock, TrendingUp, Zap } from 'lucide-react'
 
 export default function WorkshopAbout() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in')
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    const elements = sectionRef.current?.querySelectorAll('.animate-on-scroll')
+    elements?.forEach((el) => observer.observe(el))
+
+    return () => observer.disconnect()
+  }, [])
+
   const cards = [
     {
       icon: Target,
       title: '¿Para quién es?',
       color: '#2CB6D7',
       items: [
-        'Fundadoras latinas con negocios establecidos',
-        'Emprendedoras que ya generan ingresos',
-        'Líderes que quieren escalar, no empezar desde cero',
-        'Empresarias listas para implementar IA estratégicamente',
+        'Dueñas de negocio que ya generan ingresos',
+        'Empresarias de habla hispana listas para escalar',
+        'Líderes que quieren dejar de ser "la empleada más barata"',
+        'Mujeres de negocios que valoran su tiempo',
       ],
     },
     {
       icon: Lightbulb,
-      title: '¿Qué aprenderás?',
+      title: '¿Qué lograrás?',
       color: '#36B3AE',
       items: [
-        'Estrategias de automatización personalizadas para tu industria',
-        'Herramientas de IA que realmente funcionan para negocios latinos',
-        'Claridad de nivel ejecutivo para liderar en el mercado actual',
-        'Plan de implementación paso a paso',
+        'Recuperar 10+ horas semanales con automatización',
+        'Clonar tu inteligencia de negocio en un asistente IA',
+        'Crear contenido visual de ultra-lujo en minutos',
+        'Pasar de operadora a verdadera dueña de tu negocio',
       ],
     },
     {
@@ -30,28 +53,59 @@ export default function WorkshopAbout() {
       color: '#C7517E',
       items: [
         'No es para principiantes sin negocio',
-        'No es teoría genérica sin aplicación práctica',
-        'No es otro webinar aburrido de 2 horas',
-        'No es contenido que encontrarás gratis en YouTube',
+        'No es teoría genérica sin aplicación',
+        'No es un webinar de 2 horas que olvidarás',
+        'No es contenido que encuentras gratis en YouTube',
       ],
     },
   ]
 
+  const stats = [
+    { icon: Clock, value: '10+', label: 'Horas semanales recuperadas', color: '#2CB6D7' },
+    { icon: TrendingUp, value: '3x', label: 'Productividad aumentada', color: '#36B3AE' },
+    { icon: Zap, value: '3', label: 'Horas de transformación', color: '#C7517E' },
+  ]
+
   return (
-    <section className="py-20 bg-[#FCFEFB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section ref={sectionRef} className="py-20 bg-[#FCFEFB] relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#2CB6D7]/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7517E]/5 rounded-full blur-3xl" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <span className="inline-block bg-[#2CB6D7]/10 text-[#2CB6D7] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             SOBRE EL WORKSHOP
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-[#022133] mb-4">
-            Un Intensivo Diseñado para{' '}
-            <span className="text-[#C7517E]">Líderes Probadas</span>
+            Un Intensivo de 3 Horas que{' '}
+            <span className="text-[#C7517E]">Cambiará Tu Negocio</span>
           </h2>
           <p className="text-xl text-[#022133]/70 max-w-2xl mx-auto">
-            3 horas de estrategia, implementación y claridad para transformar tu negocio con IA.
+            Basado en la metodología probada de Alex Hormozi: maximizar resultados mientras reduces tiempo y esfuerzo.
           </p>
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3"
+                style={{ backgroundColor: `${stat.color}20` }}
+              >
+                <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
+              </div>
+              <div className="text-3xl md:text-4xl font-bold" style={{ color: stat.color }}>
+                {stat.value}
+              </div>
+              <div className="text-sm text-[#022133]/60 mt-1">{stat.label}</div>
+            </div>
+          ))}
         </div>
 
         {/* Cards Grid */}
@@ -59,10 +113,11 @@ export default function WorkshopAbout() {
           {cards.map((card, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl group"
+              style={{ transitionDelay: `${(index + 2) * 100}ms` }}
             >
               <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
+                className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                 style={{ backgroundColor: `${card.color}20` }}
               >
                 <card.icon className="w-7 h-7" style={{ color: card.color }} />

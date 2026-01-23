@@ -1,30 +1,85 @@
 import { Metadata } from 'next'
+import WorkshopHeader from '@/components/workshop/WorkshopHeader'
 import WorkshopHero from '@/components/workshop/WorkshopHero'
+import WorkshopProblem from '@/components/workshop/WorkshopProblem'
 import WorkshopAbout from '@/components/workshop/WorkshopAbout'
+import WorkshopMethodology from '@/components/workshop/WorkshopMethodology'
 import WorkshopRoadmap from '@/components/workshop/WorkshopRoadmap'
+import WorkshopTestimonials from '@/components/workshop/WorkshopTestimonials'
 import WorkshopSpeaker from '@/components/workshop/WorkshopSpeaker'
 import WorkshopPricing from '@/components/workshop/WorkshopPricing'
 import WorkshopFAQ from '@/components/workshop/WorkshopFAQ'
+import WorkshopChatWidget from '@/components/workshop/WorkshopChatWidget'
 
 export const metadata: Metadata = {
-  title: 'Latina Smart-Scaling Workshop | Sinsajo Creators',
-  description: 'Workshop exclusivo de estrategia AI para fundadoras latinas. Aprende a escalar tu negocio con inteligencia artificial. 7 de Marzo 2026.',
+  title: 'IA para Empresarias Exitosas - Workshop | Sinsajo Creators',
+  description: 'Workshop exclusivo de estrategia IA para empresarias de habla hispana. De Dueña Agotada a Estratega Imparable. Recupera 10+ horas semanales. 7 de Marzo 2026.',
+  keywords: ['workshop IA', 'inteligencia artificial negocios', 'automatización empresas', 'empresarias exitosas', 'Sinsajo Creators'],
   openGraph: {
-    title: 'Latina Smart-Scaling: AI for Inspiring Businesses',
-    description: 'Workshop exclusivo para fundadoras latinas establecidas. Sábado 7 de Marzo 2026.',
+    title: 'IA para Empresarias Exitosas - De Dueña Agotada a Estratega Imparable',
+    description: 'Workshop exclusivo para empresarias de habla hispana. Aprende a escalar tu negocio con agentes de IA. Sábado 7 de Marzo 2026.',
+    images: ['/images/workshop-og.png'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IA para Empresarias Exitosas - Workshop',
+    description: 'Recupera 10+ horas semanales con automatización IA. Solo 12 lugares.',
     images: ['/images/workshop-og.png'],
   },
 }
 
 export default function WorkshopPage() {
   return (
-    <main className="min-h-screen">
-      <WorkshopHero />
-      <WorkshopAbout />
-      <WorkshopRoadmap />
-      <WorkshopSpeaker />
-      <WorkshopPricing />
-      <WorkshopFAQ />
-    </main>
+    <div className="workshop-page">
+      {/* Workshop-specific Header */}
+      <WorkshopHeader />
+
+      <main className="min-h-screen">
+        {/* Hero - Main value proposition */}
+        <WorkshopHero />
+
+        {/* Problem - Pain points (Plan Maestro) */}
+        <WorkshopProblem />
+
+        {/* About - What you'll learn */}
+        <WorkshopAbout />
+
+        {/* Methodology - Metodología SINSAJO IA-3 */}
+        <WorkshopMethodology />
+
+        {/* Roadmap - Workshop agenda */}
+        <WorkshopRoadmap />
+
+        {/* Testimonials - Social proof */}
+        <WorkshopTestimonials />
+
+        {/* Speaker - Giovanna */}
+        <WorkshopSpeaker />
+
+        {/* Pricing - CTA */}
+        <WorkshopPricing />
+
+        {/* FAQ */}
+        <WorkshopFAQ />
+
+        {/* Footer */}
+        <footer className="bg-[#022133] py-8 border-t border-[#2CB6D7]/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-[#FCFEFB]/60 text-sm">
+              © 2026 Sinsajo Creators. Todos los derechos reservados.
+            </p>
+            <p className="text-[#2CB6D7] text-sm mt-2">
+              <a href="https://www.screatorsai.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                www.screatorsai.com
+              </a>
+            </p>
+          </div>
+        </footer>
+      </main>
+
+      {/* Workshop-specific Chat Widget with auto-greeting */}
+      <WorkshopChatWidget />
+    </div>
   )
 }
