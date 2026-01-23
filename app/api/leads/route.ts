@@ -3,6 +3,17 @@ import { z } from 'zod'
 import { supabase } from '@/lib/supabase'
 import { checkRateLimit, getClientIp, rateLimits } from '@/lib/utils/rateLimit'
 
+// Type definition for lead row
+interface LeadRow {
+  id: string
+  name: string
+  email: string
+  company: string
+  phone: string
+  challenge: string
+  created_at: string
+}
+
 // Allowed origins for CORS validation
 const ALLOWED_ORIGINS = [
   'https://www.screatorsai.com',
@@ -99,7 +110,7 @@ Fecha: ${new Date().toLocaleString()}
     }
 
     // Save lead to Supabase
-    const { data, error } = await supabase
+    const { data: insertedData, error } = await supabase
       .from('leads')
       .insert([
         {
@@ -112,6 +123,9 @@ Fecha: ${new Date().toLocaleString()}
         }
       ])
       .select()
+
+    // Type assertion for Supabase query result
+    const data = insertedData as LeadRow[] | null
 
     if (error) {
       console.error('Supabase error:', error)

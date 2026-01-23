@@ -1,6 +1,63 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
+// Type definitions for Supabase query results
+interface WorkshopProfile {
+  id: string
+  business_name: string | null
+  business_type: string | null
+  industry: string | null
+  years_in_business: string | null
+  monthly_revenue: string | null
+  team_size: string | null
+  challenges: string[] | null
+  primary_goal: string | null
+  expected_outcome: string | null
+  current_tools: string[] | null
+  ai_experience: string | null
+  communication_preference: string | null
+  profile_completed: boolean | null
+  profile_completion_percentage: number | null
+  completed_at: string | null
+}
+
+interface HannaAnalysis {
+  id: string
+  analysis_type: string
+  summary: string | null
+  readiness_score: number | null
+  key_insights: string[] | null
+  challenges_prioritized: string[] | null
+  recommended_focus: string | null
+  potential_quick_wins: string[] | null
+  customized_tips: string[] | null
+  engagement_level_text: string | null
+  follow_up_suggestions: string[] | null
+  follow_up_priority: string | null
+  analyzed_at: string | null
+}
+
+interface ParticipantRow {
+  id: string
+  email: string
+  full_name: string
+  phone: string | null
+  country: string | null
+  payment_status: string
+  payment_method: string | null
+  amount_paid: number | null
+  currency: string | null
+  registration_status: string
+  utm_source: string | null
+  utm_medium: string | null
+  utm_campaign: string | null
+  created_at: string
+  confirmed_at: string | null
+  attended_at: string | null
+  workshop_profiles: WorkshopProfile[] | null
+  hanna_analysis: HannaAnalysis[] | null
+}
+
 // Admin API key check
 function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization')
@@ -113,8 +170,11 @@ export async function GET(request: Request) {
       )
     }
 
+    // Type assertion for Supabase query result
+    const participantData = data as ParticipantRow[] | null
+
     // Transform data for easier consumption
-    const participants = (data || []).map((participant) => {
+    const participants = (participantData || []).map((participant) => {
       const profile = participant.workshop_profiles?.[0] || null
       const analysis = participant.hanna_analysis?.find(
         (a: { analysis_type: string }) => a.analysis_type === 'profile'
