@@ -218,6 +218,16 @@ export interface AnalyticsEvent {
   created_at: string
 }
 
+export interface Lead {
+  id: string
+  name: string
+  email: string
+  company: string
+  phone: string
+  challenge: string
+  created_at: string
+}
+
 // ============================================
 // INSERT TYPES (for creating new records)
 // ============================================
@@ -254,6 +264,10 @@ export type EmailLogInsert = Omit<EmailLog, 'id' | 'created_at'> & {
 export type AnalyticsEventInsert = Omit<AnalyticsEvent, 'id' | 'created_at'> & {
   id?: string
   created_at?: string
+}
+
+export type LeadInsert = Omit<Lead, 'id'> & {
+  id?: string
 }
 
 // ============================================
@@ -302,6 +316,11 @@ export interface Database {
         Row: AnalyticsEvent
         Insert: AnalyticsEventInsert
         Update: Partial<AnalyticsEventInsert>
+      }
+      leads: {
+        Row: Lead
+        Insert: LeadInsert
+        Update: Partial<LeadInsert>
       }
     }
     Views: {
