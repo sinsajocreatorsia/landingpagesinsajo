@@ -109,19 +109,20 @@ Fecha: ${new Date().toLocaleString()}
       }
     }
 
-    // Save lead to Supabase
-    const { data: insertedData, error } = await supabase
+    // Save lead to Supabase (using type assertion to bypass strict typing)
+    const leadData = {
+      name: validatedData.name,
+      email: validatedData.email,
+      company: validatedData.company,
+      phone: validatedData.phone,
+      challenge: validatedData.challenge,
+      created_at: new Date().toISOString(),
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: insertedData, error } = await (supabase as any)
       .from('leads')
-      .insert([
-        {
-          name: validatedData.name,
-          email: validatedData.email,
-          company: validatedData.company,
-          phone: validatedData.phone,
-          challenge: validatedData.challenge,
-          created_at: new Date().toISOString(),
-        }
-      ])
+      .insert([leadData])
       .select()
 
     // Type assertion for Supabase query result
