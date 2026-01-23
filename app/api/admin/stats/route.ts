@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
+interface RegistrationRow {
+  id: string
+  payment_status: string
+  payment_method: string | null
+  amount_paid: number | null
+  registration_status: string
+  created_at: string
+}
+
+interface ProfileRow {
+  id: string
+  profile_completed: boolean
+  profile_completion_percentage: number
+}
+
+interface AnalysisRow {
+  id: string
+  readiness_score: number | null
+  engagement_level_text: string | null
+  follow_up_priority: string | null
+  analysis_type: string
+}
+
+interface EmailRow {
+  id: string
+  email_type: string
+  status: string
+}
+
 // Admin API key check
 function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization')
@@ -27,37 +56,45 @@ export async function GET(request: Request) {
 
   try {
     // Get registration stats
-    const { data: registrations, error: regError } = await supabaseAdmin
+    const { data: registrationsData, error: regError } = await supabaseAdmin
       .from('workshop_registrations')
       .select('id, payment_status, payment_method, amount_paid, registration_status, created_at')
+
+    const registrations = registrationsData as RegistrationRow[] | null
 
     if (regError) {
       throw new Error(`Registration query error: ${regError.message}`)
     }
 
     // Get profile completion stats
-    const { data: profiles, error: profileError } = await supabaseAdmin
+    const { data: profilesData, error: profileError } = await supabaseAdmin
       .from('workshop_profiles')
       .select('id, profile_completed, profile_completion_percentage')
+
+    const profiles = profilesData as ProfileRow[] | null
 
     if (profileError) {
       throw new Error(`Profile query error: ${profileError.message}`)
     }
 
     // Get analysis stats
-    const { data: analyses, error: analysisError } = await supabaseAdmin
+    const { data: analysesData, error: analysisError } = await supabaseAdmin
       .from('hanna_analysis')
       .select('id, readiness_score, engagement_level_text, follow_up_priority, analysis_type')
       .eq('analysis_type', 'profile')
+
+    const analyses = analysesData as AnalysisRow[] | null
 
     if (analysisError) {
       throw new Error(`Analysis query error: ${analysisError.message}`)
     }
 
     // Get email stats
-    const { data: emails, error: emailError } = await supabaseAdmin
+    const { data: emailsData, error: emailError } = await supabaseAdmin
       .from('email_logs')
       .select('id, email_type, status')
+
+    const emails = emailsData as EmailRow[] | null
 
     if (emailError) {
       throw new Error(`Email query error: ${emailError.message}`)

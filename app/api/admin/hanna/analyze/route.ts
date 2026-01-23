@@ -2,6 +2,30 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { analyzeProfile, saveAnalysis, getAnalysis } from '@/lib/hanna/analysis'
 
+// Type definitions for Supabase query results
+interface WorkshopProfileData {
+  business_name: string | null
+  business_type: string | null
+  industry: string | null
+  years_in_business: string | null
+  monthly_revenue: string | null
+  team_size: string | null
+  challenges: string[] | null
+  primary_goal: string | null
+  expected_outcome: string | null
+  current_tools: string[] | null
+  ai_experience: string | null
+  communication_preference: string | null
+  profile_completed: boolean | null
+}
+
+interface RegistrationWithProfile {
+  id: string
+  full_name: string
+  email: string
+  workshop_profiles: WorkshopProfileData[] | null
+}
+
 // Admin API key check
 function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization')
@@ -49,7 +73,7 @@ export async function POST(request: Request) {
     }
 
     // Get registration and profile data
-    const { data: registration, error: regError } = await supabaseAdmin
+    const { data: registrationData, error: regError } = await supabaseAdmin
       .from('workshop_registrations')
       .select(`
         id,
@@ -73,6 +97,9 @@ export async function POST(request: Request) {
       `)
       .eq('id', registrationId)
       .single()
+
+    // Type assertion for Supabase query result
+    const registration = registrationData as RegistrationWithProfile | null
 
     if (regError || !registration) {
       return NextResponse.json(
