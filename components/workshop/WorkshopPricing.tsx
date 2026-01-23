@@ -38,7 +38,7 @@ export default function WorkshopPricing() {
     <section
       ref={sectionRef}
       id="pricing"
-      className="py-20 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
+      className="py-12 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute top-20 left-20 w-72 h-72 bg-[#C7517E] rounded-full blur-[150px] opacity-20 animate-pulse" />

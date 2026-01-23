@@ -50,7 +50,7 @@ export default function WorkshopProblem() {
   return (
     <section
       ref={sectionRef}
-      className="py-20 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
+      className="py-12 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-5" />
@@ -60,7 +60,7 @@ export default function WorkshopProblem() {
         {/* Section Header */}
         <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <span className="inline-block bg-[#C7517E]/20 text-[#C7517E] font-semibold px-4 py-2 rounded-full text-sm mb-4">
-            EL INFIERNO DE LA DUEÑA DE NEGOCIO
+            EL DESAFÍO DE LA EMPRESARIA MODERNA
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-[#FCFEFB] mb-4">
             ¿Te Suena Familiar?

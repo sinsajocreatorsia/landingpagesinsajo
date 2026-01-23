@@ -1,4 +1,5 @@
 import { FileWarning, Settings, Brain } from 'lucide-react'
+import SectionCTA from './SectionCTA'
 
 export default function WorkshopRoadmap() {
   const phases = [
@@ -32,7 +33,7 @@ export default function WorkshopRoadmap() {
   ]
 
   return (
-    <section className="py-20 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden">
+    <section className="py-12 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#2CB6D7] rounded-full blur-[200px] opacity-10" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7517E] rounded-full blur-[150px] opacity-10" />
@@ -97,6 +98,11 @@ export default function WorkshopRoadmap() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Section CTA */}
+        <div className="mt-12">
+          <SectionCTA text="Comienza Tu Transformación" />
         </div>
       </div>
     </section>

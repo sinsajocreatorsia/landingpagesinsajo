@@ -146,27 +146,27 @@ export default function WorkshopHero() {
           </div>
 
           {/* Right Content - Hanna Image with Parallax */}
-          <div className="relative flex justify-center lg:justify-end" data-parallax="-0.1">
+          <div className="relative flex justify-center lg:justify-end z-20" data-parallax="-0.1">
             <div className="relative animate-fadeInRight">
               {/* Glow effect behind image */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#2CB6D7] to-[#C7517E] rounded-full blur-3xl opacity-30 scale-90 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2CB6D7] to-[#C7517E] rounded-full blur-3xl opacity-30 scale-90 animate-pulse -z-10" />
               <Image
                 src="/images/hanna-ai.png"
                 alt="Hanna - Tu Asistente AI"
                 width={500}
                 height={600}
-                className="relative z-10 object-contain drop-shadow-2xl"
+                className="relative z-30 object-contain drop-shadow-2xl"
                 priority
               />
               {/* Floating badge */}
-              <div className="absolute bottom-10 left-0 bg-[#022133]/90 backdrop-blur-sm border border-[#2CB6D7]/30 rounded-xl p-4 shadow-xl animate-bounce-slow">
+              <div className="absolute bottom-10 left-0 z-40 bg-[#022133]/90 backdrop-blur-sm border border-[#2CB6D7]/30 rounded-xl p-4 shadow-xl animate-bounce-slow">
                 <p className="text-[#2CB6D7] font-semibold text-sm">ASISTENTE IA SINSAJO</p>
                 <p className="text-[#FCFEFB] font-bold text-lg">HANNA</p>
                 <p className="text-[#FCFEFB]/70 text-sm">Tu guía en este workshop</p>
               </div>
 
               {/* Stats floating */}
-              <div className="absolute top-10 right-0 bg-[#022133]/90 backdrop-blur-sm border border-[#36B3AE]/30 rounded-xl p-3 shadow-xl animate-float">
+              <div className="absolute top-10 right-0 z-40 bg-[#022133]/90 backdrop-blur-sm border border-[#36B3AE]/30 rounded-xl p-3 shadow-xl animate-float">
                 <p className="text-[#36B3AE] font-bold text-2xl">+73</p>
                 <p className="text-[#FCFEFB]/70 text-xs">Empresas transformadas</p>
               </div>
