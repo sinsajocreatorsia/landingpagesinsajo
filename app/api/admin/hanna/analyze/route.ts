@@ -116,23 +116,23 @@ export async function POST(request: Request) {
       )
     }
 
-    // Run Hanna's analysis
+    // Run Hanna's analysis (convert null to undefined for ProfileData interface)
     const analysis = await analyzeProfile({
       registrationId: registration.id,
       fullName: registration.full_name,
       email: registration.email,
-      businessName: profile.business_name,
-      businessType: profile.business_type,
-      industry: profile.industry,
-      yearsInBusiness: profile.years_in_business,
-      monthlyRevenue: profile.monthly_revenue,
-      teamSize: profile.team_size,
+      businessName: profile.business_name ?? undefined,
+      businessType: profile.business_type ?? undefined,
+      industry: profile.industry ?? undefined,
+      yearsInBusiness: profile.years_in_business ? parseInt(profile.years_in_business) : undefined,
+      monthlyRevenue: profile.monthly_revenue ?? undefined,
+      teamSize: profile.team_size ?? undefined,
       challenges: profile.challenges || [],
-      primaryGoal: profile.primary_goal,
-      expectedOutcome: profile.expected_outcome,
+      primaryGoal: profile.primary_goal ?? undefined,
+      expectedOutcome: profile.expected_outcome ?? undefined,
       currentTools: profile.current_tools || [],
-      aiExperience: profile.ai_experience,
-      communicationPreference: profile.communication_preference,
+      aiExperience: profile.ai_experience ?? undefined,
+      communicationPreference: profile.communication_preference ?? undefined,
     })
 
     // Save analysis to database
