@@ -9,6 +9,7 @@ import WorkshopTestimonials from '@/components/workshop/WorkshopTestimonials'
 import WorkshopSpeaker from '@/components/workshop/WorkshopSpeaker'
 import WorkshopPricing from '@/components/workshop/WorkshopPricing'
 import WorkshopFAQ from '@/components/workshop/WorkshopFAQ'
+import WorkshopFooter from '@/components/workshop/WorkshopFooter'
 import WorkshopChatWidget from '@/components/workshop/WorkshopChatWidget'
 
 export const metadata: Metadata = {
@@ -64,18 +65,7 @@ export default function WorkshopPage() {
         <WorkshopFAQ />
 
         {/* Footer */}
-        <footer className="bg-[#022133] py-8 border-t border-[#2CB6D7]/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-[#FCFEFB]/60 text-sm">
-              © 2026 Sinsajo Creators. Todos los derechos reservados.
-            </p>
-            <p className="text-[#2CB6D7] text-sm mt-2">
-              <a href="https://www.screatorsai.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                www.screatorsai.com
-              </a>
-            </p>
-          </div>
-        </footer>
+        <WorkshopFooter />
       </main>
 
       {/* Workshop-specific Chat Widget with auto-greeting */}
