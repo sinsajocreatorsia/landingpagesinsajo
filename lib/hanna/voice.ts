@@ -164,7 +164,8 @@ export class VoiceRecognition {
       callbacks.onStart?.()
     }
 
-    this.recognition.onresult = (event) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.recognition.onresult = (event: any) => {
       let finalTranscript = ''
       let interimTranscript = ''
 
@@ -189,7 +190,8 @@ export class VoiceRecognition {
       callbacks.onEnd?.()
     }
 
-    this.recognition.onerror = (event) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.recognition.onerror = (event: any) => {
       this.isListening = false
       callbacks.onError?.(event.error)
     }
