@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Globe, Menu, X } from 'lucide-react'
 import Image from 'next/image'
@@ -8,11 +9,17 @@ import { useLanguage } from '@/lib/contexts/LanguageContext'
 import { useTheme } from '@/lib/contexts/ThemeContext'
 
 export default function Header() {
+  const pathname = usePathname()
   const { language, setLanguage, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
   const [showVideo, setShowVideo] = useState(true)
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Hide this header on workshop pages (they have their own header)
+  if (pathname?.startsWith('/academy/workshop')) {
+    return null
+  }
 
   const navLinks = [
     { href: '#agents', label: language === 'en' ? 'Agents' : 'Agentes' },
