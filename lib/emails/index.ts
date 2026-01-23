@@ -188,7 +188,7 @@ async function logEmail({
   status: 'pending' | 'sent' | 'delivered' | 'opened' | 'clicked' | 'bounced' | 'failed'
   providerMessageId?: string
   errorMessage?: string
-) {
+}) {
   try {
     // Using type assertion to bypass strict Supabase typing
     const emailLogData = {
