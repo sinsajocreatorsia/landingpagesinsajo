@@ -34,27 +34,29 @@ export async function POST(request: Request) {
     const completedFields = fields.filter(Boolean).length
     const completionPercentage = Math.round((completedFields / fields.length) * 100)
 
-    // Update profile in database
-    const { data, error } = await supabaseAdmin
+    // Update profile in database (using type assertion to bypass strict typing)
+    const profileData = {
+      business_name: businessName,
+      business_type: businessType || null,
+      industry: industry,
+      years_in_business: yearsInBusiness ? parseInt(yearsInBusiness) : null,
+      monthly_revenue: monthlyRevenue || null,
+      team_size: teamSize || null,
+      challenges: challenges || [],
+      primary_goal: primaryGoal || null,
+      expected_outcome: expectedOutcome || null,
+      current_tools: currentTools || [],
+      ai_experience: aiExperience || null,
+      communication_preference: communicationPreference || null,
+      best_contact_time: bestContactTime || null,
+      profile_completed: completionPercentage >= 80,
+      profile_completion_percentage: completionPercentage,
+      completed_at: new Date().toISOString(),
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin as any)
       .from('workshop_profiles')
-      .update({
-        business_name: businessName,
-        business_type: businessType || null,
-        industry: industry,
-        years_in_business: yearsInBusiness ? parseInt(yearsInBusiness) : null,
-        monthly_revenue: monthlyRevenue || null,
-        team_size: teamSize || null,
-        challenges: challenges || [],
-        primary_goal: primaryGoal || null,
-        expected_outcome: expectedOutcome || null,
-        current_tools: currentTools || [],
-        ai_experience: aiExperience || null,
-        communication_preference: communicationPreference || null,
-        best_contact_time: bestContactTime || null,
-        profile_completed: completionPercentage >= 80,
-        profile_completion_percentage: completionPercentage,
-        completed_at: new Date().toISOString(),
-      })
+      .update(profileData)
       .eq('registration_id', registrationId)
       .select()
       .single()
@@ -64,27 +66,14 @@ export async function POST(request: Request) {
 
       // If no profile exists, try to create one
       if (error.code === 'PGRST116') {
-        const { data: newProfile, error: createError } = await supabaseAdmin
+        const newProfileData = {
+          registration_id: registrationId,
+          ...profileData,
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: newProfile, error: createError } = await (supabaseAdmin as any)
           .from('workshop_profiles')
-          .insert({
-            registration_id: registrationId,
-            business_name: businessName,
-            business_type: businessType || null,
-            industry: industry,
-            years_in_business: yearsInBusiness ? parseInt(yearsInBusiness) : null,
-            monthly_revenue: monthlyRevenue || null,
-            team_size: teamSize || null,
-            challenges: challenges || [],
-            primary_goal: primaryGoal || null,
-            expected_outcome: expectedOutcome || null,
-            current_tools: currentTools || [],
-            ai_experience: aiExperience || null,
-            communication_preference: communicationPreference || null,
-            best_contact_time: bestContactTime || null,
-            profile_completed: completionPercentage >= 80,
-            profile_completion_percentage: completionPercentage,
-            completed_at: new Date().toISOString(),
-          })
+          .insert(newProfileData)
           .select()
           .single()
 
