@@ -7,7 +7,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 })
 
-const MODEL = 'anthropic/claude-3.5-sonnet'
+// Use OpenRouter model - claude-3.5-sonnet via OpenRouter
+const MODEL = 'anthropic/claude-3.5-sonnet:beta'
 
 const HANNA_SYSTEM_PROMPT = `Eres Hanna, la asistente de IA de Sinsajo Creators, una empresa enfocada en ayudar a empresarias de habla hispana a dominar la inteligencia artificial para sus negocios.
 

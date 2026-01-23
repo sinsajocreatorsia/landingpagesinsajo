@@ -21,7 +21,7 @@ export default function SectionCTA({
   const isPrimary = variant === 'primary'
 
   return (
-    <div className="text-center py-8">
+    <div className="text-center pt-6">
       <motion.a
         href={href}
         whileHover={{ scale: 1.05 }}
