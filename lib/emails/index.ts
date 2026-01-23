@@ -7,7 +7,19 @@ import WorkshopRecording from './templates/WorkshopRecording'
 import WorkshopFollowUp from './templates/WorkshopFollowUp'
 import { supabaseAdmin } from '@/lib/supabase'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization to avoid build-time errors when API key is not set
+let resend: Resend | null = null
+
+function getResendClient(): Resend {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    resend = new Resend(apiKey)
+  }
+  return resend
+}
 
 const FROM_EMAIL = process.env.FROM_EMAIL || 'Sinsajo Creators <noreply@sinsajocreators.com>'
 
@@ -111,7 +123,7 @@ export async function sendEmail({ to, type, data, registrationId }: SendEmailPar
     const html = await render(config.templateFn(data))
 
     // Send via Resend
-    const { data: result, error } = await resend.emails.send({
+    const { data: result, error } = await getResendClient().emails.send({
       from: FROM_EMAIL,
       to: [to],
       subject: config.subject,
