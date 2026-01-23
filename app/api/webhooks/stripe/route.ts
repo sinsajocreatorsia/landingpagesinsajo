@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendConfirmationEmail } from '@/lib/emails'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -62,14 +63,20 @@ export async function POST(request: Request) {
       } else {
         console.log('Registration created:', registration?.id)
 
-        // Log confirmation email (will be sent by email service)
-        await supabaseAdmin.from('email_logs').insert({
-          registration_id: registration?.id,
-          email_type: 'confirmation',
-          recipient_email: session.customer_email || '',
-          subject: 'Confirmación de registro - IA para Empresarias Exitosas',
-          status: 'pending',
+        // Send confirmation email via Resend
+        const emailResult = await sendConfirmationEmail({
+          to: session.customer_email || session.metadata?.customer_email || '',
+          customerName: session.metadata?.customer_name || 'Participante',
+          amount: String((session.amount_total || 0) / 100),
+          paymentMethod: 'Tarjeta de crédito/débito',
+          registrationId: registration?.id,
         })
+
+        if (emailResult.success) {
+          console.log('Confirmation email sent:', emailResult.messageId)
+        } else {
+          console.error('Failed to send confirmation email:', emailResult.error)
+        }
       }
     } catch (dbError) {
       console.error('Database error:', dbError)

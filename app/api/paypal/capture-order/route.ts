@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendConfirmationEmail } from '@/lib/emails'
 
 const PAYPAL_API = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
@@ -86,14 +87,21 @@ export async function POST(request: Request) {
         } else {
           console.log('Registration created:', registration?.id)
 
-          // Log confirmation email
-          await supabaseAdmin.from('email_logs').insert({
-            registration_id: registration?.id,
-            email_type: 'confirmation',
-            recipient_email: payerEmail,
-            subject: 'Confirmación de registro - IA para Empresarias Exitosas',
-            status: 'pending',
+          // Send confirmation email via Resend
+          const customerName = name || `${data.payer?.name?.given_name || ''} ${data.payer?.name?.surname || ''}`.trim() || 'Participante'
+          const emailResult = await sendConfirmationEmail({
+            to: payerEmail,
+            customerName,
+            amount: String(parseFloat(captureAmount) || 100),
+            paymentMethod: 'PayPal',
+            registrationId: registration?.id,
           })
+
+          if (emailResult.success) {
+            console.log('Confirmation email sent:', emailResult.messageId)
+          } else {
+            console.error('Failed to send confirmation email:', emailResult.error)
+          }
         }
       } catch (dbError) {
         console.error('Database error:', dbError)
