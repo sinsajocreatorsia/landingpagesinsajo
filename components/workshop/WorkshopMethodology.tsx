@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Brain, Palette, Rocket } from 'lucide-react'
+import SectionCTA from './SectionCTA'
 
 export default function WorkshopMethodology() {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -52,7 +53,7 @@ export default function WorkshopMethodology() {
   ]
 
   return (
-    <section ref={sectionRef} className="py-20 bg-[#FCFEFB] relative overflow-hidden">
+    <section ref={sectionRef} className="py-12 bg-[#FCFEFB] relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-[#2CB6D7]/5 rounded-full blur-3xl transform -translate-y-1/2" />
       <div className="absolute top-1/2 right-0 w-96 h-96 bg-[#C7517E]/5 rounded-full blur-3xl transform -translate-y-1/2" />
@@ -133,6 +134,11 @@ export default function WorkshopMethodology() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Section CTA */}
+        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
+          <SectionCTA text="Aprende la Metodología IA-3" variant="secondary" />
         </div>
       </div>
     </section>

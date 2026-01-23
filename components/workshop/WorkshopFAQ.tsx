@@ -51,7 +51,7 @@ export default function WorkshopFAQ() {
   }
 
   return (
-    <section className="py-20 bg-[#FCFEFB]">
+    <section className="py-12 bg-[#FCFEFB]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">

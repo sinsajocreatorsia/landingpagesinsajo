@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Target, Lightbulb, XCircle, Clock, TrendingUp, Zap } from 'lucide-react'
+import SectionCTA from './SectionCTA'
 
 export default function WorkshopAbout() {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -67,7 +68,7 @@ export default function WorkshopAbout() {
   ]
 
   return (
-    <section ref={sectionRef} className="py-20 bg-[#FCFEFB] relative overflow-hidden">
+    <section ref={sectionRef} className="py-12 bg-[#FCFEFB] relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#2CB6D7]/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C7517E]/5 rounded-full blur-3xl" />
@@ -140,6 +141,11 @@ export default function WorkshopAbout() {
               </ul>
             </div>
           ))}
+        </div>
+
+        {/* Section CTA */}
+        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
+          <SectionCTA text="Quiero Transformar Mi Negocio" />
         </div>
       </div>
     </section>
