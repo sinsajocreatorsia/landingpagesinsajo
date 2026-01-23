@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(self), geolocation=()'
           },
           {
             // Content Security Policy - allows required external services
@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.openai.com https://api.cal.com https://api.web3forms.com https://www.google-analytics.com https://diiqsossuiuymexdocrg.supabase.co https://www.facebook.com",
+              "connect-src 'self' https://api.openai.com https://openrouter.ai https://api.cal.com https://api.web3forms.com https://www.google-analytics.com https://diiqsossuiuymexdocrg.supabase.co https://www.facebook.com https://js.stripe.com https://api.stripe.com https://api.paypal.com https://api-m.paypal.com https://api-m.sandbox.paypal.com",
               "frame-src 'self' https://cal.com",
               "object-src 'none'",
               "base-uri 'self'",
