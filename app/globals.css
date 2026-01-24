@@ -701,3 +701,193 @@ textarea:focus-visible {
   outline: 2px solid #2CB6D7;
   outline-offset: 2px;
 }
+
+/* ============================================
+   WORKSHOP LIGHT MODE OVERRIDES
+   ============================================ */
+
+/* Workshop Light Mode Base */
+.light-mode .workshop-page {
+  --ws-primary-dark: #FCFEFB;
+  --ws-light: #022133;
+}
+
+/* Override dark backgrounds to light */
+.light-mode .bg-\[\#022133\] {
+  background-color: #FCFEFB !important;
+}
+
+.light-mode .bg-\[\#200F5D\] {
+  background-color: #f0f4f8 !important;
+}
+
+.light-mode .bg-workshop-dark {
+  background: linear-gradient(135deg, #FCFEFB 0%, #e8f4f8 100%) !important;
+}
+
+/* Override light text to dark */
+.light-mode .text-\[\#FCFEFB\] {
+  color: #022133 !important;
+}
+
+.light-mode .text-\[\#FCFEFB\]\/60,
+.light-mode .text-\[\#FCFEFB\]\/70,
+.light-mode .text-\[\#FCFEFB\]\/80,
+.light-mode .text-\[\#FCFEFB\]\/50 {
+  color: rgba(2, 33, 51, 0.7) !important;
+}
+
+/* Override dark text classes for light mode */
+.light-mode .text-\[\#022133\] {
+  color: #022133 !important;
+}
+
+.light-mode .text-\[\#022133\]\/60,
+.light-mode .text-\[\#022133\]\/70,
+.light-mode .text-\[\#022133\]\/80 {
+  color: rgba(2, 33, 51, 0.7) !important;
+}
+
+/* Workshop Header Light Mode */
+.light-mode .workshop-page header {
+  background-color: rgba(252, 254, 251, 0.95) !important;
+}
+
+.light-mode .workshop-page header.bg-\[\#022133\]\/95 {
+  background-color: rgba(252, 254, 251, 0.95) !important;
+}
+
+/* Workshop Footer Light Mode */
+.light-mode .workshop-page footer {
+  background-color: #e8f4f8 !important;
+}
+
+.light-mode .workshop-page footer.bg-\[\#022133\] {
+  background-color: #e8f4f8 !important;
+}
+
+/* Workshop Sections Light Mode */
+.light-mode .workshop-page section.bg-\[\#FCFEFB\] {
+  background-color: #FCFEFB !important;
+}
+
+.light-mode .workshop-page .bg-gradient-to-br.from-\[\#022133\] {
+  background: linear-gradient(135deg, #FCFEFB 0%, #e8f4f8 100%) !important;
+}
+
+/* Workshop Hero and Sections Gradient Light Mode */
+.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\],
+.light-mode .workshop-page .bg-gradient-to-br.from-\[\#022133\] {
+  background: linear-gradient(to bottom right, #FCFEFB, #e8f4f8) !important;
+}
+
+.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\].to-\[\#200F5D\] {
+  background: linear-gradient(to bottom right, #FCFEFB, #e8f4f8) !important;
+}
+
+.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\].via-\[\#022133\].to-\[\#200F5D\] {
+  background: linear-gradient(to bottom right, #FCFEFB, #f0f4f8, #e8f4f8) !important;
+}
+
+/* Cards Light Mode */
+.light-mode .workshop-page .bg-white {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(2, 33, 51, 0.1) !important;
+}
+
+.light-mode .workshop-page .bg-\[\#022133\]\/50,
+.light-mode .workshop-page .bg-\[\#022133\]\/70,
+.light-mode .workshop-page .bg-\[\#022133\]\/90 {
+  background-color: rgba(232, 244, 248, 0.95) !important;
+}
+
+/* Purple semi-transparent backgrounds */
+.light-mode .workshop-page .bg-\[\#200F5D\]\/50 {
+  background-color: rgba(44, 182, 215, 0.1) !important;
+}
+
+/* Gradient backgrounds for buttons and special elements */
+.light-mode .workshop-page .bg-gradient-to-r.from-\[\#C7517E\]\/20.to-\[\#2CB6D7\]\/20 {
+  background: linear-gradient(to right, rgba(199, 81, 126, 0.15), rgba(44, 182, 215, 0.15)) !important;
+}
+
+/* Border Colors Light Mode */
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/20,
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/30,
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/10 {
+  border-color: rgba(44, 182, 215, 0.4) !important;
+}
+
+.light-mode .workshop-page .border-gray-100 {
+  border-color: rgba(2, 33, 51, 0.1) !important;
+}
+
+/* Glass Effect Light Mode */
+.light-mode .glass-workshop {
+  background: rgba(252, 254, 251, 0.9) !important;
+  border-color: rgba(44, 182, 215, 0.3) !important;
+}
+
+/* Preserve accent colors */
+.light-mode .text-\[\#2CB6D7\] {
+  color: #2CB6D7 !important;
+}
+
+.light-mode .text-\[\#C7517E\] {
+  color: #C7517E !important;
+}
+
+.light-mode .text-\[\#36B3AE\] {
+  color: #36B3AE !important;
+}
+
+.light-mode .text-\[\#F9D423\] {
+  color: #D97706 !important;
+}
+
+/* Buttons keep their accent colors */
+.light-mode .bg-\[\#C7517E\] {
+  background-color: #C7517E !important;
+}
+
+.light-mode .bg-\[\#2CB6D7\] {
+  background-color: #2CB6D7 !important;
+}
+
+/* Workshop Chat Widget Light Mode */
+.light-mode .workshop-page .bg-\[\#022133\]\/95 {
+  background-color: rgba(252, 254, 251, 0.95) !important;
+}
+
+/* Workshop Scrollbar Light Mode */
+.light-mode .workshop-page ::-webkit-scrollbar-track {
+  background: #FCFEFB !important;
+}
+
+/* Workshop Selection Light Mode */
+.light-mode .workshop-page ::selection {
+  background: rgba(44, 182, 215, 0.3) !important;
+  color: #022133 !important;
+}
+
+/* Animated Logo Text Light Mode */
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/80 {
+  color: rgba(2, 33, 51, 0.8) !important;
+}
+
+/* FAQ Accordion Light Mode */
+.light-mode .workshop-page .bg-\[\#FCFEFB\]\/5 {
+  background-color: rgba(2, 33, 51, 0.05) !important;
+}
+
+/* Icon backgrounds Light Mode */
+.light-mode .workshop-page .bg-\[\#25D366\]\/20,
+.light-mode .workshop-page .bg-\[\#1877F2\]\/20,
+.light-mode .workshop-page .bg-\[\#E4405F\]\/20 {
+  background-color: rgba(2, 33, 51, 0.1) !important;
+}
+
+/* Transition for smooth theme change */
+.workshop-page * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
