@@ -20,8 +20,11 @@ export default function WorkshopHeader() {
   }, [])
 
   const toggleTheme = () => {
-    setIsDark(!isDark)
-    document.documentElement.classList.toggle('light-mode', !isDark)
+    const newIsDark = !isDark
+    setIsDark(newIsDark)
+    // When newIsDark is false (light mode), add light-mode class
+    // When newIsDark is true (dark mode), remove light-mode class
+    document.documentElement.classList.toggle('light-mode', !newIsDark)
   }
 
   const toggleLanguage = (lang: 'es' | 'en') => {
