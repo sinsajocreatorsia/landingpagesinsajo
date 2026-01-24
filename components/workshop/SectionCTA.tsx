@@ -21,7 +21,7 @@ export default function SectionCTA({
   const isPrimary = variant === 'primary'
 
   return (
-    <div className="text-center pt-6">
+    <div className="text-center pt-4 pb-2">
       <motion.a
         href={href}
         whileHover={{ scale: 1.05 }}
@@ -45,7 +45,7 @@ export default function SectionCTA({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex items-center justify-center gap-2 mt-4"
+          className="flex items-center justify-center gap-2 mt-2"
         >
           <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
           <span className="text-red-400 font-semibold text-sm">{spotsText}</span>

@@ -50,7 +50,7 @@ export default function WorkshopProblem() {
   return (
     <section
       ref={sectionRef}
-      className="py-12 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
+      className="py-8 bg-gradient-to-br from-[#022133] to-[#200F5D] relative overflow-hidden"
     >
       {/* Background effects */}
       <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-5" />
