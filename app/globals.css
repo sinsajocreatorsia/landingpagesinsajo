@@ -703,7 +703,7 @@ textarea:focus-visible {
 }
 
 /* ============================================
-   WORKSHOP LIGHT MODE OVERRIDES
+   WORKSHOP LIGHT MODE OVERRIDES - COMPREHENSIVE
    ============================================ */
 
 /* Workshop Light Mode Base */
@@ -712,12 +712,16 @@ textarea:focus-visible {
   --ws-light: #022133;
 }
 
-/* Override dark backgrounds to light */
-.light-mode .bg-\[\#022133\] {
+/* ===== BACKGROUND OVERRIDES ===== */
+
+/* Dark backgrounds to light */
+.light-mode .bg-\[\#022133\],
+.light-mode .workshop-page .bg-\[\#022133\] {
   background-color: #FCFEFB !important;
 }
 
-.light-mode .bg-\[\#200F5D\] {
+.light-mode .bg-\[\#200F5D\],
+.light-mode .workshop-page .bg-\[\#200F5D\] {
   background-color: #f0f4f8 !important;
 }
 
@@ -725,169 +729,270 @@ textarea:focus-visible {
   background: linear-gradient(135deg, #FCFEFB 0%, #e8f4f8 100%) !important;
 }
 
-/* Override light text to dark */
-.light-mode .text-\[\#FCFEFB\] {
+/* All gradient backgrounds */
+.light-mode .workshop-page section.bg-gradient-to-br,
+.light-mode .workshop-page .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #FCFEFB, #f0f8ff) !important;
+}
+
+/* Semi-transparent dark backgrounds */
+.light-mode .workshop-page .bg-\[\#022133\]\/50,
+.light-mode .workshop-page .bg-\[\#022133\]\/70,
+.light-mode .workshop-page .bg-\[\#022133\]\/80,
+.light-mode .workshop-page .bg-\[\#022133\]\/90,
+.light-mode .workshop-page .bg-\[\#022133\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(2, 33, 51, 0.1) !important;
+}
+
+/* Purple semi-transparent */
+.light-mode .workshop-page .bg-\[\#200F5D\]\/50 {
+  background-color: rgba(44, 182, 215, 0.08) !important;
+}
+
+/* ===== TEXT COLOR OVERRIDES ===== */
+
+/* Main light text to dark */
+.light-mode .text-\[\#FCFEFB\],
+.light-mode .workshop-page .text-\[\#FCFEFB\] {
   color: #022133 !important;
 }
 
+/* Opacity variants of light text */
+.light-mode .text-\[\#FCFEFB\]\/50,
 .light-mode .text-\[\#FCFEFB\]\/60,
 .light-mode .text-\[\#FCFEFB\]\/70,
 .light-mode .text-\[\#FCFEFB\]\/80,
-.light-mode .text-\[\#FCFEFB\]\/50 {
-  color: rgba(2, 33, 51, 0.7) !important;
+.light-mode .text-\[\#FCFEFB\]\/90,
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/50,
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/60,
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/70,
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/80,
+.light-mode .workshop-page .text-\[\#FCFEFB\]\/90 {
+  color: rgba(2, 33, 51, 0.75) !important;
 }
 
-/* Override dark text classes for light mode */
-.light-mode .text-\[\#022133\] {
+/* White text */
+.light-mode .workshop-page .text-white {
   color: #022133 !important;
 }
 
+/* Red text colors - make darker for readability */
+.light-mode .workshop-page .text-red-400,
+.light-mode .workshop-page .text-red-500 {
+  color: #dc2626 !important;
+}
+
+.light-mode .workshop-page .text-red-600 {
+  color: #b91c1c !important;
+}
+
+/* Gray text */
+.light-mode .workshop-page .text-gray-400,
+.light-mode .workshop-page .text-gray-500 {
+  color: #4b5563 !important;
+}
+
+/* Keep dark text dark */
+.light-mode .text-\[\#022133\],
+.light-mode .workshop-page .text-\[\#022133\] {
+  color: #022133 !important;
+}
+
+.light-mode .text-\[\#022133\]\/50,
 .light-mode .text-\[\#022133\]\/60,
 .light-mode .text-\[\#022133\]\/70,
-.light-mode .text-\[\#022133\]\/80 {
+.light-mode .text-\[\#022133\]\/80,
+.light-mode .workshop-page .text-\[\#022133\]\/50,
+.light-mode .workshop-page .text-\[\#022133\]\/60,
+.light-mode .workshop-page .text-\[\#022133\]\/70,
+.light-mode .workshop-page .text-\[\#022133\]\/80 {
   color: rgba(2, 33, 51, 0.7) !important;
 }
 
-/* Workshop Header Light Mode */
+/* ===== ACCENT COLORS - PRESERVE ===== */
+
+.light-mode .text-\[\#2CB6D7\],
+.light-mode .workshop-page .text-\[\#2CB6D7\] {
+  color: #0e9bb5 !important;
+}
+
+.light-mode .text-\[\#C7517E\],
+.light-mode .workshop-page .text-\[\#C7517E\] {
+  color: #b04570 !important;
+}
+
+.light-mode .text-\[\#36B3AE\],
+.light-mode .workshop-page .text-\[\#36B3AE\] {
+  color: #2a9994 !important;
+}
+
+.light-mode .text-\[\#F9D423\],
+.light-mode .workshop-page .text-\[\#F9D423\] {
+  color: #d97706 !important;
+}
+
+/* ===== HEADER & FOOTER ===== */
+
 .light-mode .workshop-page header {
-  background-color: rgba(252, 254, 251, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 2px 10px rgba(2, 33, 51, 0.1) !important;
 }
 
-.light-mode .workshop-page header.bg-\[\#022133\]\/95 {
-  background-color: rgba(252, 254, 251, 0.95) !important;
-}
-
-/* Workshop Footer Light Mode */
 .light-mode .workshop-page footer {
-  background-color: #e8f4f8 !important;
+  background-color: #f0f4f8 !important;
 }
 
 .light-mode .workshop-page footer.bg-\[\#022133\] {
-  background-color: #e8f4f8 !important;
+  background-color: #f0f4f8 !important;
 }
 
-/* Workshop Sections Light Mode */
-.light-mode .workshop-page section.bg-\[\#FCFEFB\] {
-  background-color: #FCFEFB !important;
-}
+/* ===== CARDS & CONTAINERS ===== */
 
-.light-mode .workshop-page .bg-gradient-to-br.from-\[\#022133\] {
-  background: linear-gradient(135deg, #FCFEFB 0%, #e8f4f8 100%) !important;
-}
-
-/* Workshop Hero and Sections Gradient Light Mode */
-.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\],
-.light-mode .workshop-page .bg-gradient-to-br.from-\[\#022133\] {
-  background: linear-gradient(to bottom right, #FCFEFB, #e8f4f8) !important;
-}
-
-.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\].to-\[\#200F5D\] {
-  background: linear-gradient(to bottom right, #FCFEFB, #e8f4f8) !important;
-}
-
-.light-mode .workshop-page section.bg-gradient-to-br.from-\[\#022133\].via-\[\#022133\].to-\[\#200F5D\] {
-  background: linear-gradient(to bottom right, #FCFEFB, #f0f4f8, #e8f4f8) !important;
-}
-
-/* Cards Light Mode */
 .light-mode .workshop-page .bg-white {
   background-color: #ffffff !important;
-  box-shadow: 0 4px 20px rgba(2, 33, 51, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(2, 33, 51, 0.08) !important;
 }
 
-.light-mode .workshop-page .bg-\[\#022133\]\/50,
-.light-mode .workshop-page .bg-\[\#022133\]\/70,
-.light-mode .workshop-page .bg-\[\#022133\]\/90 {
-  background-color: rgba(232, 244, 248, 0.95) !important;
-}
-
-/* Purple semi-transparent backgrounds */
-.light-mode .workshop-page .bg-\[\#200F5D\]\/50 {
-  background-color: rgba(44, 182, 215, 0.1) !important;
-}
-
-/* Gradient backgrounds for buttons and special elements */
-.light-mode .workshop-page .bg-gradient-to-r.from-\[\#C7517E\]\/20.to-\[\#2CB6D7\]\/20 {
-  background: linear-gradient(to right, rgba(199, 81, 126, 0.15), rgba(44, 182, 215, 0.15)) !important;
-}
-
-/* Border Colors Light Mode */
-.light-mode .workshop-page .border-\[\#2CB6D7\]\/20,
-.light-mode .workshop-page .border-\[\#2CB6D7\]\/30,
-.light-mode .workshop-page .border-\[\#2CB6D7\]\/10 {
-  border-color: rgba(44, 182, 215, 0.4) !important;
-}
-
-.light-mode .workshop-page .border-gray-100 {
+/* Cards in sections */
+.light-mode .workshop-page .rounded-2xl.border {
+  background-color: rgba(255, 255, 255, 0.9) !important;
   border-color: rgba(2, 33, 51, 0.1) !important;
 }
 
-/* Glass Effect Light Mode */
-.light-mode .glass-workshop {
-  background: rgba(252, 254, 251, 0.9) !important;
+/* ===== BORDERS ===== */
+
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/10,
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/20,
+.light-mode .workshop-page .border-\[\#2CB6D7\]\/30 {
   border-color: rgba(44, 182, 215, 0.3) !important;
 }
 
-/* Preserve accent colors */
-.light-mode .text-\[\#2CB6D7\] {
-  color: #2CB6D7 !important;
+.light-mode .workshop-page .border-\[\#C7517E\]\/20,
+.light-mode .workshop-page .border-\[\#C7517E\]\/50 {
+  border-color: rgba(199, 81, 126, 0.3) !important;
 }
 
-.light-mode .text-\[\#C7517E\] {
-  color: #C7517E !important;
+.light-mode .workshop-page .border-\[\#36B3AE\] {
+  border-color: rgba(54, 179, 174, 0.4) !important;
 }
 
-.light-mode .text-\[\#36B3AE\] {
-  color: #36B3AE !important;
+.light-mode .workshop-page .border-gray-100,
+.light-mode .workshop-page .border-gray-200 {
+  border-color: rgba(2, 33, 51, 0.1) !important;
 }
 
-.light-mode .text-\[\#F9D423\] {
-  color: #D97706 !important;
-}
+/* ===== BUTTONS - KEEP VIBRANT ===== */
 
-/* Buttons keep their accent colors */
-.light-mode .bg-\[\#C7517E\] {
+.light-mode .bg-\[\#C7517E\],
+.light-mode .workshop-page .bg-\[\#C7517E\] {
   background-color: #C7517E !important;
 }
 
-.light-mode .bg-\[\#2CB6D7\] {
+.light-mode .workshop-page .bg-\[\#C7517E\] .text-white,
+.light-mode .workshop-page .bg-gradient-to-r .text-white {
+  color: #ffffff !important;
+}
+
+.light-mode .bg-\[\#2CB6D7\],
+.light-mode .workshop-page .bg-\[\#2CB6D7\] {
   background-color: #2CB6D7 !important;
 }
 
-/* Workshop Chat Widget Light Mode */
+/* CTA Button gradient */
+.light-mode .workshop-page .bg-gradient-to-r.from-\[\#C7517E\] {
+  background: linear-gradient(to right, #C7517E, #b04570) !important;
+}
+
+/* ===== SPECIAL COMPONENTS ===== */
+
+/* Chat Widget */
 .light-mode .workshop-page .bg-\[\#022133\]\/95 {
-  background-color: rgba(252, 254, 251, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 4px 20px rgba(2, 33, 51, 0.15) !important;
 }
 
-/* Workshop Scrollbar Light Mode */
-.light-mode .workshop-page ::-webkit-scrollbar-track {
-  background: #FCFEFB !important;
+/* Language dropdown */
+.light-mode .workshop-page .bg-\[\#022133\].border {
+  background-color: #ffffff !important;
+  border-color: rgba(2, 33, 51, 0.15) !important;
+  box-shadow: 0 4px 15px rgba(2, 33, 51, 0.1) !important;
 }
 
-/* Workshop Selection Light Mode */
-.light-mode .workshop-page ::selection {
-  background: rgba(44, 182, 215, 0.3) !important;
-  color: #022133 !important;
-}
-
-/* Animated Logo Text Light Mode */
-.light-mode .workshop-page .text-\[\#FCFEFB\]\/80 {
-  color: rgba(2, 33, 51, 0.8) !important;
-}
-
-/* FAQ Accordion Light Mode */
-.light-mode .workshop-page .bg-\[\#FCFEFB\]\/5 {
+/* Icon background badges */
+.light-mode .workshop-page .bg-\[\#C7517E\]\/20,
+.light-mode .workshop-page .bg-\[\#2CB6D7\]\/20,
+.light-mode .workshop-page .bg-\[\#36B3AE\]\/20 {
   background-color: rgba(2, 33, 51, 0.05) !important;
 }
 
-/* Icon backgrounds Light Mode */
+/* Roadmap phase cards */
+.light-mode .workshop-page .bg-\[\#022133\]\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 15px rgba(2, 33, 51, 0.08) !important;
+}
+
+/* Social icons in footer */
 .light-mode .workshop-page .bg-\[\#25D366\]\/20,
 .light-mode .workshop-page .bg-\[\#1877F2\]\/20,
 .light-mode .workshop-page .bg-\[\#E4405F\]\/20 {
-  background-color: rgba(2, 33, 51, 0.1) !important;
+  background-color: rgba(2, 33, 51, 0.05) !important;
 }
 
-/* Transition for smooth theme change */
+/* FAQ backgrounds */
+.light-mode .workshop-page .bg-\[\#FCFEFB\]\/5 {
+  background-color: rgba(2, 33, 51, 0.03) !important;
+}
+
+/* ===== SCROLLBAR ===== */
+
+.light-mode .workshop-page ::-webkit-scrollbar-track {
+  background: #f5f5f5 !important;
+}
+
+.light-mode .workshop-page ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2CB6D7, #36B3AE) !important;
+}
+
+/* ===== SELECTION ===== */
+
+.light-mode .workshop-page ::selection {
+  background: rgba(44, 182, 215, 0.25) !important;
+  color: #022133 !important;
+}
+
+/* ===== ANIMATIONS & TRANSITIONS ===== */
+
+.workshop-page,
 .workshop-page * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== REDUCED SECTION SPACING ===== */
+
+.workshop-page section {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+
+.workshop-page section:first-of-type {
+  padding-top: 0 !important;
+}
+
+/* Reduce margin on section headers */
+.workshop-page section .mb-16 {
+  margin-bottom: 2rem !important;
+}
+
+.workshop-page section .mb-12 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Reduce CTA spacing */
+.workshop-page .pt-6 {
+  padding-top: 1rem !important;
+}
+
+.workshop-page .mt-12 {
+  margin-top: 2rem !important;
 }

@@ -26,7 +26,7 @@ export default function WorkshopSpeaker() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-12 bg-[#FCFEFB] relative overflow-hidden">
+    <section ref={sectionRef} className="py-8 bg-[#FCFEFB] relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#C7517E]/5 rounded-full blur-3xl" />
 
