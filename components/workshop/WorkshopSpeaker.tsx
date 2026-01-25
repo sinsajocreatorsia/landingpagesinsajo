@@ -58,57 +58,58 @@ export default function WorkshopSpeaker() {
               TU PRESENTADORA
             </span>
 
-            <h2 className="text-3xl md:text-4xl font-bold text-[#022133]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#022133] break-words">
               Giovanna Rodríguez
             </h2>
 
-            <p className="text-xl text-[#022133]/70 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-[#022133]/70 leading-relaxed break-words">
               Experta en estrategias de IA para negocios de habla hispana. Fundadora de Sinsajo Creators,
               empresa dedicada a transformar negocios con agentes de inteligencia artificial
               que trabajan 24/7.
             </p>
 
-            <p className="text-[#022133]/70 leading-relaxed">
+            <p className="text-sm sm:text-base text-[#022133]/70 leading-relaxed break-words">
               Con años de experiencia ayudando a empresarias a escalar sus negocios,
               Giovanna ha desarrollado la metodología IA-3 que combina arquitectura estratégica,
               producción visual de ultra-lujo y automatización radical.
             </p>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 py-6">
-              <div className="text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-[#2CB6D7]">+73</div>
-                <div className="text-sm text-[#022133]/60">Empresas transformadas</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 py-6">
+              <div className="text-center p-2 sm:p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-[#2CB6D7]">+73</div>
+                <div className="text-xs sm:text-sm text-[#022133]/60">Empresas transformadas</div>
               </div>
-              <div className="text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-[#C7517E]">5+</div>
-                <div className="text-sm text-[#022133]/60">Años de experiencia</div>
+              <div className="text-center p-2 sm:p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-[#C7517E]">5+</div>
+                <div className="text-xs sm:text-sm text-[#022133]/60">Años de experiencia</div>
               </div>
-              <div className="text-center p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-3xl font-bold text-[#36B3AE]">98%</div>
-                <div className="text-sm text-[#022133]/60">Satisfacción</div>
+              <div className="text-center p-2 sm:p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-[#36B3AE]">98%</div>
+                <div className="text-xs sm:text-sm text-[#022133]/60">Satisfacción</div>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-2 sm:gap-4">
               <a
                 href="https://www.linkedin.com/in/giovanna-rodriguez"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-[#022133] hover:bg-[#200F5D] text-[#FCFEFB] px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+                className="flex items-center gap-2 bg-[#022133] hover:bg-[#200F5D] text-[#FCFEFB] px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
               >
-                <Linkedin className="w-5 h-5" />
+                <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>LinkedIn</span>
               </a>
               <a
                 href="https://www.screatorsai.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-[#2CB6D7] hover:bg-[#189FB2] text-[#FCFEFB] px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105"
+                className="flex items-center gap-2 bg-[#2CB6D7] hover:bg-[#189FB2] text-[#FCFEFB] px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
               >
-                <Globe className="w-5 h-5" />
-                <span>www.screatorsai.com</span>
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">www.screatorsai.com</span>
+                <span className="sm:hidden">Web</span>
               </a>
             </div>
           </div>
