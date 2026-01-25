@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import { translations, Language, Translations } from './translations'
 
 interface LanguageContextType {
@@ -14,6 +14,16 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('es')
+
+  // Load stored language preference on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('workshop-language') as Language | null
+      if (stored && (stored === 'es' || stored === 'en')) {
+        setLanguageState(stored)
+      }
+    }
+  }, [])
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang)

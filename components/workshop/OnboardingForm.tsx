@@ -270,7 +270,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   value={formData.businessName}
                   onChange={(e) => updateFormData('businessName', e.target.value)}
                   placeholder="Ej: María García Coaching"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133] placeholder:text-gray-400"
                 />
               </div>
 
@@ -281,7 +281,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                 <select
                   value={formData.industry}
                   onChange={(e) => updateFormData('industry', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133]"
                 >
                   <option value="">Selecciona tu industria</option>
                   {INDUSTRIES.map((ind) => (
@@ -300,7 +300,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   <select
                     value={formData.yearsInBusiness}
                     onChange={(e) => updateFormData('yearsInBusiness', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133]"
                   >
                     <option value="">Selecciona</option>
                     <option value="<1">Menos de 1 año</option>
@@ -318,7 +318,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   <select
                     value={formData.teamSize}
                     onChange={(e) => updateFormData('teamSize', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133]"
                   >
                     <option value="">Selecciona</option>
                     <option value="solo">Solo yo</option>
@@ -374,7 +374,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   onChange={(e) => updateFormData('primaryGoal', e.target.value)}
                   placeholder="Ej: Quiero automatizar mi atención al cliente y liberar tiempo para enfocarme en estrategia..."
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all resize-none bg-white text-[#022133] placeholder:text-gray-400"
                 />
               </div>
 
@@ -468,7 +468,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                 <select
                   value={formData.bestContactTime}
                   onChange={(e) => updateFormData('bestContactTime', e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133]"
                 >
                   <option value="">Selecciona un horario</option>
                   <option value="morning">Mañana (8am - 12pm)</option>
@@ -487,7 +487,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   onChange={(e) => updateFormData('expectedOutcome', e.target.value)}
                   placeholder="Ej: Tener mi asistente IA funcionando, automatizar mis respuestas..."
                   rows={2}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all resize-none bg-white text-[#022133] placeholder:text-gray-400"
                 />
               </div>
             </>
