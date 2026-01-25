@@ -8,16 +8,42 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const sessionId = searchParams.get('sessionId')
+    const registrationId = searchParams.get('registrationId')
 
-    if (!sessionId) {
+    // Support both sessionId (from Stripe redirect) and registrationId (from reminder email)
+    if (!sessionId && !registrationId) {
       return NextResponse.json(
-        { error: 'Session ID es requerido' },
+        { error: 'Session ID o Registration ID es requerido' },
         { status: 400 }
       )
     }
 
-    // Fetch session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    // If we have a registrationId, fetch directly from database
+    if (registrationId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: registration, error } = await (supabaseAdmin as any)
+        .from('workshop_registrations')
+        .select('id, full_name, email, payment_status')
+        .eq('id', registrationId)
+        .single()
+
+      if (error || !registration) {
+        return NextResponse.json(
+          { error: 'Registro no encontrado' },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json({
+        registrationId: registration.id,
+        customerName: registration.full_name || '',
+        customerEmail: registration.email || '',
+        paymentStatus: registration.payment_status === 'completed' ? 'paid' : registration.payment_status,
+      })
+    }
+
+    // If we have a sessionId, fetch from Stripe first
+    const session = await stripe.checkout.sessions.retrieve(sessionId!)
 
     if (!session) {
       return NextResponse.json(

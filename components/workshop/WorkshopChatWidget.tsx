@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle, Sparkles, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
 import DOMPurify from 'isomorphic-dompurify'
 import { processMessage } from '@/lib/utils/messageFormatter'
+import { useLanguage } from '@/lib/i18n'
 import {
   speakText,
   stopSpeaking,
@@ -34,23 +35,17 @@ interface Message {
   isHtml?: boolean
 }
 
-// Workshop-specific greeting that auto-opens
-const workshopGreeting = {
-  line1: '¡Hola! Soy <strong>Hanna</strong> y te doy la bienvenida al Workshop',
-  line2: '<strong>"IA para Empresarias Exitosas"</strong> - De Dueña Agotada a Estratega Imparable',
-  line3: 'Gracias por tu interés en transformar tu negocio con IA. Este workshop exclusivo te enseñará a recuperar 10+ horas semanales automatizando las tareas que te tienen atrapada.',
-  line4: '¿Cómo te llamas? Me encantaría conocerte y contarte más sobre lo que aprenderás el 7 de Marzo.',
-}
-
 export default function WorkshopChatWidget() {
+  const { t, language } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  const [hasAutoOpened, setHasAutoOpened] = useState(false)
   const [showPulse, setShowPulse] = useState(true)
+  const [hasShownGreeting, setHasShownGreeting] = useState(false)
+  const [isGreetingTyping, setIsGreetingTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Voice state
@@ -130,18 +125,26 @@ export default function WorkshopChatWidget() {
     recognitionRef.current?.stop()
   }, [])
 
-  // Auto-open chat after 3 seconds
+  // Show greeting with delay when chat opens
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasAutoOpened) {
-        setIsOpen(true)
-        setHasAutoOpened(true)
-        setShowPulse(false)
-      }
-    }, 3000)
+    if (isOpen && !hasShownGreeting) {
+      // Start typing indicator after a short delay
+      const typingTimer = setTimeout(() => {
+        setIsGreetingTyping(true)
+      }, 500)
 
-    return () => clearTimeout(timer)
-  }, [hasAutoOpened])
+      // Show greeting after typing animation
+      const greetingTimer = setTimeout(() => {
+        setIsGreetingTyping(false)
+        setHasShownGreeting(true)
+      }, 2500) // 2 seconds of "typing"
+
+      return () => {
+        clearTimeout(typingTimer)
+        clearTimeout(greetingTimer)
+      }
+    }
+  }, [isOpen, hasShownGreeting])
 
   const handleOpenChat = () => {
     if (!isOpen) {
@@ -204,7 +207,7 @@ export default function WorkshopChatWidget() {
             role: m.role,
             content: m.content
           })),
-          language: 'es',
+          language,
           context: 'workshop'
         })
       })
@@ -288,7 +291,7 @@ export default function WorkshopChatWidget() {
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#C7517E]" />
-                <span>¡Pregúntame sobre el Workshop!</span>
+                <span>{t.chat.askAboutWorkshop}</span>
               </div>
               <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
             </motion.div>
@@ -330,7 +333,7 @@ export default function WorkshopChatWidget() {
                 <div>
                   <h3 className="text-white font-bold text-lg">Hanna</h3>
                   <p className="text-white/80 text-sm">
-                    {isSpeakingState ? '🎙️ Hablando...' : 'Asesora del Workshop'}
+                    {isSpeakingState ? `🎙️ ${t.chat.speaking}` : t.chat.advisor}
                   </p>
                 </div>
               </div>
@@ -362,8 +365,31 @@ export default function WorkshopChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto bg-[#022133] space-y-4">
-              {/* Initial workshop greeting */}
-              {messages.length === 0 && (
+              {/* Hanna typing indicator before greeting */}
+              {messages.length === 0 && isGreetingTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex gap-2"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-3 rounded-2xl rounded-tl-none border border-[#2CB6D7]/20">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-400 text-sm">{t.chat.typing}</span>
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-[#2CB6D7] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-[#2CB6D7] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-[#2CB6D7] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Initial workshop greeting - only show after typing animation */}
+              {messages.length === 0 && hasShownGreeting && !isGreetingTyping && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -373,13 +399,13 @@ export default function WorkshopChatWidget() {
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-[#2CB6D7]/20 max-w-[85%]">
-                    <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(workshopGreeting.line1) }} />
-                    <p className="text-[#2CB6D7] text-sm mb-3" dangerouslySetInnerHTML={{ __html: sanitizeHtml(workshopGreeting.line2) }} />
+                    <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t.chat.greeting.line1) }} />
+                    <p className="text-[#2CB6D7] text-sm mb-3" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t.chat.greeting.line2) }} />
                     <p className="text-gray-300 text-sm mb-3">
-                      {workshopGreeting.line3}
+                      {t.chat.greeting.line3}
                     </p>
                     <p className="text-[#C7517E] text-sm font-medium">
-                      {workshopGreeting.line4}
+                      {t.chat.greeting.line4}
                     </p>
                   </div>
                 </motion.div>
@@ -453,7 +479,7 @@ export default function WorkshopChatWidget() {
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-[#2CB6D7]/20">
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-xs">Hanna está escribiendo</span>
+                      <span className="text-gray-400 text-xs">{t.chat.typing}</span>
                       <div className="flex gap-1">
                         <div className="w-1.5 h-1.5 bg-[#2CB6D7] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                         <div className="w-1.5 h-1.5 bg-[#2CB6D7] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -467,11 +493,11 @@ export default function WorkshopChatWidget() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Actions */}
-            {messages.length === 0 && (
+            {/* Quick Actions - only show after greeting */}
+            {messages.length === 0 && hasShownGreeting && (
               <div className="px-4 pb-2">
                 <div className="flex flex-wrap gap-2">
-                  {['¿Qué aprenderé?', '¿Cuál es el precio?', 'Cuéntame más'].map((quick, i) => (
+                  {t.chat.quickActions.map((quick, i) => (
                     <button
                       key={i}
                       onClick={() => setInput(quick)}
@@ -516,7 +542,7 @@ export default function WorkshopChatWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isListening ? 'Escuchando...' : 'Escribe tu mensaje...'}
+                  placeholder={isListening ? t.chat.listening : t.chat.placeholder}
                   disabled={isLoading || isTyping || isListening}
                   className="flex-1 px-4 py-3 bg-white/5 border border-[#2CB6D7]/30 rounded-full focus:outline-none focus:ring-2 focus:ring-[#C7517E] text-white placeholder-gray-400 text-sm disabled:opacity-70"
                 />
@@ -536,7 +562,7 @@ export default function WorkshopChatWidget() {
                   <p className="text-xs text-[#2CB6D7]/60 flex items-center gap-1">
                     {voiceSupport.stt && <Mic size={10} />}
                     {voiceSupport.tts && <Volume2 size={10} />}
-                    Voz habilitada
+                    {t.chat.voiceEnabled}
                   </p>
                 )}
               </div>
