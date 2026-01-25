@@ -5,6 +5,7 @@ import WorkshopReminder from './templates/WorkshopReminder'
 import WorkshopAccessLink from './templates/WorkshopAccessLink'
 import WorkshopRecording from './templates/WorkshopRecording'
 import WorkshopFollowUp from './templates/WorkshopFollowUp'
+import ProfileReminder from './templates/ProfileReminder'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Lazy initialization to avoid build-time errors when API key is not set
@@ -30,6 +31,7 @@ export type EmailType =
   | 'access_link'
   | 'recording'
   | 'follow_up'
+  | 'profile_reminder'
 
 interface SendEmailParams {
   to: string
@@ -104,6 +106,14 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       customerName: data.customerName || 'Empresaria',
       daysAfter: parseInt(data.daysAfter || '7'),
       workshopTitle: data.workshopTitle || 'IA para Empresarias Exitosas',
+    }),
+  },
+  profile_reminder: {
+    subject: '📋 ¡Completa tu perfil! - Personaliza tu experiencia del Workshop',
+    templateFn: (data) => ProfileReminder({
+      customerName: data.customerName || 'Empresaria',
+      profileUrl: data.profileUrl || 'https://www.screatorsai.com/academy/workshop/success',
+      hoursAfterPayment: parseInt(data.hoursAfterPayment || '24'),
     }),
   },
 }
@@ -359,6 +369,34 @@ export async function sendFollowUpEmail({
     data: {
       customerName,
       daysAfter: String(daysAfter),
+    },
+    registrationId,
+  })
+}
+
+/**
+ * Send profile completion reminder email
+ */
+export async function sendProfileReminderEmail({
+  to,
+  customerName,
+  registrationId,
+  hoursAfterPayment = 24,
+}: {
+  to: string
+  customerName: string
+  registrationId: string
+  hoursAfterPayment?: number
+}): Promise<EmailResult> {
+  const profileUrl = `https://www.screatorsai.com/academy/workshop/success?registrationId=${registrationId}`
+
+  return sendEmail({
+    to,
+    type: 'profile_reminder',
+    data: {
+      customerName,
+      profileUrl,
+      hoursAfterPayment: String(hoursAfterPayment),
     },
     registrationId,
   })

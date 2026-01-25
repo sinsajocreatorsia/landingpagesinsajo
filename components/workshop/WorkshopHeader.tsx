@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react'
 import { Moon, Sun, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedLogo from './AnimatedLogo'
+import { useLanguage } from '@/lib/i18n'
 
 export default function WorkshopHeader() {
   const [scrolled, setScrolled] = useState(false)
   const [isDark, setIsDark] = useState(true)
-  const [language, setLanguage] = useState<'es' | 'en'>('es')
   const [showLangMenu, setShowLangMenu] = useState(false)
+  const { language, setLanguage, t } = useLanguage()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +28,7 @@ export default function WorkshopHeader() {
     document.documentElement.classList.toggle('light-mode', !newIsDark)
   }
 
-  const toggleLanguage = (lang: 'es' | 'en') => {
+  const handleLanguageChange = (lang: 'es' | 'en') => {
     setLanguage(lang)
     setShowLangMenu(false)
   }
@@ -70,7 +71,7 @@ export default function WorkshopHeader() {
                     className="absolute top-full right-0 mt-2 bg-[#022133] border border-[#2CB6D7]/30 rounded-lg shadow-xl overflow-hidden z-50"
                   >
                     <button
-                      onClick={() => toggleLanguage('es')}
+                      onClick={() => handleLanguageChange('es')}
                       className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2CB6D7]/20 transition-colors flex items-center gap-2 ${
                         language === 'es' ? 'text-[#2CB6D7]' : 'text-[#FCFEFB]'
                       }`}
@@ -78,7 +79,7 @@ export default function WorkshopHeader() {
                       <span>🇪🇸</span> Español
                     </button>
                     <button
-                      onClick={() => toggleLanguage('en')}
+                      onClick={() => handleLanguageChange('en')}
                       className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2CB6D7]/20 transition-colors flex items-center gap-2 ${
                         language === 'en' ? 'text-[#2CB6D7]' : 'text-[#FCFEFB]'
                       }`}
@@ -96,7 +97,7 @@ export default function WorkshopHeader() {
               whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-[#022133]/50 hover:bg-[#022133]/70 border border-[#2CB6D7]/30 transition-all"
-              title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              title={isDark ? t.header.lightMode : t.header.darkMode}
             >
               <motion.div
                 initial={false}
@@ -118,8 +119,8 @@ export default function WorkshopHeader() {
               whileTap={{ scale: 0.95 }}
               className="inline-flex items-center gap-2 bg-[#C7517E] hover:bg-[#b8456f] text-white font-semibold py-2.5 px-4 sm:px-6 rounded-lg text-sm transition-all duration-300 shadow-lg shadow-[#C7517E]/20"
             >
-              <span className="hidden sm:inline">Reservar Lugar</span>
-              <span className="sm:hidden">Reservar</span>
+              <span className="hidden sm:inline">{t.header.reserveSpot}</span>
+              <span className="sm:hidden">{t.header.reserve}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

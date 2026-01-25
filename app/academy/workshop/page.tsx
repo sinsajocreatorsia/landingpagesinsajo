@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import WorkshopLayout from '@/components/workshop/WorkshopLayout'
 import WorkshopHeader from '@/components/workshop/WorkshopHeader'
 import WorkshopHero from '@/components/workshop/WorkshopHero'
 import WorkshopProblem from '@/components/workshop/WorkshopProblem'
@@ -32,44 +33,46 @@ export const metadata: Metadata = {
 
 export default function WorkshopPage() {
   return (
-    <div className="workshop-page">
-      {/* Workshop-specific Header */}
-      <WorkshopHeader />
+    <WorkshopLayout>
+      <div className="workshop-page">
+        {/* Workshop-specific Header */}
+        <WorkshopHeader />
 
-      <main className="min-h-screen">
-        {/* Hero - Main value proposition */}
-        <WorkshopHero />
+        <main className="min-h-screen">
+          {/* Hero - Main value proposition */}
+          <WorkshopHero />
 
-        {/* Problem - Pain points (Plan Maestro) */}
-        <WorkshopProblem />
+          {/* Problem - Pain points (Plan Maestro) */}
+          <WorkshopProblem />
 
-        {/* About - What you'll learn */}
-        <WorkshopAbout />
+          {/* About - What you'll learn */}
+          <WorkshopAbout />
 
-        {/* Methodology - Metodología SINSAJO IA-3 */}
-        <WorkshopMethodology />
+          {/* Methodology - Metodología SINSAJO IA-3 */}
+          <WorkshopMethodology />
 
-        {/* Roadmap - Workshop agenda */}
-        <WorkshopRoadmap />
+          {/* Roadmap - Workshop agenda */}
+          <WorkshopRoadmap />
 
-        {/* Testimonials - Social proof */}
-        <WorkshopTestimonials />
+          {/* Testimonials - Social proof */}
+          <WorkshopTestimonials />
 
-        {/* Speaker - Giovanna */}
-        <WorkshopSpeaker />
+          {/* Speaker - Giovanna */}
+          <WorkshopSpeaker />
 
-        {/* Pricing - CTA */}
-        <WorkshopPricing />
+          {/* Pricing - CTA */}
+          <WorkshopPricing />
 
-        {/* FAQ */}
-        <WorkshopFAQ />
+          {/* FAQ */}
+          <WorkshopFAQ />
 
-        {/* Footer */}
-        <WorkshopFooter />
-      </main>
+          {/* Footer */}
+          <WorkshopFooter />
+        </main>
 
-      {/* Workshop-specific Chat Widget with auto-greeting */}
-      <WorkshopChatWidget />
-    </div>
+        {/* Workshop-specific Chat Widget with auto-greeting */}
+        <WorkshopChatWidget />
+      </div>
+    </WorkshopLayout>
   )
 }

@@ -20,6 +20,7 @@ import confetti from 'canvas-confetti'
 function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
+  const regIdFromUrl = searchParams.get('registrationId')
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [registrationId, setRegistrationId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -34,11 +35,21 @@ function SuccessContent() {
       colors: ['#2CB6D7', '#C7517E', '#36B3AE', '#F59E0B'],
     })
 
-    // Fetch session details if we have a session_id
+    // Fetch session details using sessionId or registrationId
     const fetchSession = async () => {
+      // Build the API URL based on available parameters
+      let apiUrl = '/api/workshop/session?'
       if (sessionId) {
+        apiUrl += `sessionId=${sessionId}`
+      } else if (regIdFromUrl) {
+        apiUrl += `registrationId=${regIdFromUrl}`
+        // If coming from reminder email, show onboarding immediately
+        setShowOnboarding(true)
+      }
+
+      if (sessionId || regIdFromUrl) {
         try {
-          const response = await fetch(`/api/workshop/session?sessionId=${sessionId}`)
+          const response = await fetch(apiUrl)
           if (response.ok) {
             const data = await response.json()
             setRegistrationId(data.registrationId)
@@ -52,7 +63,7 @@ function SuccessContent() {
     }
 
     fetchSession()
-  }, [sessionId])
+  }, [sessionId, regIdFromUrl])
 
   const handleOnboardingComplete = () => {
     // Additional confetti on completion

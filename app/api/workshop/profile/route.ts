@@ -84,6 +84,15 @@ export async function POST(request: Request) {
           )
         }
 
+        // Update registration to mark profile as completed
+        if (newProfile?.profile_completed) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabaseAdmin as any)
+            .from('workshop_registrations')
+            .update({ profile_completed: true })
+            .eq('id', registrationId)
+        }
+
         return NextResponse.json({
           success: true,
           profile: newProfile,
@@ -94,6 +103,15 @@ export async function POST(request: Request) {
         { error: 'Error al actualizar el perfil' },
         { status: 500 }
       )
+    }
+
+    // Update registration to mark profile as completed
+    if (data?.profile_completed) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabaseAdmin as any)
+        .from('workshop_registrations')
+        .update({ profile_completed: true })
+        .eq('id', registrationId)
     }
 
     return NextResponse.json({

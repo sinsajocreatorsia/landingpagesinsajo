@@ -3,9 +3,11 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import CountdownTimer from './CountdownTimer'
+import { useLanguage } from '@/lib/i18n'
 
 export default function WorkshopHero() {
   const heroRef = useRef<HTMLDivElement>(null)
+  const { t, language } = useLanguage()
 
   // Parallax effect
   useEffect(() => {
@@ -73,24 +75,24 @@ export default function WorkshopHero() {
             <div className="inline-flex items-center gap-2 bg-[#36B3AE]/20 border border-[#36B3AE] rounded-full px-4 py-2 animate-slideInLeft">
               <span className="w-2 h-2 bg-[#36B3AE] rounded-full animate-pulse" />
               <span className="text-[#36B3AE] text-sm font-semibold uppercase tracking-wide">
-                Workshop Exclusivo - Empresarias de Habla Hispana
+                {t.hero.badge}
               </span>
             </div>
 
             {/* Title */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FCFEFB] leading-tight">
-              <span className="text-[#2CB6D7]">IA</span> para{' '}
-              <span className="text-[#C7517E]">Empresarias Exitosas</span>
+              <span className="text-[#2CB6D7]">IA</span>{' '}
+              {language === 'es' ? 'para' : 'for'}{' '}
+              <span className="text-[#C7517E]">{language === 'es' ? 'Empresarias Exitosas' : 'Successful Businesswomen'}</span>
               <br />
               <span className="text-2xl md:text-3xl lg:text-4xl font-normal text-[#FCFEFB]/80 block mt-2">
-                De Dueña Agotada a Estratega Imparable
+                {t.hero.title} <span className="text-[#2CB6D7]">{t.hero.titleHighlight}</span>
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-xl text-[#FCFEFB]/80 max-w-xl leading-relaxed">
-              <strong className="text-[#2CB6D7]">Recupera 10+ horas semanales</strong> y escala tu negocio en solo 3 horas.
-              Workshop intensivo donde instalarás sistemas de IA que trabajan por ti 24/7.
+              {t.hero.subtitle}
             </p>
 
             {/* Key Benefits */}
@@ -130,7 +132,7 @@ export default function WorkshopHero() {
                 href="#pricing"
                 className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#C7517E] to-[#b8456f] hover:from-[#d4608d] hover:to-[#C7517E] text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#C7517E]/30 hover:shadow-2xl hover:shadow-[#C7517E]/40"
               >
-                Reserva Tu Lugar Ahora
+                {t.hero.cta}
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -138,9 +140,8 @@ export default function WorkshopHero() {
               <div className="flex items-center gap-2 text-[#FCFEFB]">
                 <div className="flex items-center gap-1">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-red-400 font-semibold">Solo 12 lugares</span>
+                  <span className="text-red-400 font-semibold">{t.hero.spots}</span>
                 </div>
-                <span className="text-[#FCFEFB]/60">disponibles</span>
               </div>
             </div>
           </div>
