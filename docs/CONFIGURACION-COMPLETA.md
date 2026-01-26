@@ -68,11 +68,11 @@ Marca estos eventos:
 ### 2.2 Añadir y Verificar Dominio
 1. En el dashboard de Resend, ve a **Domains**
 2. Click en **"Add Domain"**
-3. Ingresa: `sinsajocreators.com`
+3. Ingresa: `screatorsai.com`
 4. Resend te mostrará registros DNS que necesitas añadir
 
 ### 2.3 Configurar DNS en Hostinger
-Ve a Hostinger → Dominios → sinsajocreators.com → Zona DNS
+Ve a Hostinger → Dominios → screatorsai.com → Zona DNS
 
 Añade estos registros (Resend te dará los valores exactos):
 
@@ -103,7 +103,7 @@ Añade estos registros (Resend te dará los valores exactos):
    - **Value**: (tu API key)
 3. Añade también:
    - **Name**: `FROM_EMAIL`
-   - **Value**: `Sinsajo Creators <noreply@sinsajocreators.com>`
+   - **Value**: `Sinsajo Creators <noreply@screatorsai.com>`
 4. Redeploy el proyecto
 
 ---
@@ -160,7 +160,7 @@ Asegúrate de tener TODAS estas variables en Vercel:
 | `STRIPE_SECRET_KEY` | `sk_test_...` | ✅ |
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` | ⏳ Paso 1 |
 | `RESEND_API_KEY` | `re_...` | ⏳ Paso 2 |
-| `FROM_EMAIL` | `Sinsajo Creators <noreply@sinsajocreators.com>` | ⏳ Paso 2 |
+| `FROM_EMAIL` | `Sinsajo Creators <noreply@screatorsai.com>` | ⏳ Paso 2 |
 | `OPENROUTER_API_KEY` | `sk-or-...` | ✅ (para chat) |
 
 ---
@@ -268,4 +268,4 @@ Si tienes problemas:
 2. Revisa eventos en Stripe Dashboard → Webhooks
 3. Revisa tabla `email_logs` en Supabase
 
-¿Necesitas ayuda? Contacta: sales@sinsajocreators.com
+¿Necesitas ayuda? Contacta: sales@screatorsai.com

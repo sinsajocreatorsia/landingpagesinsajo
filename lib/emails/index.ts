@@ -22,7 +22,7 @@ function getResendClient(): Resend {
   return resend
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'Sinsajo Creators <noreply@sinsajocreators.com>'
+const FROM_EMAIL = process.env.FROM_EMAIL || 'Sinsajo Creators <noreply@screatorsai.com>'
 
 export type EmailType =
   | 'confirmation'
