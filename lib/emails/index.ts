@@ -49,14 +49,15 @@ interface EmailResult {
 // Email templates configuration
 const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Record<string, string>) => React.ReactElement }> = {
   confirmation: {
-    subject: '¡Tu lugar está confirmado! - IA para Empresarias Exitosas',
+    subject: '¡Tu lugar está confirmado! - Workshop PRESENCIAL IA para Empresarias Exitosas',
     templateFn: (data) => WorkshopConfirmation({
       customerName: data.customerName || 'Empresaria',
       workshopDate: data.workshopDate || 'Sábado, 7 de Marzo 2026',
-      workshopTime: data.workshopTime || '9:00 AM - 12:00 PM (EST)',
+      workshopTime: data.workshopTime || '9:00 AM - 12:00 PM',
       amount: data.amount || '$100',
       paymentMethod: data.paymentMethod || 'tarjeta',
-      zoomLink: data.zoomLink,
+      location: data.location || 'Se confirmará vía WhatsApp',
+      whatsappLink: data.whatsappLink,
     }),
   },
   reminder_24h: {
@@ -253,9 +254,10 @@ export async function sendConfirmationEmail({
     data: {
       customerName,
       workshopDate: 'Sábado, 7 de Marzo 2026',
-      workshopTime: '9:00 AM - 12:00 PM (EST)',
+      workshopTime: '9:00 AM - 12:00 PM',
       amount: `$${amount}`,
       paymentMethod,
+      location: 'Se confirmará vía WhatsApp',
     },
     registrationId,
   })
