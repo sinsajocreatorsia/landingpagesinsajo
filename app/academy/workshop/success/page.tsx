@@ -172,6 +172,12 @@ function SuccessContent() {
             transition={{ delay: 0.5 }}
             className="bg-gradient-to-r from-[#2CB6D7]/10 to-[#36B3AE]/10 rounded-2xl p-6 mb-8"
           >
+            {/* Presencial Badge */}
+            <div className="flex justify-center mb-4">
+              <span className="inline-flex items-center gap-2 bg-[#C7517E] text-white px-4 py-2 rounded-full font-bold text-sm">
+                📍 WORKSHOP PRESENCIAL
+              </span>
+            </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="flex items-center justify-center gap-3">
                 <Calendar className="w-6 h-6 text-[#2CB6D7]" />
@@ -184,14 +190,14 @@ function SuccessContent() {
                 <Clock className="w-6 h-6 text-[#2CB6D7]" />
                 <div>
                   <p className="text-[#022133] font-semibold">9:00 AM - 12:00 PM</p>
-                  <p className="text-[#022133]/60 text-sm">Hora del Este (EST)</p>
+                  <p className="text-[#022133]/60 text-sm">En Español</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3">
-                <Mail className="w-6 h-6 text-[#2CB6D7]" />
+                <MessageCircle className="w-6 h-6 text-[#25D366]" />
                 <div>
-                  <p className="text-[#022133] font-semibold">Revisa tu email</p>
-                  <p className="text-[#022133]/60 text-sm">Link de acceso enviado</p>
+                  <p className="text-[#022133] font-semibold">Únete al WhatsApp</p>
+                  <p className="text-[#022133]/60 text-sm">Indicaciones previas</p>
                 </div>
               </div>
             </div>

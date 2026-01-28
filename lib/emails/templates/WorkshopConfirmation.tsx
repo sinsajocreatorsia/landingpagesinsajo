@@ -21,16 +21,18 @@ interface WorkshopConfirmationProps {
   workshopTime: string
   amount: string
   paymentMethod: string
-  zoomLink?: string
+  location?: string
+  whatsappLink?: string
 }
 
 export default function WorkshopConfirmation({
   customerName = 'Empresaria',
   workshopDate = 'Sábado, 7 de Marzo 2026',
-  workshopTime = '9:00 AM - 12:00 PM (EST)',
+  workshopTime = '9:00 AM - 12:00 PM',
   amount = '$100',
   paymentMethod = 'tarjeta',
-  zoomLink = '',
+  location = 'Se confirmará vía WhatsApp',
+  whatsappLink = '',
 }: WorkshopConfirmationProps) {
   const previewText = `¡Tu lugar en el workshop "IA para Empresarias Exitosas" está confirmado!`
 
@@ -109,8 +111,24 @@ export default function WorkshopConfirmation({
             <Row style={detailRow}>
               <Column style={iconCol}>📍</Column>
               <Column style={textCol}>
+                <Text style={detailLabel}>Modalidad</Text>
+                <Text style={detailValue}>PRESENCIAL</Text>
+              </Column>
+            </Row>
+
+            <Row style={detailRow}>
+              <Column style={iconCol}>🌎</Column>
+              <Column style={textCol}>
+                <Text style={detailLabel}>Idioma</Text>
+                <Text style={detailValue}>Español</Text>
+              </Column>
+            </Row>
+
+            <Row style={detailRow}>
+              <Column style={iconCol}>📌</Column>
+              <Column style={textCol}>
                 <Text style={detailLabel}>Ubicación</Text>
-                <Text style={detailValue}>Virtual (Zoom)</Text>
+                <Text style={detailValue}>{location}</Text>
               </Column>
             </Row>
           </Section>
@@ -121,16 +139,32 @@ export default function WorkshopConfirmation({
               Próximos Pasos
             </Heading>
             <Text style={listItem}>
-              <strong>1.</strong> Agrega el evento a tu calendario (link abajo)
+              <strong>1.</strong> 📱 Únete a nuestro grupo de WhatsApp (recibirás el link pronto)
             </Text>
             <Text style={listItem}>
-              <strong>2.</strong> Únete a nuestra comunidad privada de Slack
+              <strong>2.</strong> 📍 En el grupo de WhatsApp te daremos todas las indicaciones previas al workshop (ubicación exacta, qué traer, etc.)
             </Text>
             <Text style={listItem}>
-              <strong>3.</strong> Prepara tus preguntas para la sesión Q&amp;A
+              <strong>3.</strong> 📅 Agrega el evento a tu calendario
             </Text>
             <Text style={listItem}>
-              <strong>4.</strong> Revisa tu email el día antes del evento para el link de Zoom
+              <strong>4.</strong> ✍️ Prepara tus preguntas para la sesión Q&amp;A
+            </Text>
+          </Section>
+
+          {/* Contact Info */}
+          <Section style={contactBox}>
+            <Heading as="h2" style={h2}>
+              ¿Tienes Dudas?
+            </Heading>
+            <Text style={contactText}>
+              Puedes contactarnos por cualquiera de estos medios:
+            </Text>
+            <Text style={contactItem}>
+              📞 <strong>Teléfono/WhatsApp:</strong> +1 (786) 555-0123
+            </Text>
+            <Text style={contactItem}>
+              ✉️ <strong>Email:</strong> sales@screatorsai.com
             </Text>
           </Section>
 
@@ -164,10 +198,10 @@ export default function WorkshopConfirmation({
           <Section style={content}>
             <Hr style={hr} />
             <Text style={supportText}>
-              ¿Tienes preguntas? Responde a este email o escríbenos a{' '}
-              <Link href="mailto:sales@sinsajocreators.com" style={link}>
-                sales@sinsajocreators.com
-              </Link>
+              ¡Nos vemos pronto en persona! 🎉
+            </Text>
+            <Text style={supportText}>
+              Recuerda que todas las indicaciones las recibirás en el grupo de WhatsApp.
             </Text>
           </Section>
 
@@ -342,6 +376,27 @@ const highlightItem = {
   fontSize: '15px',
   lineHeight: '28px',
   margin: '0',
+}
+
+const contactBox = {
+  backgroundColor: '#fef3c7',
+  padding: '24px',
+  margin: '0',
+  borderLeft: '4px solid #f59e0b',
+}
+
+const contactText = {
+  color: '#374151',
+  fontSize: '15px',
+  lineHeight: '24px',
+  margin: '0 0 12px 0',
+}
+
+const contactItem = {
+  color: '#374151',
+  fontSize: '15px',
+  lineHeight: '28px',
+  margin: '4px 0',
 }
 
 const hr = {

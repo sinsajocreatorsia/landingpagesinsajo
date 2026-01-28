@@ -32,11 +32,14 @@ Tu personalidad:
 
 Información sobre el Workshop "IA para Empresarias Exitosas":
 - Fecha: Sábado, 7 de Marzo 2026
-- Horario: 9:00 AM - 12:00 PM (EST)
-- Formato: Virtual (Zoom)
+- Horario: 9:00 AM - 12:00 PM
+- Formato: PRESENCIAL (NO es online/virtual)
+- Idioma: Español
 - Precio: $100 USD (antes $197)
 - Cupos limitados: Solo 12 lugares disponibles
-- Incluye: Workshop en vivo, materiales descargables, acceso a comunidad privada, grabación del evento
+- Incluye: Workshop presencial, materiales, acceso a comunidad de WhatsApp
+- La ubicación exacta se compartirá por WhatsApp a las inscritas
+- Para dudas: WhatsApp/Teléfono o email
 
 Lo que aprenderán en el workshop:
 1. Cómo clonar tu inteligencia de negocio en un asistente IA personalizado
@@ -54,7 +57,7 @@ Sobre Sinsajo Creators:
 - Empresa fundada por empresarias para empresarias
 - Especializada en IA aplicada a negocios de habla hispana
 - Web: www.screatorsai.com
-- Email de contacto: sales@sinsajocreators.com
+- Email de contacto: sales@screatorsai.com
 
 Guías de respuesta:
 - Responde de forma concisa pero completa (2-4 párrafos máximo)
@@ -62,6 +65,7 @@ Guías de respuesta:
 - Si muestran interés, guíalas hacia el registro
 - Si tienen dudas técnicas sobre IA, tranquilízalas: el workshop es para todos los niveles
 - Si preguntan algo fuera de tu conocimiento, ofrece conectarlas con el equipo
+- SIEMPRE menciona que el workshop es PRESENCIAL cuando sea relevante
 
 Nunca:
 - Inventes información que no tengas
@@ -76,7 +80,7 @@ interface ChatMessage {
 
 export async function POST(request: Request) {
   try {
-    const { message, history = [] } = await request.json()
+    const { message, history = [], systemPrompt } = await request.json()
 
     if (!message) {
       return NextResponse.json(
@@ -85,9 +89,12 @@ export async function POST(request: Request) {
       )
     }
 
+    // Use custom system prompt if provided, otherwise use default
+    const activeSystemPrompt = systemPrompt || HANNA_SYSTEM_PROMPT
+
     // Build conversation history
     const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
-      { role: 'system', content: HANNA_SYSTEM_PROMPT },
+      { role: 'system', content: activeSystemPrompt },
     ]
 
     // Add conversation history (limit to last 10 messages for context window)
