@@ -69,8 +69,8 @@ export default function WorkshopMethodology() {
             <span className="text-[#2CB6D7]">Transformación</span>
           </h2>
           <p className="text-xl text-[#022133]/70 max-w-3xl mx-auto">
-            Basada en la Ecuación de Valor de Hormozi: Maximizar el resultado soñado y la probabilidad de éxito,
-            mientras reducimos a cero el tiempo y el esfuerzo percibido.
+            Basada en la Ecuación de Valor: Maximizar el resultado soñado y la probabilidad de éxito,
+            mientras reducimos al mínimo el tiempo y el esfuerzo percibido.
           </p>
         </div>
 

@@ -84,7 +84,7 @@ export default function WorkshopAbout() {
             <span className="text-[#C7517E]">Cambiará Tu Negocio</span>
           </h2>
           <p className="text-xl text-[#022133]/70 max-w-2xl mx-auto">
-            Basado en la metodología probada de Alex Hormozi: maximizar resultados mientras reduces tiempo y esfuerzo.
+            Basado en la metodología usada por los empresarios más exitosos del mundo: maximizar resultados mientras reduces tiempo y esfuerzo.
           </p>
         </div>
 
