@@ -90,6 +90,7 @@ export async function POST(request: Request) {
     // Create coupon
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
+      // @ts-expect-error - dynamic insert fields
       .insert({
         code: code.toUpperCase(),
         discount_type,
