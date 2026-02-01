@@ -83,7 +83,7 @@ export default function WorkshopHero() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#FCFEFB] leading-tight">
               <span className="text-[#2CB6D7]">IA</span>{' '}
               {language === 'es' ? 'para' : 'for'}{' '}
-              <span className="text-[#C7517E]">{language === 'es' ? 'Empresarias Exitosas' : 'Successful Businesswomen'}</span>
+              <span className="text-[#C7517E]">{language === 'es' ? 'Empresarias Exitosas' : 'Successful Business Women'}</span>
               <br />
               <span className="text-2xl md:text-3xl lg:text-4xl font-normal text-[#FCFEFB]/80 block mt-2">
                 {t.hero.title} <span className="text-[#2CB6D7]">{t.hero.titleHighlight}</span>
@@ -97,7 +97,10 @@ export default function WorkshopHero() {
 
             {/* Key Benefits */}
             <div className="flex flex-wrap gap-3">
-              {['Automatización Real', 'Resultados Inmediatos', 'Sin Conocimientos Técnicos'].map((benefit, i) => (
+              {(language === 'es'
+                ? ['Automatización Real', 'Resultados Inmediatos', 'Sin Conocimientos Técnicos']
+                : ['Real Automation', 'Immediate Results', 'No Technical Knowledge Required']
+              ).map((benefit, i) => (
                 <span
                   key={i}
                   className="bg-[#200F5D]/50 text-[#FCFEFB]/90 px-3 py-1.5 rounded-full text-sm border border-[#2CB6D7]/20"
@@ -113,7 +116,7 @@ export default function WorkshopHero() {
                 <svg className="w-5 h-5 text-[#2CB6D7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="font-semibold">Sábado, 7 de Marzo 2026</span>
+                <span className="font-semibold">{language === 'es' ? 'Sábado, 7 de Marzo 2026' : 'Saturday, March 7, 2026'}</span>
               </div>
               <div className="flex items-center gap-2 bg-[#200F5D]/50 rounded-lg px-4 py-3 border border-[#2CB6D7]/10">
                 <svg className="w-5 h-5 text-[#2CB6D7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
