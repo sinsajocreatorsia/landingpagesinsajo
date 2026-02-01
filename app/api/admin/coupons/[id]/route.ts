@@ -83,6 +83,7 @@ export async function PATCH(
 
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
+      // @ts-expect-error - dynamic update fields
       .update(updates)
       .eq('id', id)
       .select()
