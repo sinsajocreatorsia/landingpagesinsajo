@@ -45,7 +45,7 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const updates: any = {}
+    const updates: Record<string, unknown> = {}
 
     // Only update provided fields
     if (body.discount_value !== undefined) {
