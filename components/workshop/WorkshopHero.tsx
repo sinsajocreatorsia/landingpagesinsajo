@@ -124,6 +124,11 @@ export default function WorkshopHero() {
                 </svg>
                 <span className="font-semibold">9:00 AM - 12:00 PM (EST)</span>
               </div>
+              {/* Workshop Language Indicator */}
+              <div className="flex items-center gap-2 bg-[#C7517E]/20 rounded-lg px-4 py-3 border border-[#C7517E]/30">
+                <span className="text-lg">🇪🇸</span>
+                <span className="font-semibold text-[#C7517E]">{language === 'es' ? 'Workshop en Español' : 'Workshop in Spanish'}</span>
+              </div>
             </div>
 
             {/* Countdown */}

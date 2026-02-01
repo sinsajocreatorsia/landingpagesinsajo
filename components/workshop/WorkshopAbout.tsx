@@ -33,7 +33,7 @@ export default function WorkshopAbout() {
       items: [
         'Dueñas de negocio que ya generan ingresos',
         'Empresarias de habla hispana listas para escalar',
-        'Líderes que quieren dejar de ser "la empleada más barata"',
+        'Líderes que quieren pasar de lo operativo a lo estratégico',
         'Mujeres de negocios que valoran su tiempo',
       ],
     },

@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { Moon, Sun, Globe } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import AnimatedLogo from './AnimatedLogo'
 import { useLanguage } from '@/lib/i18n'
 
 export default function WorkshopHeader() {
   const [scrolled, setScrolled] = useState(false)
   const [isDark, setIsDark] = useState(true)
-  const [showLangMenu, setShowLangMenu] = useState(false)
   const { language, setLanguage, t } = useLanguage()
 
   useEffect(() => {
@@ -23,14 +22,12 @@ export default function WorkshopHeader() {
   const toggleTheme = () => {
     const newIsDark = !isDark
     setIsDark(newIsDark)
-    // When newIsDark is false (light mode), add light-mode class
-    // When newIsDark is true (dark mode), remove light-mode class
     document.documentElement.classList.toggle('light-mode', !newIsDark)
   }
 
-  const handleLanguageChange = (lang: 'es' | 'en') => {
-    setLanguage(lang)
-    setShowLangMenu(false)
+  // Single-click language toggle
+  const toggleLanguage = () => {
+    setLanguage(language === 'es' ? 'en' : 'es')
   }
 
   return (
@@ -48,48 +45,19 @@ export default function WorkshopHeader() {
 
           {/* Right side controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Language Toggle */}
-            <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowLangMenu(!showLangMenu)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#022133]/50 hover:bg-[#022133]/70 border border-[#2CB6D7]/30 transition-all"
-              >
-                <Globe className="w-4 h-4 text-[#2CB6D7]" />
-                <span className="text-xs font-medium text-[#FCFEFB] uppercase hidden sm:inline">
-                  {language}
-                </span>
-              </motion.button>
-
-              <AnimatePresence>
-                {showLangMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full right-0 mt-2 bg-[#022133] border border-[#2CB6D7]/30 rounded-lg shadow-xl overflow-hidden z-50"
-                  >
-                    <button
-                      onClick={() => handleLanguageChange('es')}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2CB6D7]/20 transition-colors flex items-center gap-2 ${
-                        language === 'es' ? 'text-[#2CB6D7]' : 'text-[#FCFEFB]'
-                      }`}
-                    >
-                      <span>🇪🇸</span> Español
-                    </button>
-                    <button
-                      onClick={() => handleLanguageChange('en')}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-[#2CB6D7]/20 transition-colors flex items-center gap-2 ${
-                        language === 'en' ? 'text-[#2CB6D7]' : 'text-[#FCFEFB]'
-                      }`}
-                    >
-                      <span>🇺🇸</span> English
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Language Toggle - Single Click */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#022133]/50 hover:bg-[#022133]/70 border border-[#2CB6D7]/30 transition-all"
+              title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+            >
+              <Globe className="w-4 h-4 text-[#2CB6D7]" />
+              <span className="text-xs font-medium text-[#FCFEFB] uppercase">
+                {language === 'es' ? 'ES' : 'EN'}
+              </span>
+            </motion.button>
 
             {/* Day/Night Toggle */}
             <motion.button
