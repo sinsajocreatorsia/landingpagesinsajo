@@ -4,13 +4,15 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Get single coupon
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) throw error
@@ -38,9 +40,10 @@ export async function GET(
 // PATCH - Update coupon
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const updates: any = {}
 
@@ -81,7 +84,7 @@ export async function PATCH(
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
       .update(updates)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -106,13 +109,15 @@ export async function PATCH(
 // DELETE - Deactivate coupon (soft delete)
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
       .update({ is_active: false })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
