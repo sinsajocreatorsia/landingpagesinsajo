@@ -32,7 +32,7 @@ export default function WorkshopProblem() {
     },
     {
       icon: DollarSign,
-      title: 'Eres la empleada más barata',
+      title: 'Atrapada en tareas operativas',
       description: 'Haces tareas de $15/hora cuando tu hora vale $500. Contestas emails, agendas citas, creas contenido...',
     },
     {
@@ -94,7 +94,7 @@ export default function WorkshopProblem() {
         {/* The Question */}
         <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500 text-center bg-gradient-to-r from-[#C7517E]/20 to-[#2CB6D7]/20 border border-[#2CB6D7]/30 rounded-2xl p-8 max-w-3xl mx-auto">
           <p className="text-2xl md:text-3xl font-bold text-[#FCFEFB] mb-4">
-            &quot;¿Eres la dueña o la empleada más barata de tu negocio?&quot;
+            &quot;¿Eres la dueña estratégica o estás atrapada en lo operativo?&quot;
           </p>
           <p className="text-[#FCFEFB]/80 mb-6">
             Si esta pregunta te incomoda, este workshop es para ti.
