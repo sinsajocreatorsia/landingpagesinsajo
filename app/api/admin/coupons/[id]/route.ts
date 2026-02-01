@@ -117,6 +117,7 @@ export async function DELETE(
 
     const { data: coupon, error } = await supabaseAdmin
       .from('discount_coupons')
+      // @ts-expect-error - dynamic update fields
       .update({ is_active: false })
       .eq('id', id)
       .select()
