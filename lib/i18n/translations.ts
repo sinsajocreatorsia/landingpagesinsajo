@@ -9,7 +9,7 @@ export const translations = {
     },
     // Hero
     hero: {
-      badge: 'WORKSHOP EXCLUSIVO - 7 DE MARZO 2025',
+      badge: 'WORKSHOP EXCLUSIVO - 7 DE MARZO 2026',
       title: 'De Dueña Agotada a',
       titleHighlight: 'Estratega Imparable',
       subtitle: 'Domina la IA para recuperar 10+ horas semanales y escalar tu negocio sin trabajar más',
@@ -31,7 +31,7 @@ export const translations = {
           description: 'Tu negocio crece pero tú trabajas el doble. Cada cliente nuevo significa más horas de tu tiempo.',
         },
         {
-          title: 'Eres la empleada más barata',
+          title: 'Atrapada en tareas operativas',
           description: 'Haces tareas de $15/hora cuando tu hora vale $500. Contestas emails, agendas citas, creas contenido...',
         },
         {
@@ -43,7 +43,7 @@ export const translations = {
           description: 'Mientras tú sigues haciendo todo manual, otros usan IA para hacer en 1 hora lo que tú haces en 1 día.',
         },
       ],
-      question: '¿Eres la dueña o la empleada más barata de tu negocio?',
+      question: '¿Eres la dueña estratégica o estás atrapada en lo operativo?',
       questionCta: 'Si esta pregunta te incomoda, este workshop es para ti.',
       ctaButton: 'Quiero Ser la Dueña de Verdad',
     },
@@ -138,7 +138,7 @@ export const translations = {
     },
     // Hero
     hero: {
-      badge: 'EXCLUSIVE WORKSHOP - MARCH 7, 2025',
+      badge: 'EXCLUSIVE WORKSHOP - MARCH 7, 2026',
       title: 'From Exhausted Owner to',
       titleHighlight: 'Unstoppable Strategist',
       subtitle: 'Master AI to recover 10+ hours weekly and scale your business without working more',
@@ -160,7 +160,7 @@ export const translations = {
           description: 'Your business grows but you work twice as hard. Every new client means more hours of your time.',
         },
         {
-          title: "You're the Cheapest Employee",
+          title: "Trapped in Operational Tasks",
           description: 'You do $15/hour tasks when your hour is worth $500. You answer emails, schedule appointments, create content...',
         },
         {
@@ -172,7 +172,7 @@ export const translations = {
           description: "While you keep doing everything manually, others use AI to do in 1 hour what takes you 1 day.",
         },
       ],
-      question: 'Are you the owner or the cheapest employee of your business?',
+      question: 'Are you the strategic owner or trapped in daily operations?',
       questionCta: 'If this question makes you uncomfortable, this workshop is for you.',
       ctaButton: 'I Want to Be the Real Owner',
     },
@@ -230,7 +230,7 @@ export const translations = {
     },
     // Footer
     footer: {
-      description: 'Transforming successful businesswomen into tech leaders with artificial intelligence.',
+      description: 'Transforming successful business women into tech leaders with artificial intelligence.',
       rights: 'All rights reserved.',
       links: {
         about: 'About Us',
@@ -243,7 +243,7 @@ export const translations = {
     chat: {
       greeting: {
         line1: "Hi! I'm <strong>Hanna</strong> and I welcome you to the Workshop",
-        line2: '<strong>"AI for Successful Businesswomen"</strong> - From Exhausted Owner to Unstoppable Strategist',
+        line2: '<strong>"AI for Successful Business Women"</strong> - From Exhausted Owner to Unstoppable Strategist',
         line3: 'Thank you for your interest in transforming your business with AI. This exclusive workshop will teach you how to recover 10+ hours weekly by automating the tasks that have you trapped.',
         line4: "What's your name? I'd love to meet you and tell you more about what you'll learn on March 7th.",
       },
