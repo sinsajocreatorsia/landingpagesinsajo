@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
+interface Coupon {
+  code: string
+  discount_type: 'percentage' | 'fixed'
+  discount_value: number
+  max_uses: number | null
+  times_used: number
+  valid_until: string | null
+  is_active: boolean
+  applicable_plans: string[]
+}
+
 // POST - Validate coupon code
 export async function POST(request: Request) {
   try {
@@ -11,12 +22,14 @@ export async function POST(request: Request) {
     }
 
     // Fetch coupon
-    const { data: coupon, error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('discount_coupons')
       .select('*')
       .eq('code', code.toUpperCase())
       .eq('is_active', true)
       .single()
+
+    const coupon = data as Coupon | null
 
     if (error || !coupon) {
       return NextResponse.json(
