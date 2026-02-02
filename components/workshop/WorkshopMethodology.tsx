@@ -3,9 +3,11 @@
 import { useEffect, useRef } from 'react'
 import { Brain, Palette, Rocket } from 'lucide-react'
 import SectionCTA from './SectionCTA'
+import { useLanguage } from '@/lib/i18n'
 
 export default function WorkshopMethodology() {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const { language } = useLanguage()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,32 +27,76 @@ export default function WorkshopMethodology() {
     return () => observer.disconnect()
   }, [])
 
-  const pillars = [
-    {
-      icon: Brain,
-      title: 'ARQUITECTURA',
-      subtitle: 'La Mente',
-      description: 'Clonación de tu inteligencia de negocio. No usamos IA para "chatear", la usamos para construir la estructura estratégica de tu empresa.',
-      color: '#2CB6D7',
-      features: ['Clon Asistente Personal', 'Avatar de Cliente Ideal', 'Oferta Irresistible'],
+  const content = {
+    es: {
+      badge: 'METODOLOGÍA SINSAJO IA-3',
+      title: 'Los 3 Pilares de la',
+      titleHighlight: 'Transformación',
+      subtitle: 'Basada en la Ecuación de Valor: Maximizar el resultado soñado y la probabilidad de éxito, mientras reducimos al mínimo el tiempo y el esfuerzo percibido.',
+      pillars: [
+        {
+          icon: Brain,
+          title: 'ARQUITECTURA',
+          subtitle: 'La Mente',
+          description: 'Clonación de tu inteligencia de negocio. No usamos IA para "chatear", la usamos para construir la estructura estratégica de tu empresa.',
+          color: '#2CB6D7',
+          features: ['Clon Asistente Personal', 'Avatar de Cliente Ideal', 'Oferta Irresistible'],
+        },
+        {
+          icon: Palette,
+          title: 'PRODUCCIÓN',
+          subtitle: 'La Cara',
+          description: 'Generación de activos visuales de ultra-lujo. Si tu marca no se ve de $10M, eres invisible en el mercado actual.',
+          color: '#C7517E',
+          features: ['Fotografía IA Profesional', 'Videos Cinematográficos', 'Contenido que Detiene el Scroll'],
+        },
+        {
+          icon: Rocket,
+          title: 'LIBERTAD',
+          subtitle: 'El Músculo',
+          description: 'Automatización radical de la operación diaria. Dejar de ser operadora para ser la verdadera dueña de tu negocio.',
+          color: '#36B3AE',
+          features: ['Inbox Zero Automático', 'Calificación de Leads', 'Agendamiento Inteligente'],
+        },
+      ],
+      cta: 'Aprende la Metodología IA-3',
     },
-    {
-      icon: Palette,
-      title: 'PRODUCCIÓN',
-      subtitle: 'La Cara',
-      description: 'Generación de activos visuales de ultra-lujo. Si tu marca no se ve de $10M, eres invisible en el mercado actual.',
-      color: '#C7517E',
-      features: ['Fotografía IA Profesional', 'Videos Cinematográficos', 'Contenido que Detiene el Scroll'],
+    en: {
+      badge: 'SINSAJO AI-3 METHODOLOGY',
+      title: 'The 3 Pillars of',
+      titleHighlight: 'Transformation',
+      subtitle: 'Based on the Value Equation: Maximize the dream outcome and probability of success, while minimizing time and perceived effort.',
+      pillars: [
+        {
+          icon: Brain,
+          title: 'ARCHITECTURE',
+          subtitle: 'The Mind',
+          description: 'Cloning your business intelligence. We don\'t use AI to "chat", we use it to build the strategic structure of your company.',
+          color: '#2CB6D7',
+          features: ['Personal Assistant Clone', 'Ideal Client Avatar', 'Irresistible Offer'],
+        },
+        {
+          icon: Palette,
+          title: 'PRODUCTION',
+          subtitle: 'The Face',
+          description: 'Ultra-luxury visual asset generation. If your brand doesn\'t look like $10M, you\'re invisible in today\'s market.',
+          color: '#C7517E',
+          features: ['Professional AI Photography', 'Cinematic Videos', 'Scroll-Stopping Content'],
+        },
+        {
+          icon: Rocket,
+          title: 'FREEDOM',
+          subtitle: 'The Muscle',
+          description: 'Radical automation of daily operations. Stop being an operator to become the true owner of your business.',
+          color: '#36B3AE',
+          features: ['Automatic Inbox Zero', 'Lead Qualification', 'Smart Scheduling'],
+        },
+      ],
+      cta: 'Learn the AI-3 Methodology',
     },
-    {
-      icon: Rocket,
-      title: 'LIBERTAD',
-      subtitle: 'El Músculo',
-      description: 'Automatización radical de la operación diaria. Dejar de ser operadora para ser la verdadera dueña de tu negocio.',
-      color: '#36B3AE',
-      features: ['Inbox Zero Automático', 'Calificación de Leads', 'Agendamiento Inteligente'],
-    },
-  ]
+  }
+
+  const t = content[language]
 
   return (
     <section ref={sectionRef} className="py-8 bg-[#FCFEFB] relative overflow-hidden">
@@ -62,21 +108,20 @@ export default function WorkshopMethodology() {
         {/* Section Header */}
         <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <span className="inline-block bg-[#36B3AE]/10 text-[#36B3AE] font-semibold px-4 py-2 rounded-full text-sm mb-4">
-            METODOLOGÍA SINSAJO IA-3
+            {t.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-[#022133] mb-4">
-            Los 3 Pilares de la{' '}
-            <span className="text-[#2CB6D7]">Transformación</span>
+            {t.title}{' '}
+            <span className="text-[#2CB6D7]">{t.titleHighlight}</span>
           </h2>
           <p className="text-xl text-[#022133]/70 max-w-3xl mx-auto">
-            Basada en la Ecuación de Valor: Maximizar el resultado soñado y la probabilidad de éxito,
-            mientras reducimos al mínimo el tiempo y el esfuerzo percibido.
+            {t.subtitle}
           </p>
         </div>
 
         {/* Pillars */}
         <div className="grid md:grid-cols-3 gap-8">
-          {pillars.map((pillar, index) => (
+          {t.pillars.map((pillar, index) => (
             <div
               key={index}
               className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 group"
@@ -138,7 +183,7 @@ export default function WorkshopMethodology() {
 
         {/* Section CTA */}
         <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
-          <SectionCTA text="Aprende la Metodología IA-3" variant="secondary" />
+          <SectionCTA text={t.cta} variant="secondary" />
         </div>
       </div>
     </section>
