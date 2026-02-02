@@ -3,9 +3,11 @@
 import { useEffect, useRef } from 'react'
 import { Target, Lightbulb, XCircle, Clock, TrendingUp, Zap } from 'lucide-react'
 import SectionCTA from './SectionCTA'
+import { useLanguage } from '@/lib/i18n'
 
 export default function WorkshopAbout() {
   const sectionRef = useRef<HTMLDivElement>(null)
+  const { language } = useLanguage()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,47 +27,104 @@ export default function WorkshopAbout() {
     return () => observer.disconnect()
   }, [])
 
-  const cards = [
-    {
-      icon: Target,
-      title: '¿Para quién es?',
-      color: '#2CB6D7',
-      items: [
-        'Dueñas de negocio que ya generan ingresos',
-        'Empresarias de habla hispana listas para escalar',
-        'Líderes que quieren pasar de lo operativo a lo estratégico',
-        'Mujeres de negocios que valoran su tiempo',
+  const content = {
+    es: {
+      badge: 'SOBRE EL WORKSHOP',
+      title: 'Un Intensivo de 3 Horas que',
+      titleHighlight: 'Cambiará Tu Negocio',
+      subtitle: 'Basado en la metodología usada por los empresarios más exitosos del mundo: maximizar resultados mientras reduces tiempo y esfuerzo.',
+      cards: [
+        {
+          icon: Target,
+          title: '¿Para quién es?',
+          color: '#2CB6D7',
+          items: [
+            'Dueñas de negocio que ya generan ingresos',
+            'Empresarias de habla hispana listas para escalar',
+            'Líderes que quieren pasar de lo operativo a lo estratégico',
+            'Mujeres de negocios que valoran su tiempo',
+          ],
+        },
+        {
+          icon: Lightbulb,
+          title: '¿Qué lograrás?',
+          color: '#36B3AE',
+          items: [
+            'Recuperar 10+ horas semanales con automatización',
+            'Clonar tu inteligencia de negocio en un asistente IA',
+            'Crear contenido visual de ultra-lujo en minutos',
+            'Pasar de operadora a verdadera dueña de tu negocio',
+          ],
+        },
+        {
+          icon: XCircle,
+          title: '¿Qué NO es este workshop?',
+          color: '#C7517E',
+          items: [
+            'No es para principiantes sin negocio',
+            'No es teoría genérica sin aplicación',
+            'No es un webinar de 2 horas que olvidarás',
+            'No es contenido que encuentras gratis en YouTube',
+          ],
+        },
       ],
-    },
-    {
-      icon: Lightbulb,
-      title: '¿Qué lograrás?',
-      color: '#36B3AE',
-      items: [
-        'Recuperar 10+ horas semanales con automatización',
-        'Clonar tu inteligencia de negocio en un asistente IA',
-        'Crear contenido visual de ultra-lujo en minutos',
-        'Pasar de operadora a verdadera dueña de tu negocio',
+      stats: [
+        { icon: Clock, value: '10+', label: 'Horas semanales recuperadas', color: '#2CB6D7' },
+        { icon: TrendingUp, value: '3x', label: 'Productividad aumentada', color: '#36B3AE' },
+        { icon: Zap, value: '3', label: 'Horas de transformación', color: '#C7517E' },
       ],
+      cta: 'Quiero Transformar Mi Negocio',
     },
-    {
-      icon: XCircle,
-      title: '¿Qué NO es este workshop?',
-      color: '#C7517E',
-      items: [
-        'No es para principiantes sin negocio',
-        'No es teoría genérica sin aplicación',
-        'No es un webinar de 2 horas que olvidarás',
-        'No es contenido que encuentras gratis en YouTube',
+    en: {
+      badge: 'ABOUT THE WORKSHOP',
+      title: 'A 3-Hour Intensive That Will',
+      titleHighlight: 'Change Your Business',
+      subtitle: 'Based on the methodology used by the most successful entrepreneurs in the world: maximize results while reducing time and effort.',
+      cards: [
+        {
+          icon: Target,
+          title: 'Who is it for?',
+          color: '#2CB6D7',
+          items: [
+            'Business owners already generating revenue',
+            'Spanish-speaking entrepreneurs ready to scale',
+            'Leaders who want to go from operational to strategic',
+            'Business women who value their time',
+          ],
+        },
+        {
+          icon: Lightbulb,
+          title: 'What will you achieve?',
+          color: '#36B3AE',
+          items: [
+            'Recover 10+ hours weekly with automation',
+            'Clone your business intelligence into an AI assistant',
+            'Create ultra-luxury visual content in minutes',
+            'Go from operator to true business owner',
+          ],
+        },
+        {
+          icon: XCircle,
+          title: 'What this workshop is NOT',
+          color: '#C7517E',
+          items: [
+            'Not for beginners without a business',
+            'Not generic theory without application',
+            'Not a 2-hour webinar you will forget',
+            'Not content you can find free on YouTube',
+          ],
+        },
       ],
+      stats: [
+        { icon: Clock, value: '10+', label: 'Weekly hours recovered', color: '#2CB6D7' },
+        { icon: TrendingUp, value: '3x', label: 'Productivity increased', color: '#36B3AE' },
+        { icon: Zap, value: '3', label: 'Hours of transformation', color: '#C7517E' },
+      ],
+      cta: 'I Want to Transform My Business',
     },
-  ]
+  }
 
-  const stats = [
-    { icon: Clock, value: '10+', label: 'Horas semanales recuperadas', color: '#2CB6D7' },
-    { icon: TrendingUp, value: '3x', label: 'Productividad aumentada', color: '#36B3AE' },
-    { icon: Zap, value: '3', label: 'Horas de transformación', color: '#C7517E' },
-  ]
+  const t = content[language]
 
   return (
     <section ref={sectionRef} className="py-8 bg-[#FCFEFB] relative overflow-hidden">
@@ -77,20 +136,20 @@ export default function WorkshopAbout() {
         {/* Section Header */}
         <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <span className="inline-block bg-[#2CB6D7]/10 text-[#2CB6D7] font-semibold px-4 py-2 rounded-full text-sm mb-4">
-            SOBRE EL WORKSHOP
+            {t.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-[#022133] mb-4">
-            Un Intensivo de 3 Horas que{' '}
-            <span className="text-[#C7517E]">Cambiará Tu Negocio</span>
+            {t.title}{' '}
+            <span className="text-[#C7517E]">{t.titleHighlight}</span>
           </h2>
           <p className="text-xl text-[#022133]/70 max-w-2xl mx-auto">
-            Basado en la metodología usada por los empresarios más exitosos del mundo: maximizar resultados mientras reduces tiempo y esfuerzo.
+            {t.subtitle}
           </p>
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4 md:gap-8 mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
-          {stats.map((stat, index) => (
+          {t.stats.map((stat, index) => (
             <div
               key={index}
               className="text-center p-6 bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
@@ -111,7 +170,7 @@ export default function WorkshopAbout() {
 
         {/* Cards Grid */}
         <div className="grid md:grid-cols-3 gap-8">
-          {cards.map((card, index) => (
+          {t.cards.map((card, index) => (
             <div
               key={index}
               className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl group"
@@ -145,7 +204,7 @@ export default function WorkshopAbout() {
 
         {/* Section CTA */}
         <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
-          <SectionCTA text="Quiero Transformar Mi Negocio" />
+          <SectionCTA text={t.cta} />
         </div>
       </div>
     </section>
