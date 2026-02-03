@@ -339,11 +339,11 @@ function SuccessContent() {
           {/* CTA */}
           <div className="text-center">
             <Link
-              href="/"
+              href="/academy/workshop"
               className="inline-flex items-center gap-2 bg-[#022133] hover:bg-[#200F5D] text-white font-bold py-4 px-8 rounded-xl transition-all duration-300"
             >
               <ArrowLeft className="w-5 h-5" />
-              Volver al Inicio
+              Volver al Workshop
             </Link>
           </div>
         </motion.div>
