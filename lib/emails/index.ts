@@ -62,7 +62,7 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       workshopTime: data.workshopTime || '9:00 AM - 12:00 PM',
       amount: data.amount || '$100',
       paymentMethod: data.paymentMethod || 'tarjeta',
-      location: data.location || 'Se confirmará vía WhatsApp',
+      location: data.location || '110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023',
       whatsappLink: data.whatsappLink,
     }),
   },
@@ -275,7 +275,7 @@ export async function sendConfirmationEmail({
       workshopTime: '9:00 AM - 12:00 PM',
       amount: `$${amount}`,
       paymentMethod,
-      location: 'Se confirmará vía WhatsApp',
+      location: '110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023',
     },
     registrationId,
   })

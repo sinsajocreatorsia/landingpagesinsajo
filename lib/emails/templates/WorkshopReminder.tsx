@@ -120,7 +120,7 @@ export default function WorkshopReminder({
               <Column style={iconCol}>📍</Column>
               <Column style={textCol}>
                 <Text style={detailLabel}>Ubicación</Text>
-                <Text style={detailValue}>Presencial en Miami</Text>
+                <Text style={detailValue}>110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023</Text>
               </Column>
             </Row>
           </Section>

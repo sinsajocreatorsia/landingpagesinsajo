@@ -133,7 +133,7 @@ export default function ProfileReminder({
               <strong>Hora:</strong> 9:00 AM - 12:00 PM (EST)
             </Text>
             <Text style={workshopDetail}>
-              <strong>Formato:</strong> Presencial en Miami
+              <strong>Ubicación:</strong> 110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023
             </Text>
           </Section>
 
