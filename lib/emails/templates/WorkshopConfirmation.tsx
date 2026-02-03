@@ -161,11 +161,14 @@ export default function WorkshopConfirmation({
               Puedes contactarnos por cualquiera de estos medios:
             </Text>
             <Text style={contactItem}>
-              📞 <strong>Teléfono/WhatsApp:</strong> +1 (786) 555-0123
+              📞 <strong>Teléfono/WhatsApp:</strong> +1 (609) 288-5466
             </Text>
             <Text style={contactItem}>
-              ✉️ <strong>Email:</strong> sales@screatorsai.com
+              ✉️ <strong>Email:</strong> sales@sinsajocreators.com
             </Text>
+            <Button style={whatsappButton} href="https://wa.me/16092885466?text=Hola%2C%20acabo%20de%20registrarme%20en%20el%20workshop%20y%20tengo%20una%20pregunta">
+              💬 Escríbenos por WhatsApp
+            </Button>
           </Section>
 
           {/* CTA Button */}
@@ -397,6 +400,19 @@ const contactItem = {
   fontSize: '15px',
   lineHeight: '28px',
   margin: '4px 0',
+}
+
+const whatsappButton = {
+  backgroundColor: '#25D366',
+  borderRadius: '8px',
+  color: '#FCFEFB',
+  fontSize: '14px',
+  fontWeight: '600',
+  padding: '12px 24px',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'inline-block',
+  marginTop: '16px',
 }
 
 const hr = {
