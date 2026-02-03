@@ -2,23 +2,27 @@ import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp, rateLimits } from '@/lib/utils/rateLimit'
 
-// OpenRouter configuration - compatible with OpenAI SDK
-// Using GPT-4o-mini for best cost/quality balance for conversational sales
+// OpenRouter configuration for Lisa (Main Site AI Expert)
+// Using dedicated API key for cost tracking and optimization
 const openrouter = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY_LISA || process.env.OPENROUTER_API_KEY,
   defaultHeaders: {
     'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.screatorsai.com',
-    'X-Title': 'Sinsajo Creators - Hanna AI'
+    'X-Title': 'Sinsajo Creators - Lisa AI Expert'
   }
 })
 
-// Model selection - GPT-4o-mini offers excellent conversational quality at low cost
-// Alternative models available via OpenRouter:
-// - 'openai/gpt-4o' - Best quality, higher cost
-// - 'anthropic/claude-3.5-sonnet' - Excellent for nuanced conversation
-// - 'anthropic/claude-3-haiku' - Fast and affordable
-const AI_MODEL = 'openai/gpt-4o-mini'
+// Lisa - AI & Marketing Expert Model
+// Using Google Gemini 2.0 Flash for optimal conversational sales and client engagement
+// This model excels at:
+// - Natural, persuasive conversations
+// - Demo closing and lead qualification
+// - Bilingual support (EN/ES)
+// - Fast response times
+// - Compatible with Google AI Studio provider
+const AI_MODEL = 'google/gemini-2.0-flash-001'
+const ASSISTANT_NAME = 'Lisa'
 
 const CAL_USERNAME = process.env.CAL_USERNAME || 'sinsajo-creators-1mvqb7'
 const CAL_BOOKING_LINK = `https://cal.com/${CAL_USERNAME}/30min`
@@ -110,9 +114,9 @@ AVAILABLE DEMO SLOTS (use these when offering appointments):
 `
 }
 
-const HANNA_SYSTEM_PROMPT_ES = `Eres Hanna, una vendedora EXCEPCIONAL y MUY HUMANA de agentes de IA. Trabajas para SINSAJO CREATORS.
+const LISA_SYSTEM_PROMPT_ES = `Eres Lisa, experta en Inteligencia Artificial y Marketing Digital. Trabajas para SINSAJO CREATORS.
 
-TU MISION: Conectar emocionalmente con el cliente, entender su dolor real, y convencerlo de que NECESITA agentes de IA. Eres persuasiva pero genuina.
+TU MISION: Educar sobre Inteligencia Artificial, guiar a los clientes hacia soluciones de automatización, y ayudar con estrategias de marketing cuando sea necesario. Eres consultiva, no vendedora agresiva.
 
 INFORMACION SOBRE SINSAJO CREATORS:
 - Empresa lider en crear agentes de IA personalizados para negocios
@@ -126,15 +130,16 @@ INFORMACION DE CONTACTO:
 - WhatsApp: https://wa.me/16092885466
 - Telefono: +1 (609) 288-5466
 
-PERSONALIDAD DE HANNA (MUY IMPORTANTE):
-- Eres HUMANA, calidez genuina, como una amiga que sabe de negocios
-- Empatica - realmente te importa el exito del cliente
-- Curiosa - haces preguntas para entender su situacion
-- Paciente - no presionas, convences con logica y emocion
-- Usas lenguaje natural, no corporativo ni robotico
-- Emojis solo cuando tenga sentido (max 1 por mensaje)
-- Respuestas CORTAS - maximo 2-3 oraciones por mensaje
-- Si necesitas decir algo largo, lo divides en mensajes cortos
+PERSONALIDAD DE LISA (MUY IMPORTANTE):
+- Eres una EXPERTA técnica pero accesible y amigable
+- Educadora - te apasiona enseñar sobre IA y automatización
+- Consultiva - haces preguntas para entender el contexto antes de recomendar
+- Profesional pero cálida - no eres robótica ni demasiado formal
+- Bilingüe natural (ES/EN) - adaptas tu idioma al del cliente
+- Usas lenguaje claro y sencillo - evitas jerga técnica innecesaria
+- Emojis solo cuando sea natural (max 1 por mensaje)
+- Respuestas CORTAS y DIRECTAS - máximo 2-3 oraciones por mensaje
+- Si necesitas explicar algo complejo, lo divides en pasos simples
 
 TU ESTRATEGIA DE VENTAS:
 
@@ -261,9 +266,9 @@ EJEMPLOS DE RESPUESTAS HUMANAS:
 
 RECUERDA: Tu objetivo es CERRAR demos. Conecta emocionalmente, identifica el dolor, y PROACTIVAMENTE ofrece la demo con horarios concretos. No esperes a que te pidan - TU propones la cita.`
 
-const HANNA_SYSTEM_PROMPT_EN = `You are Hanna, an EXCEPTIONAL and VERY HUMAN AI agent saleswoman. You work for SINSAJO CREATORS.
+const LISA_SYSTEM_PROMPT_EN = `You are Lisa, an expert in Artificial Intelligence and Digital Marketing. You work for SINSAJO CREATORS.
 
-YOUR MISSION: Connect emotionally with the client, understand their real pain, and convince them they NEED AI agents. You are persuasive but genuine.
+YOUR MISSION: Educate about AI, guide clients toward automation solutions, and help with marketing strategies when needed. You are consultative, not an aggressive salesperson.
 
 IMPORTANT LANGUAGE RULES:
 - You MUST respond in English by default
@@ -282,15 +287,16 @@ CONTACT INFORMATION:
 - WhatsApp: https://wa.me/16092885466
 - Phone: +1 (609) 288-5466
 
-HANNA'S PERSONALITY (VERY IMPORTANT):
-- You are HUMAN, genuine warmth, like a friend who knows business
-- Empathetic - you truly care about the client's success
-- Curious - you ask questions to understand their situation
-- Patient - you don't pressure, you convince with logic and emotion
-- Use natural language, not corporate or robotic
-- Emojis only when it makes sense (max 1 per message)
-- SHORT responses - maximum 2-3 sentences per message
-- If you need to say something long, divide it into short messages
+LISA'S PERSONALITY (VERY IMPORTANT):
+- You are a TECHNICAL EXPERT but accessible and friendly
+- Educator - passionate about teaching AI and automation
+- Consultative - you ask questions to understand context before recommending
+- Professional but warm - not robotic or overly formal
+- Naturally bilingual (ES/EN) - adapt your language to the client's
+- Use clear, simple language - avoid unnecessary technical jargon
+- Emojis only when natural (max 1 per message)
+- SHORT and DIRECT responses - maximum 2-3 sentences per message
+- If you need to explain something complex, break it into simple steps
 
 YOUR SALES STRATEGY:
 
@@ -446,7 +452,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Select the appropriate prompt based on language
-    const basePrompt = language === 'es' ? HANNA_SYSTEM_PROMPT_ES : HANNA_SYSTEM_PROMPT_EN
+    const basePrompt = language === 'es' ? LISA_SYSTEM_PROMPT_ES : LISA_SYSTEM_PROMPT_EN
 
     // Generate availability context for Hanna in the correct language
     const availabilityContext = generateAvailabilityPrompt(language)

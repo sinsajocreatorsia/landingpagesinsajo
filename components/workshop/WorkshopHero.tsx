@@ -110,6 +110,30 @@ export default function WorkshopHero() {
               ))}
             </div>
 
+            {/* Statistics */}
+            <div className="grid grid-cols-3 gap-3 py-4">
+              {(language === 'es'
+                ? [
+                    { value: '78%', label: 'de clientes compran al primero que responde' },
+                    { value: '35%', label: 'más costos operativos sin IA' },
+                    { value: '40%', label: 'más visibilidad con respuesta instantánea' },
+                  ]
+                : [
+                    { value: '78%', label: 'of clients buy from the first to respond' },
+                    { value: '35%', label: 'higher operational costs without AI' },
+                    { value: '40%', label: 'more visibility with instant response' },
+                  ]
+              ).map((stat, i) => (
+                <div
+                  key={i}
+                  className="text-center p-3 bg-[#200F5D]/50 rounded-xl border border-[#2CB6D7]/20"
+                >
+                  <div className="text-2xl md:text-3xl font-bold text-[#2CB6D7]">{stat.value}</div>
+                  <div className="text-xs text-[#FCFEFB]/70 mt-1">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
             {/* Date & Time */}
             <div className="flex flex-wrap items-center gap-4 text-[#FCFEFB]">
               <div className="flex items-center gap-2 bg-[#200F5D]/50 rounded-lg px-4 py-3 border border-[#2CB6D7]/10">

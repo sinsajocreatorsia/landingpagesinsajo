@@ -28,10 +28,10 @@ export default function WorkshopPricing() {
   const benefits = [
     { icon: Video, text: 'Acceso al workshop en vivo (3 horas)' },
     { icon: FileText, text: 'Workbook digital + Manual de Prompts' },
-    { icon: Users, text: 'Acceso a comunidad privada' },
+    { icon: Users, text: 'Grupo privado de WhatsApp con las estudiantes' },
     { icon: MessageCircle, text: 'Sesión Q&A en vivo con Giovanna' },
     { icon: Gift, text: 'Clon Asistente personalizado' },
-    { icon: Shield, text: 'Garantía de satisfacción 7 días' },
+    { icon: Sparkles, text: 'Plantillas de automatización listas para usar' },
   ]
 
   return (
@@ -115,7 +115,7 @@ export default function WorkshopPricing() {
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <Check className="w-5 h-5 text-[#36B3AE]" />
-              <span className="text-sm">Garantía 7 días</span>
+              <span className="text-sm">Cupo limitado a 12 personas</span>
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <svg className="w-5 h-5 text-[#36B3AE]" fill="currentColor" viewBox="0 0 24 24">

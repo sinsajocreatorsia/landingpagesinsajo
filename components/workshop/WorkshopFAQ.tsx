@@ -11,35 +11,31 @@ interface FAQItem {
 const faqData: FAQItem[] = [
   {
     question: '¿En qué idioma es el workshop?',
-    answer: 'El workshop será en español, optimizado para fundadoras latinas. Todo el material, incluyendo el workbook y la grabación, estará en español.',
+    answer: 'El workshop será en español, optimizado para fundadoras latinas. Todo el material, incluyendo el workbook digital, estará en español.',
   },
   {
     question: '¿Necesito experiencia previa con IA?',
     answer: 'No necesitas experiencia técnica en IA. Lo que sí necesitas es un negocio establecido que ya genere ingresos. El workshop está diseñado para empresarias que quieren escalar, no para principiantes.',
   },
   {
-    question: '¿Qué pasa si no puedo asistir en vivo?',
-    answer: 'Tendrás acceso a la grabación completa por 30 días. Sin embargo, recomendamos asistir en vivo para participar en la sesión de Q&A y obtener el máximo valor del workshop.',
-  },
-  {
-    question: '¿Cuál es la política de reembolso?',
-    answer: 'Ofrecemos garantía de satisfacción de 7 días. Si el workshop no cumple tus expectativas, te devolvemos el 100% de tu inversión, sin preguntas.',
-  },
-  {
-    question: '¿Cómo accedo a la comunidad privada?',
-    answer: 'Después de tu compra, recibirás un email con el enlace de invitación a nuestra comunidad privada en Slack/Discord donde podrás conectar con otras fundadoras latinas.',
+    question: '¿Cómo accedo al grupo de WhatsApp?',
+    answer: 'Después de tu compra, recibirás por email el enlace de invitación a nuestro grupo privado de WhatsApp donde podrás conectar con las demás participantes del workshop y recibir soporte directo.',
   },
   {
     question: '¿Qué incluye el workbook digital?',
     answer: 'El workbook incluye plantillas de estrategia AI, checklists de implementación, prompts personalizables para tu industria, y un plan de acción de 30 días post-workshop.',
   },
   {
-    question: '¿Puedo pagar con PayPal o tarjeta de crédito?',
-    answer: 'Sí, aceptamos pagos con tarjeta de crédito/débito (Visa, Mastercard, Amex) a través de Stripe, y también PayPal. Ambos métodos son 100% seguros.',
+    question: '¿Cómo puedo pagar?',
+    answer: 'Aceptamos pagos con tarjeta de crédito/débito (Visa, Mastercard, Amex) a través de Stripe. Tu pago es 100% seguro con encriptación SSL.',
   },
   {
     question: '¿Cuántos lugares hay disponibles?',
-    answer: 'Limitamos cada workshop a 50 participantes para garantizar atención personalizada y que todas las preguntas sean respondidas durante la sesión Q&A.',
+    answer: 'Limitamos este workshop a solo 12 participantes. Este número reducido permite una experiencia de aprendizaje más personalizada, donde cada asistente recibe atención individual y puede resolver todas sus dudas en tiempo real.',
+  },
+  {
+    question: '¿Este es el único workshop disponible?',
+    answer: 'Este es el Workshop Fundacional, diseñado como el primer paso en tu transformación digital. Forma parte de un programa progresivo donde irás avanzando hacia niveles más especializados de implementación de IA en tu negocio. Al completar este workshop, tendrás la base sólida necesaria para acceder a módulos avanzados que te permitirán dominar sistemas completos de automatización.',
   },
 ]
 

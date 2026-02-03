@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { CreditCard, Loader2, Shield, Lock } from 'lucide-react'
 
 interface PaymentButtonsProps {
@@ -14,7 +13,6 @@ export default function PaymentButtons({ price, workshopName }: PaymentButtonsPr
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
-  const [country, setCountry] = useState('')
   const [error, setError] = useState('')
   const [utmParams, setUtmParams] = useState({
     utm_source: '',
@@ -59,7 +57,7 @@ export default function PaymentButtons({ price, workshopName }: PaymentButtonsPr
           email,
           name,
           phone,
-          country,
+          country: 'US',
           price,
           workshopName,
           ...utmParams,
@@ -80,8 +78,6 @@ export default function PaymentButtons({ price, workshopName }: PaymentButtonsPr
       setLoading(false)
     }
   }
-
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ''
 
   return (
     <div className="space-y-6">
@@ -125,54 +121,18 @@ export default function PaymentButtons({ price, workshopName }: PaymentButtonsPr
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-[#022133] mb-1">
-              Teléfono / WhatsApp
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="+1 555 123 4567"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-white text-[#022133] focus:border-[#2CB6D7] focus:ring-2 focus:ring-[#2CB6D7]/20 outline-none transition-all"
-            />
-          </div>
-          <div>
-            <label htmlFor="country" className="block text-sm font-medium text-[#022133] mb-1">
-              País
-            </label>
-            <select
-              id="country"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-white text-[#022133] focus:border-[#2CB6D7] focus:ring-2 focus:ring-[#2CB6D7]/20 outline-none transition-all"
-            >
-              <option value="">Selecciona tu país</option>
-              <option value="US">Estados Unidos</option>
-              <option value="MX">México</option>
-              <option value="CO">Colombia</option>
-              <option value="AR">Argentina</option>
-              <option value="ES">España</option>
-              <option value="PE">Perú</option>
-              <option value="CL">Chile</option>
-              <option value="EC">Ecuador</option>
-              <option value="VE">Venezuela</option>
-              <option value="PA">Panamá</option>
-              <option value="CR">Costa Rica</option>
-              <option value="DO">República Dominicana</option>
-              <option value="PR">Puerto Rico</option>
-              <option value="GT">Guatemala</option>
-              <option value="HN">Honduras</option>
-              <option value="SV">El Salvador</option>
-              <option value="NI">Nicaragua</option>
-              <option value="BO">Bolivia</option>
-              <option value="PY">Paraguay</option>
-              <option value="UY">Uruguay</option>
-              <option value="OTHER">Otro</option>
-            </select>
-          </div>
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-[#022133] mb-1">
+            Teléfono / WhatsApp
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            placeholder="+1 555 123 4567"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-white text-[#022133] focus:border-[#2CB6D7] focus:ring-2 focus:ring-[#2CB6D7]/20 outline-none transition-all"
+          />
         </div>
       </div>
 
@@ -194,84 +154,6 @@ export default function PaymentButtons({ price, workshopName }: PaymentButtonsPr
           </>
         )}
       </button>
-
-      {/* Divider */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1 h-px bg-gray-200"></div>
-        <span className="text-gray-400 text-sm font-medium">o paga con</span>
-        <div className="flex-1 h-px bg-gray-200"></div>
-      </div>
-
-      {/* PayPal Button */}
-      {paypalClientId && (
-        <PayPalScriptProvider
-          options={{
-            clientId: paypalClientId,
-            currency: 'USD',
-            intent: 'capture',
-          }}
-        >
-          <PayPalButtons
-            style={{
-              layout: 'horizontal',
-              color: 'gold',
-              shape: 'rect',
-              label: 'pay',
-              height: 50,
-            }}
-            disabled={!name || !email}
-            createOrder={async () => {
-              if (!validateForm()) {
-                throw new Error('Invalid form')
-              }
-
-              const response = await fetch('/api/paypal/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name, phone, country, price, workshopName }),
-              })
-              const order = await response.json()
-
-              if (order.error) {
-                setError(order.error)
-                throw new Error(order.error)
-              }
-
-              return order.id
-            }}
-            onApprove={async (data) => {
-              try {
-                const response = await fetch('/api/paypal/capture-order', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    orderID: data.orderID,
-                    email,
-                    name,
-                    phone,
-                    country,
-                    ...utmParams,
-                  }),
-                })
-                const details = await response.json()
-
-                if (details.status === 'COMPLETED') {
-                  window.location.href = '/academy/workshop/success'
-                } else {
-                  setError('El pago no se completó. Intenta de nuevo.')
-                }
-              } catch (err) {
-                console.error('PayPal capture error:', err)
-                setError('Error al completar el pago con PayPal.')
-              }
-            }}
-            onError={(err) => {
-              console.error('PayPal error:', err)
-              setError('Error con PayPal. Intenta con tarjeta.')
-            }}
-          />
-        </PayPalScriptProvider>
-      )}
 
       {/* Security badges */}
       <div className="flex flex-wrap items-center justify-center gap-4 pt-2">

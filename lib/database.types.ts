@@ -271,6 +271,71 @@ export type LeadInsert = Omit<Lead, 'id'> & {
 }
 
 // ============================================
+// HANNA SAAS TYPES
+// ============================================
+
+export interface Profile {
+  id: string
+  email: string | null
+  full_name: string | null
+  avatar_url: string | null
+  plan: 'free' | 'pro' | null
+  messages_today: number | null
+  last_message_date: string | null
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  subscription_status: string | null
+  subscription_end_date: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface HannaSession {
+  id: string
+  user_id: string
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface HannaMessage {
+  id: string
+  session_id: string
+  role: 'user' | 'assistant'
+  content: string
+  tokens_used: number | null
+  created_at: string
+}
+
+export interface HannaBusinessProfile {
+  id: string
+  user_id: string
+  business_name: string | null
+  business_type: string | null
+  target_audience: string | null
+  brand_voice: string | null
+  products_services: string | null
+  unique_value_proposition: string | null
+  custom_instructions: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface HannaCoupon {
+  id: string
+  code: string
+  type: string
+  discount_type: string
+  discount_value: number
+  free_months: number | null
+  valid_until: string | null
+  is_active: boolean
+  max_uses: number | null
+  current_uses: number
+  created_at: string
+}
+
+// ============================================
 // DATABASE SCHEMA TYPE
 // ============================================
 
@@ -321,6 +386,31 @@ export interface Database {
         Row: Lead
         Insert: LeadInsert
         Update: Partial<LeadInsert>
+      }
+      profiles: {
+        Row: Profile
+        Insert: Omit<Profile, 'created_at' | 'updated_at'> & { created_at?: string; updated_at?: string }
+        Update: Partial<Omit<Profile, 'id'>>
+      }
+      hanna_sessions: {
+        Row: HannaSession
+        Insert: Omit<HannaSession, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Omit<HannaSession, 'id'>>
+      }
+      hanna_messages: {
+        Row: HannaMessage
+        Insert: Omit<HannaMessage, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<HannaMessage, 'id'>>
+      }
+      hanna_business_profiles: {
+        Row: HannaBusinessProfile
+        Insert: Omit<HannaBusinessProfile, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Omit<HannaBusinessProfile, 'id'>>
+      }
+      hanna_coupons: {
+        Row: HannaCoupon
+        Insert: Omit<HannaCoupon, 'id' | 'created_at' | 'current_uses'> & { id?: string; created_at?: string; current_uses?: number }
+        Update: Partial<Omit<HannaCoupon, 'id'>>
       }
     }
     Views: {

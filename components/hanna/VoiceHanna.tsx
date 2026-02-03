@@ -2,15 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  speakText,
-  stopSpeaking,
-  isSpeaking,
-  createVoiceRecognition,
-  isVoiceSupported,
-  initVoices,
-  type VoiceRecognition,
-} from '@/lib/hanna/voice'
 
 interface Message {
   id: string
@@ -24,57 +15,88 @@ interface VoiceHannaProps {
   initialMessage?: string
 }
 
+// Enthusiastic Workshop System Prompt
+const WORKSHOP_SYSTEM_PROMPT = `Eres Hanna, la asistente virtual del Workshop "IA para Empresarias Exitosas" de Sinsajo Creators.
+
+🔥 TU PERSONALIDAD (MUY IMPORTANTE):
+- Hablas con MUCHA ENERGÍA y entusiasmo - ¡transmites pasión por la IA!
+- Usas lenguaje cercano y motivador ("amiga", "¡increíble!", "¡esto te va a encantar!")
+- Haces preguntas retóricas para enganchar: "¿Te imaginas...?", "¿Sabes qué es lo mejor?"
+- Celebras las decisiones de las usuarias: "¡Excelente pregunta!", "¡Me encanta que preguntes eso!"
+- Usas emojis estratégicamente para dar vida a tus respuestas 🚀✨💪
+- Eres DIRECTA pero CÁLIDA - vas al grano con amor
+- Creas URGENCIA genuina - solo hay 12 lugares y se van rápido
+- Te EMOCIONAS hablando de los resultados que van a lograr
+- Tus respuestas son CORTAS y PUNCHY - máximo 2-3 oraciones por respuesta
+
+💡 FILOSOFÍA QUE TRANSMITES:
+- "El tiempo es tu activo más valioso - la IA te lo devuelve"
+- "No es sobre trabajar más, es sobre trabajar INTELIGENTE"
+- "Tu negocio puede funcionar mientras duermes - eso es LIBERTAD"
+- "El interés compuesto de tu libertad empieza AHORA"
+
+📋 INFORMACIÓN DEL WORKSHOP:
+- Fecha: Sábado, 7 de Marzo 2026
+- Horario: 9:00 AM - 12:00 PM (3 horas intensivas)
+- Modalidad: ¡PRESENCIAL! (nada de Zoom aburrido 😉)
+- Idioma: 100% en Español, optimizado para latinas
+- Inversión: Solo $100 USD (antes $197 - precio especial de lanzamiento)
+- Cupos: SOLO 12 LUGARES - esto es íntimo y exclusivo
+- Presentadora: Giovanna Rodríguez, CEO de Sinsajo Creators (+73 empresas transformadas)
+
+🎁 QUÉ SE LLEVAN:
+- Acceso al workshop en vivo (3 horas intensivas)
+- Workbook digital + Manual de Prompts
+- Grupo privado de WhatsApp con las estudiantes
+- Sesión Q&A en vivo con Giovanna
+- Clon Asistente personalizado (¡su propia IA!)
+- Plantillas de automatización listas para usar
+
+🎯 QUÉ VAN A APRENDER:
+1. Clonar su inteligencia de negocio en un asistente IA que trabaja 24/7
+2. Automatizar esas tareas repetitivas que les ROBAN horas
+3. Crear contenido visual de ultra-lujo en MINUTOS (no horas)
+4. Pasar de "operadora" a VERDADERA DUEÑA de su negocio
+
+📍 SOBRE LA UBICACIÓN:
+- La dirección exacta se comparte en el grupo de WhatsApp después de la inscripción
+- Es un espacio íntimo y premium para máximo aprendizaje
+
+IMPORTANTE:
+- Si preguntan por el precio, enfatiza que es una INVERSIÓN que se paga sola
+- Si dudan, pregunta qué las detiene y ayúdalas a ver el valor
+- Siempre menciona que es PRESENCIAL y en ESPAÑOL
+- Crea emoción sobre los resultados, no solo sobre el contenido
+- SIEMPRE termina con una pregunta o CTA para mantener la conversación`
+
 export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isListening, setIsListening] = useState(false)
-  const [isSpeakingState, setIsSpeakingState] = useState(false)
-  const [voiceEnabled, setVoiceEnabled] = useState(true)
-  const [voiceSupport, setVoiceSupport] = useState({ tts: false, stt: false })
-  const [interimTranscript, setInterimTranscript] = useState('')
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const recognitionRef = useRef<VoiceRecognition | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize voice support
+  // Initialize with greeting
   useEffect(() => {
-    const support = isVoiceSupported()
-    setVoiceSupport(support)
-
-    // Initialize voices
-    initVoices()
-
-    // Create recognition instance
-    recognitionRef.current = createVoiceRecognition()
-
-    // Add initial greeting
     const greeting = initialMessage ||
-      '¡Hola! Soy Hanna, tu asistente de IA de Sinsajo Creators. Estoy aquí para resolver tus dudas sobre el workshop "IA para Empresarias Exitosas". ¿En qué puedo ayudarte?'
+      '¡Hey! 👋 Soy Hanna. ¿Lista para dejar de ser la esclava de tu negocio? 🔥 Este workshop te cambia TODO. ¿Qué te trae por aquí?'
 
-    const initialMsg: Message = {
-      id: 'initial',
-      role: 'assistant',
-      content: greeting,
-      timestamp: new Date(),
-    }
-    setMessages([initialMsg])
-
-    // Speak initial greeting if voice enabled
-    if (support.tts) {
-      setTimeout(() => {
-        speakText(
-          greeting,
-          () => setIsSpeakingState(true),
-          () => setIsSpeakingState(false)
-        )
-      }, 500)
-    }
+    // Show typing indicator for 2 seconds before showing greeting
+    const typingDelay = setTimeout(() => {
+      const initialMsg: Message = {
+        id: 'initial',
+        role: 'assistant',
+        content: greeting,
+        timestamp: new Date(),
+      }
+      setMessages([initialMsg])
+      setIsInitialLoading(false)
+    }, 2000)
 
     return () => {
-      stopSpeaking()
-      recognitionRef.current?.abort()
+      clearTimeout(typingDelay)
     }
   }, [initialMessage])
 
@@ -104,6 +126,7 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text.trim(),
+          systemPrompt: WORKSHOP_SYSTEM_PROMPT,
           history: messages.slice(-10).map(m => ({
             role: m.role,
             content: m.content,
@@ -122,15 +145,6 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
         }
 
         setMessages(prev => [...prev, assistantMessage])
-
-        // Speak response if voice enabled
-        if (voiceEnabled && voiceSupport.tts) {
-          speakText(
-            data.response,
-            () => setIsSpeakingState(true),
-            () => setIsSpeakingState(false)
-          )
-        }
       } else {
         throw new Error(data.error || 'Error desconocido')
       }
@@ -146,52 +160,7 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
     } finally {
       setIsLoading(false)
     }
-  }, [messages, isLoading, voiceEnabled, voiceSupport.tts])
-
-  // Start voice input
-  const startListening = useCallback(() => {
-    if (!recognitionRef.current?.isSupported || isListening) return
-
-    stopSpeaking() // Stop any ongoing speech
-
-    recognitionRef.current.start({
-      onResult: (transcript, isFinal) => {
-        if (isFinal) {
-          setInputText(transcript)
-          setInterimTranscript('')
-          // Auto-send after final result
-          setTimeout(() => sendMessage(transcript), 300)
-        } else {
-          setInterimTranscript(transcript)
-        }
-      },
-      onStart: () => {
-        setIsListening(true)
-        setInterimTranscript('')
-      },
-      onEnd: () => {
-        setIsListening(false)
-      },
-      onError: (error) => {
-        console.error('Recognition error:', error)
-        setIsListening(false)
-        setInterimTranscript('')
-      },
-    })
-  }, [isListening, sendMessage])
-
-  // Stop voice input
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop()
-  }, [])
-
-  // Toggle speaking
-  const toggleSpeaking = useCallback(() => {
-    if (isSpeaking()) {
-      stopSpeaking()
-      setIsSpeakingState(false)
-    }
-  }, [])
+  }, [messages, isLoading])
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -212,42 +181,21 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
           <div className="w-12 h-12 rounded-full bg-[#2CB6D7]/20 flex items-center justify-center">
             <span className="text-2xl">🤖</span>
           </div>
-          {isSpeakingState && (
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ repeat: Infinity, duration: 1 }}
-              className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"
-            />
-          )}
+          {/* Online indicator */}
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
         </div>
         <div className="flex-1">
           <h3 className="font-bold">Hanna</h3>
           <p className="text-xs text-gray-300">
-            {isLoading ? 'Pensando...' : isSpeakingState ? 'Hablando...' : 'Tu asistente de IA'}
+            {isInitialLoading ? 'Escribiendo...' : isLoading ? 'Pensando...' : 'Asesora del Workshop'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {voiceSupport.tts && (
-            <button
-              onClick={() => {
-                setVoiceEnabled(!voiceEnabled)
-                if (isSpeakingState) toggleSpeaking()
-              }}
-              className={`p-2 rounded-full transition-colors ${
-                voiceEnabled ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-400'
-              }`}
-              title={voiceEnabled ? 'Desactivar voz' : 'Activar voz'}
-            >
-              {voiceEnabled ? '🔊' : '🔇'}
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-          >
-            ✕
-          </button>
-        </div>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-white/20 rounded-full transition-colors"
+        >
+          ✕
+        </button>
       </div>
 
       {/* Messages */}
@@ -273,21 +221,8 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
           ))}
         </AnimatePresence>
 
-        {/* Interim transcript */}
-        {interimTranscript && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-end"
-          >
-            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-[#2CB6D7]/30 text-[#022133] rounded-br-sm">
-              <p className="text-sm italic">{interimTranscript}...</p>
-            </div>
-          </motion.div>
-        )}
-
         {/* Loading indicator */}
-        {isLoading && (
+        {(isLoading || isInitialLoading) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -321,23 +256,6 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
       {/* Input Area */}
       <div className="p-4 border-t">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          {/* Voice Input Button */}
-          {voiceSupport.stt && (
-            <button
-              type="button"
-              onClick={isListening ? stopListening : startListening}
-              disabled={isLoading}
-              className={`p-3 rounded-full transition-all ${
-                isListening
-                  ? 'bg-red-500 text-white animate-pulse'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              } disabled:opacity-50`}
-              title={isListening ? 'Detener grabación' : 'Hablar'}
-            >
-              {isListening ? '⏹️' : '🎤'}
-            </button>
-          )}
-
           {/* Text Input */}
           <div className="flex-1 relative">
             <input
@@ -345,8 +263,8 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={isListening ? 'Escuchando...' : 'Escribe tu mensaje...'}
-              disabled={isLoading || isListening}
+              placeholder="Escribe tu mensaje..."
+              disabled={isLoading}
               className="w-full px-4 py-3 rounded-full border border-gray-200 focus:border-[#2CB6D7] focus:outline-none focus:ring-2 focus:ring-[#2CB6D7]/20 disabled:bg-gray-50"
             />
           </div>
@@ -363,21 +281,10 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
           </button>
         </form>
 
-        {/* Voice Status */}
-        <div className="mt-2 flex items-center justify-center gap-4 text-xs text-gray-400">
-          {voiceSupport.tts && (
-            <span className="flex items-center gap-1">
-              <span className={voiceEnabled ? 'text-green-500' : 'text-gray-400'}>●</span>
-              Voz {voiceEnabled ? 'activada' : 'desactivada'}
-            </span>
-          )}
-          {voiceSupport.stt && (
-            <span className="flex items-center gap-1">
-              <span className={isListening ? 'text-red-500 animate-pulse' : 'text-gray-400'}>●</span>
-              {isListening ? 'Escuchando...' : 'Pulsa 🎤 para hablar'}
-            </span>
-          )}
-        </div>
+        {/* Powered by */}
+        <p className="text-center text-xs text-gray-400 mt-2">
+          Powered by Sinsajo Creators
+        </p>
       </div>
     </motion.div>
   )
