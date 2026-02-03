@@ -1,13 +1,18 @@
 import OpenAI from 'openai'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// Use OpenRouter for AI inference
+// Use OpenRouter for AI inference - Use SAAS key for Hanna analysis
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY_SAAS || process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    'HTTP-Referer': 'https://www.screatorsai.com',
+    'X-Title': 'Sinsajo Creators - Hanna Analysis'
+  }
 })
 
-const MODEL = 'anthropic/claude-3.5-sonnet'
+// Using Gemini 2.0 Flash for consistency with chat (fast, reliable, good quality)
+const MODEL = 'google/gemini-2.0-flash-001'
 
 export interface ProfileData {
   registrationId: string
