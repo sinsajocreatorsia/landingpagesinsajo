@@ -15,7 +15,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: '¿Necesito experiencia previa con IA?',
-    answer: 'No necesitas experiencia técnica en IA. Lo que sí necesitas es un negocio establecido que ya genere ingresos. El workshop está diseñado para empresarias que quieren escalar, no para principiantes.',
+    answer: '¡Para nada! Este workshop es el primer paso perfecto para comenzar a automatizar tu negocio con IA. Está diseñado para empresarias que quieren dar el salto tecnológico, sin importar tu nivel actual. Te guiaremos paso a paso desde cero.',
   },
   {
     question: '¿Cómo accedo al grupo de WhatsApp?',
