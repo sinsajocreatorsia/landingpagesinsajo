@@ -20,7 +20,7 @@ import OnboardingForm from '@/components/workshop/OnboardingForm'
 import confetti from 'canvas-confetti'
 
 // WhatsApp community link
-const WHATSAPP_COMMUNITY_LINK = 'https://chat.whatsapp.com/REPLACE_WITH_YOUR_LINK'
+const WHATSAPP_COMMUNITY_LINK = 'https://chat.whatsapp.com/GRl4HU5dtzZLfQcqzbFzqm'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
@@ -173,9 +173,12 @@ function SuccessContent() {
             className="bg-gradient-to-r from-[#2CB6D7]/10 to-[#36B3AE]/10 rounded-2xl p-6 mb-8"
           >
             {/* Presencial Badge */}
-            <div className="flex justify-center mb-4">
-              <span className="inline-flex items-center gap-2 bg-[#C7517E] text-white px-4 py-2 rounded-full font-bold text-sm">
-                📍 WORKSHOP PRESENCIAL
+            <div className="flex justify-center gap-3 mb-4">
+              <span className="inline-flex items-center gap-2 bg-[#C7517E] text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+                <span className="text-lg">🎯</span> WORKSHOP PRESENCIAL
+              </span>
+              <span className="inline-flex items-center gap-2 bg-[#2CB6D7] text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+                <span className="text-lg">🇪🇸</span> EN ESPAÑOL
               </span>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
