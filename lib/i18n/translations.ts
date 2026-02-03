@@ -89,7 +89,6 @@ export const translations = {
       includes: 'Incluye',
       features: [
         '4 horas de workshop intensivo en vivo',
-        'Acceso a la grabación por 30 días',
         'Plantillas y prompts personalizables',
         'Certificado de participación',
         'Acceso al grupo privado de Telegram',
@@ -120,12 +119,49 @@ export const translations = {
       },
       typing: 'Hanna está escribiendo',
       placeholder: 'Escribe tu mensaje...',
-      listening: 'Escuchando...',
       quickActions: ['¿Qué aprenderé?', '¿Cuál es el precio?', 'Cuéntame más'],
       advisor: 'Asesora del Workshop',
-      speaking: 'Hablando...',
-      voiceEnabled: 'Voz habilitada',
       askAboutWorkshop: '¡Pregúntame sobre el Workshop!',
+    },
+    // Testimonials
+    testimonials: {
+      badge: 'LO QUE DICEN DE SINSAJO CREATORS',
+      title: 'Empresarias que ya',
+      titleHighlight: 'Transformaron',
+      titleEnd: 'sus Negocios',
+      subtitle: 'Resultados reales de dueñas de negocio que confiaron en nuestra metodología.',
+      items: [
+        {
+          name: 'María González',
+          role: 'CEO, Boutique de Moda',
+          quote: 'Trabajar con Sinsajo Creators transformó completamente mi negocio. En 3 meses, automatizamos el 80% de nuestras operaciones y ahora mi equipo se enfoca en lo que realmente importa.',
+          result: 'Ahorró 15 horas semanales',
+        },
+        {
+          name: 'Ana Martínez',
+          role: 'Fundadora, Agencia de Marketing',
+          quote: 'La metodología de Sinsajo es diferente. No es solo tecnología, es estrategia real que entiende los negocios latinos. Giovanna y su equipo saben exactamente cómo escalar sin perder la esencia.',
+          result: 'Triplicó sus ventas',
+        },
+        {
+          name: 'Carmen Rodríguez',
+          role: 'Directora, Consultoría Legal',
+          quote: 'Pensé que la IA era solo para empresas grandes. Sinsajo me demostró que cualquier negocio puede beneficiarse. Ahora tengo un asistente virtual que califica leads mientras duermo.',
+          result: '+40% en conversiones',
+        },
+        {
+          name: 'Laura Sánchez',
+          role: 'Propietaria, E-commerce',
+          quote: 'El ROI fue inmediato. La inversión se pagó en el primer mes. Lo mejor es que ahora tengo tiempo para mi familia y mi negocio sigue creciendo.',
+          result: 'ROI en 30 días',
+        },
+      ],
+      stats: [
+        { value: '+73', label: 'Empresas transformadas' },
+        { value: '98%', label: 'Satisfacción' },
+        { value: '10+', label: 'Horas ahorradas/semana' },
+        { value: '3x', label: 'Productividad promedio' },
+      ],
     },
   },
   en: {
@@ -218,7 +254,6 @@ export const translations = {
       includes: 'Includes',
       features: [
         '4 hours of intensive live workshop',
-        'Access to recording for 30 days',
         'Customizable templates and prompts',
         'Certificate of participation',
         'Access to private Telegram group',
@@ -249,12 +284,49 @@ export const translations = {
       },
       typing: 'Hanna is typing',
       placeholder: 'Type your message...',
-      listening: 'Listening...',
       quickActions: ["What will I learn?", "What's the price?", 'Tell me more'],
       advisor: 'Workshop Advisor',
-      speaking: 'Speaking...',
-      voiceEnabled: 'Voice enabled',
       askAboutWorkshop: 'Ask me about the Workshop!',
+    },
+    // Testimonials
+    testimonials: {
+      badge: 'WHAT THEY SAY ABOUT SINSAJO CREATORS',
+      title: 'Business Women Who Already',
+      titleHighlight: 'Transformed',
+      titleEnd: 'Their Businesses',
+      subtitle: 'Real results from business owners who trusted our methodology.',
+      items: [
+        {
+          name: 'María González',
+          role: 'CEO, Fashion Boutique',
+          quote: 'Working with Sinsajo Creators completely transformed my business. In 3 months, we automated 80% of our operations and now my team focuses on what really matters.',
+          result: 'Saved 15 hours weekly',
+        },
+        {
+          name: 'Ana Martínez',
+          role: 'Founder, Marketing Agency',
+          quote: "Sinsajo's methodology is different. It's not just technology, it's real strategy that understands Latino businesses. Giovanna and her team know exactly how to scale without losing the essence.",
+          result: 'Tripled her sales',
+        },
+        {
+          name: 'Carmen Rodríguez',
+          role: 'Director, Legal Consulting',
+          quote: 'I thought AI was only for big companies. Sinsajo showed me that any business can benefit. Now I have a virtual assistant that qualifies leads while I sleep.',
+          result: '+40% in conversions',
+        },
+        {
+          name: 'Laura Sánchez',
+          role: 'Owner, E-commerce',
+          quote: 'The ROI was immediate. The investment paid for itself in the first month. The best part is that now I have time for my family and my business keeps growing.',
+          result: 'ROI in 30 days',
+        },
+      ],
+      stats: [
+        { value: '+73', label: 'Transformed businesses' },
+        { value: '98%', label: 'Satisfaction' },
+        { value: '10+', label: 'Hours saved/week' },
+        { value: '3x', label: 'Average productivity' },
+      ],
     },
   },
 }
@@ -335,11 +407,17 @@ export interface Translations {
     }
     typing: string
     placeholder: string
-    listening: string
     quickActions: string[]
     advisor: string
-    speaking: string
-    voiceEnabled: string
     askAboutWorkshop: string
+  }
+  testimonials: {
+    badge: string
+    title: string
+    titleHighlight: string
+    titleEnd: string
+    subtitle: string
+    items: Array<{ name: string; role: string; quote: string; result: string }>
+    stats: Array<{ value: string; label: string }>
   }
 }
