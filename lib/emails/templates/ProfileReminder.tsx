@@ -133,7 +133,7 @@ export default function ProfileReminder({
               <strong>Hora:</strong> 9:00 AM - 12:00 PM (EST)
             </Text>
             <Text style={workshopDetail}>
-              <strong>Formato:</strong> En vivo por Zoom
+              <strong>Formato:</strong> Presencial en Miami
             </Text>
           </Section>
 

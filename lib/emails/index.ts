@@ -73,17 +73,15 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       hoursUntil: '24',
       workshopDate: data.workshopDate || 'Sábado, 7 de Marzo 2026',
       workshopTime: data.workshopTime || '9:00 AM - 12:00 PM (EST)',
-      zoomLink: data.zoomLink,
     }),
   },
   reminder_1h: {
-    subject: '⏰ ¡Comenzamos en 1 hora! - Link de acceso',
+    subject: '⏰ ¡Comenzamos en 1 hora! - Recordatorio del Workshop',
     templateFn: (data) => WorkshopReminder({
       customerName: data.customerName || 'Empresaria',
       hoursUntil: '1',
       workshopDate: data.workshopDate || 'Hoy',
       workshopTime: data.workshopTime || '9:00 AM - 12:00 PM (EST)',
-      zoomLink: data.zoomLink,
     }),
   },
   access_link: {
@@ -290,13 +288,11 @@ export async function sendReminderEmail({
   to,
   customerName,
   hoursUntil,
-  zoomLink,
   registrationId,
 }: {
   to: string
   customerName: string
   hoursUntil: 24 | 1
-  zoomLink?: string
   registrationId: string
 }): Promise<EmailResult> {
   const type = hoursUntil === 24 ? 'reminder_24h' : 'reminder_1h'
@@ -306,7 +302,6 @@ export async function sendReminderEmail({
     type,
     data: {
       customerName,
-      zoomLink: zoomLink || '',
     },
     registrationId,
   })

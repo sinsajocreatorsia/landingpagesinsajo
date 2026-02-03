@@ -20,7 +20,6 @@ interface WorkshopReminderProps {
   hoursUntil: '24' | '1'
   workshopDate: string
   workshopTime: string
-  zoomLink?: string
 }
 
 export default function WorkshopReminder({
@@ -28,7 +27,6 @@ export default function WorkshopReminder({
   hoursUntil = '24',
   workshopDate = 'Sábado, 7 de Marzo 2026',
   workshopTime = '9:00 AM - 12:00 PM (EST)',
-  zoomLink = '',
 }: WorkshopReminderProps) {
   const isOneHour = hoursUntil === '1'
   const previewText = isOneHour
@@ -79,8 +77,8 @@ export default function WorkshopReminder({
                   🚨 <strong>¡El workshop está a punto de comenzar!</strong>
                 </Text>
                 <Text style={paragraph}>
-                  Asegúrate de tener todo listo: un lugar tranquilo, buena conexión
-                  a internet, y tu mente abierta para aprender.
+                  Asegúrate de tener todo listo y llegar a tiempo al lugar del evento.
+                  ¡Te esperamos con mucha emoción!
                 </Text>
               </>
             ) : (
@@ -122,25 +120,10 @@ export default function WorkshopReminder({
               <Column style={iconCol}>📍</Column>
               <Column style={textCol}>
                 <Text style={detailLabel}>Ubicación</Text>
-                <Text style={detailValue}>Virtual (Zoom)</Text>
+                <Text style={detailValue}>Presencial en Miami</Text>
               </Column>
             </Row>
           </Section>
-
-          {/* Zoom Link (if available) */}
-          {zoomLink && (
-            <Section style={zoomSection}>
-              <Heading as="h2" style={h2}>
-                Tu Link de Acceso
-              </Heading>
-              <Button style={zoomButton} href={zoomLink}>
-                🎥 Unirse al Workshop
-              </Button>
-              <Text style={zoomNote}>
-                Guarda este link. Lo necesitarás para unirte al workshop.
-              </Text>
-            </Section>
-          )}
 
           {/* Checklist */}
           <Section style={content}>
@@ -148,30 +131,28 @@ export default function WorkshopReminder({
               ✅ Lista de Preparación
             </Heading>
             <Text style={checklistItem}>
-              ☐ Conexión a internet estable
+              ☐ Confirmar tu asistencia en el grupo de WhatsApp
             </Text>
             <Text style={checklistItem}>
-              ☐ Audífonos o parlantes listos
+              ☐ Revisar la ubicación exacta (se compartirá en WhatsApp)
             </Text>
             <Text style={checklistItem}>
               ☐ Libreta y bolígrafo para notas
             </Text>
             <Text style={checklistItem}>
-              ☐ Tu café o té favorito ☕
+              ☐ Tu laptop o tablet si deseas tomar notas digitales
             </Text>
             <Text style={checklistItem}>
               ☐ Mente abierta para aprender
             </Text>
           </Section>
 
-          {/* CTA */}
-          {!zoomLink && (
-            <Section style={buttonSection}>
-              <Text style={waitingNote}>
-                El link de Zoom será enviado 1 hora antes del evento.
-              </Text>
-            </Section>
-          )}
+          {/* Location Note */}
+          <Section style={buttonSection}>
+            <Text style={waitingNote}>
+              📍 La dirección exacta será compartida en el grupo de WhatsApp.
+            </Text>
+          </Section>
 
           {/* Support */}
           <Section style={content}>
