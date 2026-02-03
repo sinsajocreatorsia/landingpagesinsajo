@@ -1,20 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, MessageCircle, Sparkles, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
+import { X, Send, MessageCircle, Sparkles } from 'lucide-react'
 import DOMPurify from 'isomorphic-dompurify'
 import { processMessage } from '@/lib/utils/messageFormatter'
 import { useLanguage } from '@/lib/i18n'
-import {
-  speakText,
-  stopSpeaking,
-  isSpeaking,
-  createVoiceRecognition,
-  isVoiceSupported,
-  initVoices,
-  type VoiceRecognition,
-} from '@/lib/hanna/voice'
 
 // Configuración segura de DOMPurify
 const sanitizeHtml = (dirty: string): string => {
@@ -48,14 +39,6 @@ export default function WorkshopChatWidget() {
   const [isGreetingTyping, setIsGreetingTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Voice state
-  const [voiceEnabled, setVoiceEnabled] = useState(true)
-  const [isListening, setIsListening] = useState(false)
-  const [isSpeakingState, setIsSpeakingState] = useState(false)
-  const [voiceSupport, setVoiceSupport] = useState({ tts: false, stt: false })
-  const [interimTranscript, setInterimTranscript] = useState('')
-  const recognitionRef = useRef<VoiceRecognition | null>(null)
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -63,67 +46,6 @@ export default function WorkshopChatWidget() {
   useEffect(() => {
     scrollToBottom()
   }, [messages, isTyping])
-
-  // Initialize voice support
-  useEffect(() => {
-    const support = isVoiceSupported()
-    setVoiceSupport(support)
-    initVoices()
-    recognitionRef.current = createVoiceRecognition()
-
-    return () => {
-      stopSpeaking()
-      recognitionRef.current?.abort()
-    }
-  }, [])
-
-  // Speak Hanna's response
-  const speakResponse = useCallback((text: string) => {
-    if (!voiceEnabled || !voiceSupport.tts) return
-
-    // Strip HTML tags for speech
-    const plainText = text.replace(/<[^>]*>/g, '')
-    speakText(
-      plainText,
-      () => setIsSpeakingState(true),
-      () => setIsSpeakingState(false)
-    )
-  }, [voiceEnabled, voiceSupport.tts])
-
-  // Start voice input
-  const startListening = useCallback(() => {
-    if (!recognitionRef.current?.isSupported || isListening) return
-
-    stopSpeaking()
-
-    recognitionRef.current.start({
-      onResult: (transcript, isFinal) => {
-        if (isFinal) {
-          setInput(transcript)
-          setInterimTranscript('')
-        } else {
-          setInterimTranscript(transcript)
-        }
-      },
-      onStart: () => {
-        setIsListening(true)
-        setInterimTranscript('')
-      },
-      onEnd: () => {
-        setIsListening(false)
-      },
-      onError: (error) => {
-        console.error('Recognition error:', error)
-        setIsListening(false)
-        setInterimTranscript('')
-      },
-    })
-  }, [isListening])
-
-  // Stop voice input
-  const stopListening = useCallback(() => {
-    recognitionRef.current?.stop()
-  }, [])
 
   // Show greeting with delay when chat opens
   useEffect(() => {
@@ -175,12 +97,6 @@ export default function WorkshopChatWidget() {
       if (i < parts.length - 1) {
         await sleep(400 + Math.random() * 500)
       }
-    }
-
-    // Speak the full message after displaying all parts
-    if (voiceEnabled && voiceSupport.tts) {
-      const plainText = fullMessage.replace(/<[^>]*>/g, '')
-      speakResponse(plainText)
     }
   }
 
@@ -317,43 +233,16 @@ export default function WorkshopChatWidget() {
                   <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
-                  {isSpeakingState && (
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 0.8 }}
-                      className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white flex items-center justify-center"
-                    >
-                      <Volume2 className="w-2 h-2 text-white" />
-                    </motion.div>
-                  )}
-                  {!isSpeakingState && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
-                  )}
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">Hanna</h3>
                   <p className="text-white/80 text-sm">
-                    {isSpeakingState ? `🎙️ ${t.chat.speaking}` : t.chat.advisor}
+                    {t.chat.advisor}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Voice toggle */}
-                {voiceSupport.tts && (
-                  <button
-                    onClick={() => {
-                      setVoiceEnabled(!voiceEnabled)
-                      if (isSpeaking()) stopSpeaking()
-                      setIsSpeakingState(false)
-                    }}
-                    className={`p-2 rounded-full transition-colors ${
-                      voiceEnabled ? 'bg-white/20 text-white' : 'bg-white/10 text-white/50'
-                    }`}
-                    title={voiceEnabled ? 'Desactivar voz' : 'Activar voz'}
-                  >
-                    {voiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-                  </button>
-                )}
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
@@ -510,40 +399,15 @@ export default function WorkshopChatWidget() {
               </div>
             )}
 
-            {/* Interim transcript display */}
-            {interimTranscript && (
-              <div className="px-4 pb-2">
-                <div className="bg-[#2CB6D7]/10 rounded-lg px-3 py-2 text-sm text-[#2CB6D7] italic">
-                  🎤 {interimTranscript}...
-                </div>
-              </div>
-            )}
-
             {/* Input */}
             <form onSubmit={sendMessage} className="p-4 border-t border-[#2CB6D7]/20 bg-[#022133]">
               <div className="flex gap-2">
-                {/* Voice input button */}
-                {voiceSupport.stt && (
-                  <button
-                    type="button"
-                    onClick={isListening ? stopListening : startListening}
-                    disabled={isLoading || isTyping}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                      isListening
-                        ? 'bg-red-500 text-white animate-pulse'
-                        : 'bg-white/10 text-white hover:bg-white/20'
-                    } disabled:opacity-50`}
-                    title={isListening ? 'Detener grabación' : 'Hablar a Hanna'}
-                  >
-                    {isListening ? <MicOff size={20} /> : <Mic size={20} />}
-                  </button>
-                )}
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isListening ? t.chat.listening : t.chat.placeholder}
-                  disabled={isLoading || isTyping || isListening}
+                  placeholder={t.chat.placeholder}
+                  disabled={isLoading || isTyping}
                   className="flex-1 px-4 py-3 bg-white/5 border border-[#2CB6D7]/30 rounded-full focus:outline-none focus:ring-2 focus:ring-[#C7517E] text-white placeholder-gray-400 text-sm disabled:opacity-70"
                 />
                 <button
@@ -554,18 +418,9 @@ export default function WorkshopChatWidget() {
                   <Send size={20} />
                 </button>
               </div>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">
-                  Powered by Sinsajo Creators
-                </p>
-                {(voiceSupport.tts || voiceSupport.stt) && (
-                  <p className="text-xs text-[#2CB6D7]/60 flex items-center gap-1">
-                    {voiceSupport.stt && <Mic size={10} />}
-                    {voiceSupport.tts && <Volume2 size={10} />}
-                    {t.chat.voiceEnabled}
-                  </p>
-                )}
-              </div>
+              <p className="text-xs text-gray-500 text-center mt-2">
+                Powered by Sinsajo Creators
+              </p>
             </form>
           </motion.div>
         )}
