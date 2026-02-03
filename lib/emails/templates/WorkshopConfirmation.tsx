@@ -31,7 +31,7 @@ export default function WorkshopConfirmation({
   workshopTime = '9:00 AM - 12:00 PM',
   amount = '$100',
   paymentMethod = 'tarjeta',
-  location = 'Se confirmará vía WhatsApp',
+  location = '110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023',
   whatsappLink = '',
 }: WorkshopConfirmationProps) {
   const previewText = `¡Tu lugar en el workshop "IA para Empresarias Exitosas" está confirmado!`
