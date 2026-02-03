@@ -6,7 +6,12 @@ import WorkshopAccessLink from './templates/WorkshopAccessLink'
 import WorkshopRecording from './templates/WorkshopRecording'
 import WorkshopFollowUp from './templates/WorkshopFollowUp'
 import ProfileReminder from './templates/ProfileReminder'
+import ProfileSummary from './templates/ProfileSummary'
+import AdminProfileNotification from './templates/AdminProfileNotification'
 import { supabaseAdmin } from '@/lib/supabase'
+
+// Admin email for notifications
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sales@sinsajocreators.com'
 
 // Lazy initialization to avoid build-time errors when API key is not set
 let resend: Resend | null = null
@@ -32,6 +37,7 @@ export type EmailType =
   | 'recording'
   | 'follow_up'
   | 'profile_reminder'
+  | 'profile_summary'
 
 interface SendEmailParams {
   to: string
@@ -115,6 +121,20 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       customerName: data.customerName || 'Empresaria',
       profileUrl: data.profileUrl || 'https://www.screatorsai.com/academy/workshop/success',
       hoursAfterPayment: parseInt(data.hoursAfterPayment || '24'),
+    }),
+  },
+  profile_summary: {
+    subject: '📋 Resumen de tu perfil - Workshop IA para Empresarias Exitosas',
+    templateFn: (data) => ProfileSummary({
+      customerName: data.customerName || 'Empresaria',
+      businessName: data.businessName || '',
+      industry: data.industry || '',
+      challenges: data.challenges ? JSON.parse(data.challenges) : [],
+      primaryGoal: data.primaryGoal || '',
+      currentTools: data.currentTools ? JSON.parse(data.currentTools) : [],
+      aiExperience: data.aiExperience || '',
+      communicationPreference: data.communicationPreference || '',
+      expectedOutcome: data.expectedOutcome || '',
     }),
   },
 }
@@ -402,4 +422,155 @@ export async function sendProfileReminderEmail({
     },
     registrationId,
   })
+}
+
+/**
+ * Send profile summary email after form completion
+ * @deprecated Use sendAdminProfileNotification instead
+ */
+export async function sendProfileSummaryEmail({
+  to,
+  customerName,
+  businessName,
+  industry,
+  challenges,
+  primaryGoal,
+  currentTools,
+  aiExperience,
+  communicationPreference,
+  expectedOutcome,
+  registrationId,
+}: {
+  to: string
+  customerName: string
+  businessName: string
+  industry: string
+  challenges: string[]
+  primaryGoal: string
+  currentTools: string[]
+  aiExperience: string
+  communicationPreference: string
+  expectedOutcome?: string
+  registrationId: string
+}): Promise<EmailResult> {
+  return sendEmail({
+    to,
+    type: 'profile_summary',
+    data: {
+      customerName,
+      businessName,
+      industry,
+      challenges: JSON.stringify(challenges),
+      primaryGoal,
+      currentTools: JSON.stringify(currentTools),
+      aiExperience,
+      communicationPreference,
+      expectedOutcome: expectedOutcome || '',
+    },
+    registrationId,
+  })
+}
+
+/**
+ * Send admin notification with profile details and Hanna analysis
+ */
+export async function sendAdminProfileNotification({
+  customerName,
+  customerEmail,
+  businessName,
+  industry,
+  yearsInBusiness,
+  teamSize,
+  challenges,
+  primaryGoal,
+  currentTools,
+  aiExperience,
+  communicationPreference,
+  expectedOutcome,
+  hannaAnalysis,
+  registrationId,
+}: {
+  customerName: string
+  customerEmail: string
+  businessName: string
+  industry: string
+  yearsInBusiness?: string
+  teamSize?: string
+  challenges: string[]
+  primaryGoal: string
+  currentTools: string[]
+  aiExperience: string
+  communicationPreference: string
+  expectedOutcome?: string
+  hannaAnalysis?: {
+    summary: string
+    readinessScore: number
+    keyInsights: string[]
+    challengesPrioritized: string[]
+    recommendedFocus: string
+    potentialQuickWins: string[]
+    customizedTips: string[]
+    engagementLevel: 'high' | 'medium' | 'low'
+    followUpSuggestions: string[]
+  }
+  registrationId: string
+}): Promise<EmailResult> {
+  try {
+    // Render the admin notification template
+    const html = await render(AdminProfileNotification({
+      customerName,
+      customerEmail,
+      businessName,
+      industry,
+      yearsInBusiness,
+      teamSize,
+      challenges,
+      primaryGoal,
+      currentTools,
+      aiExperience,
+      communicationPreference,
+      expectedOutcome,
+      hannaAnalysis,
+    }))
+
+    // Send to admin email
+    const { data: result, error } = await getResendClient().emails.send({
+      from: FROM_EMAIL,
+      to: [ADMIN_EMAIL],
+      subject: `🎉 Nuevo perfil: ${customerName} - ${businessName || industry}`,
+      html,
+    })
+
+    if (error) {
+      console.error('Resend error (admin notification):', error)
+
+      // Log failed email
+      await logEmail({
+        registrationId,
+        emailType: 'admin_profile_notification' as EmailType,
+        recipientEmail: ADMIN_EMAIL,
+        subject: `Nuevo perfil: ${customerName}`,
+        status: 'failed',
+        errorMessage: error.message,
+      })
+
+      return { success: false, error: error.message }
+    }
+
+    // Log successful email
+    await logEmail({
+      registrationId,
+      emailType: 'admin_profile_notification' as EmailType,
+      recipientEmail: ADMIN_EMAIL,
+      subject: `Nuevo perfil: ${customerName}`,
+      status: 'sent',
+      providerMessageId: result?.id,
+    })
+
+    return { success: true, messageId: result?.id }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Admin notification error:', error)
+    return { success: false, error: errorMessage }
+  }
 }

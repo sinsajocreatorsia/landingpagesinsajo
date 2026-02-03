@@ -436,11 +436,12 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                 <label className="block text-sm font-medium text-[#022133] mb-2">
                   ¿Cómo prefieres que te contactemos? *
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
                     { value: 'email', label: 'Email', icon: '📧' },
                     { value: 'whatsapp', label: 'WhatsApp', icon: '💬' },
-                    { value: 'both', label: 'Ambos', icon: '✅' },
+                    { value: 'phone', label: 'Teléfono', icon: '📞' },
+                    { value: 'both', label: 'Todos', icon: '✅' },
                   ].map((opt) => (
                     <button
                       key={opt.value}

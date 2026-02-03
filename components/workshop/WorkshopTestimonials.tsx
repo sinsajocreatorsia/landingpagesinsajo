@@ -3,41 +3,14 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react'
-
-const testimonials = [
-  {
-    name: 'María González',
-    role: 'CEO, Boutique de Moda',
-    image: '/images/testimonial-1.jpg',
-    quote: 'Trabajar con Sinsajo Creators transformó completamente mi negocio. En 3 meses, automatizamos el 80% de nuestras operaciones y ahora mi equipo se enfoca en lo que realmente importa.',
-    result: 'Ahorró 15 horas semanales',
-  },
-  {
-    name: 'Ana Martínez',
-    role: 'Fundadora, Agencia de Marketing',
-    image: '/images/testimonial-2.jpg',
-    quote: 'La metodología de Sinsajo es diferente. No es solo tecnología, es estrategia real que entiende los negocios latinos. Giovanna y su equipo saben exactamente cómo escalar sin perder la esencia.',
-    result: 'Triplicó sus ventas',
-  },
-  {
-    name: 'Carmen Rodríguez',
-    role: 'Directora, Consultoría Legal',
-    image: '/images/testimonial-3.jpg',
-    quote: 'Pensé que la IA era solo para empresas grandes. Sinsajo me demostró que cualquier negocio puede beneficiarse. Ahora tengo un asistente virtual que califica leads mientras duermo.',
-    result: '+40% en conversiones',
-  },
-  {
-    name: 'Laura Sánchez',
-    role: 'Propietaria, E-commerce',
-    image: '/images/testimonial-4.jpg',
-    quote: 'El ROI fue inmediato. La inversión se pagó en el primer mes. Lo mejor es que ahora tengo tiempo para mi familia y mi negocio sigue creciendo.',
-    result: 'ROI en 30 días',
-  },
-]
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function WorkshopTestimonials() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const { t } = useLanguage()
+
+  const testimonials = t.testimonials.items
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -63,7 +36,7 @@ export default function WorkshopTestimonials() {
       setCurrentIndex((prev) => (prev + 1) % testimonials.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [testimonials.length])
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length)
@@ -87,14 +60,14 @@ export default function WorkshopTestimonials() {
         {/* Section Header */}
         <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <span className="inline-block bg-[#36B3AE]/20 text-[#36B3AE] font-semibold px-4 py-2 rounded-full text-sm mb-4">
-            LO QUE DICEN DE SINSAJO CREATORS
+            {t.testimonials.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-[#FCFEFB] mb-4">
-            Empresarias que ya{' '}
-            <span className="text-[#2CB6D7]">Transformaron</span> sus Negocios
+            {t.testimonials.title}{' '}
+            <span className="text-[#2CB6D7]">{t.testimonials.titleHighlight}</span> {t.testimonials.titleEnd}
           </h2>
           <p className="text-xl text-[#FCFEFB]/70 max-w-2xl mx-auto">
-            Resultados reales de dueñas de negocio que confiaron en nuestra metodología.
+            {t.testimonials.subtitle}
           </p>
         </div>
 
@@ -182,12 +155,7 @@ export default function WorkshopTestimonials() {
 
         {/* Stats bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-400">
-          {[
-            { value: '+73', label: 'Empresas transformadas' },
-            { value: '98%', label: 'Satisfacción' },
-            { value: '10+', label: 'Horas ahorradas/semana' },
-            { value: '3x', label: 'Productividad promedio' },
-          ].map((stat, i) => (
+          {t.testimonials.stats.map((stat, i) => (
             <div key={i} className="text-center p-4">
               <div className="text-2xl md:text-3xl font-bold text-[#2CB6D7]">{stat.value}</div>
               <div className="text-sm text-[#FCFEFB]/60">{stat.label}</div>

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendAdminProfileNotification } from '@/lib/emails'
+import { analyzeProfile, saveAnalysis, ProfileData } from '@/lib/hanna/analysis'
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +36,7 @@ export async function POST(request: Request) {
     const completedFields = fields.filter(Boolean).length
     const completionPercentage = Math.round((completedFields / fields.length) * 100)
 
-    // Update profile in database (using type assertion to bypass strict typing)
+    // Update profile in database
     const profileData = {
       business_name: businessName,
       business_type: businessType || null,
@@ -53,6 +55,7 @@ export async function POST(request: Request) {
       profile_completion_percentage: completionPercentage,
       completed_at: new Date().toISOString(),
     }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabaseAdmin as any)
       .from('workshop_profiles')
@@ -60,6 +63,8 @@ export async function POST(request: Request) {
       .eq('registration_id', registrationId)
       .select()
       .single()
+
+    let savedProfile = data
 
     if (error) {
       console.error('Profile update error:', error)
@@ -84,29 +89,17 @@ export async function POST(request: Request) {
           )
         }
 
-        // Update registration to mark profile as completed
-        if (newProfile?.profile_completed) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabaseAdmin as any)
-            .from('workshop_registrations')
-            .update({ profile_completed: true })
-            .eq('id', registrationId)
-        }
-
-        return NextResponse.json({
-          success: true,
-          profile: newProfile,
-        })
+        savedProfile = newProfile
+      } else {
+        return NextResponse.json(
+          { error: 'Error al actualizar el perfil' },
+          { status: 500 }
+        )
       }
-
-      return NextResponse.json(
-        { error: 'Error al actualizar el perfil' },
-        { status: 500 }
-      )
     }
 
     // Update registration to mark profile as completed
-    if (data?.profile_completed) {
+    if (savedProfile?.profile_completed) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabaseAdmin as any)
         .from('workshop_registrations')
@@ -114,9 +107,80 @@ export async function POST(request: Request) {
         .eq('id', registrationId)
     }
 
+    // Get registration info for analysis and admin notification
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: registration } = await (supabaseAdmin as any)
+      .from('workshop_registrations')
+      .select('email, full_name')
+      .eq('id', registrationId)
+      .single()
+
+    // Run Hanna analysis and send admin notification
+    if (registration) {
+      try {
+        // Prepare profile data for Hanna analysis
+        const profileForAnalysis: ProfileData = {
+          registrationId,
+          fullName: registration.full_name || 'Participante',
+          email: registration.email || '',
+          businessName: businessName || undefined,
+          businessType: businessType || undefined,
+          industry: industry || undefined,
+          yearsInBusiness: yearsInBusiness ? parseInt(yearsInBusiness) : undefined,
+          monthlyRevenue: monthlyRevenue || undefined,
+          teamSize: teamSize || undefined,
+          challenges: challenges || [],
+          primaryGoal: primaryGoal || undefined,
+          expectedOutcome: expectedOutcome || undefined,
+          currentTools: currentTools || [],
+          aiExperience: aiExperience || undefined,
+          communicationPreference: communicationPreference || undefined,
+        }
+
+        // Run Hanna analysis
+        console.log('Running Hanna analysis for:', registration.email)
+        const hannaAnalysis = await analyzeProfile(profileForAnalysis)
+
+        // Save analysis to database
+        const saveResult = await saveAnalysis(registrationId, hannaAnalysis)
+        if (saveResult.success) {
+          console.log('Hanna analysis saved for:', registration.email)
+        } else {
+          console.error('Failed to save Hanna analysis:', saveResult.error)
+        }
+
+        // Send admin notification with profile + Hanna analysis
+        const emailResult = await sendAdminProfileNotification({
+          customerName: registration.full_name || 'Participante',
+          customerEmail: registration.email || '',
+          businessName: businessName || '',
+          industry: industry || '',
+          yearsInBusiness: yearsInBusiness || '',
+          teamSize: teamSize || '',
+          challenges: challenges || [],
+          primaryGoal: primaryGoal || '',
+          currentTools: currentTools || [],
+          aiExperience: aiExperience || '',
+          communicationPreference: communicationPreference || '',
+          expectedOutcome: expectedOutcome || '',
+          hannaAnalysis,
+          registrationId,
+        })
+
+        if (emailResult.success) {
+          console.log('Admin notification sent for:', registration.email)
+        } else {
+          console.error('Failed to send admin notification:', emailResult.error)
+        }
+      } catch (analysisError) {
+        console.error('Error in Hanna analysis or admin notification:', analysisError)
+        // Don't fail the request if analysis/notification fails
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      profile: data,
+      profile: savedProfile,
     })
   } catch (error) {
     console.error('Profile API error:', error)

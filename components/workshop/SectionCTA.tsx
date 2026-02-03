@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/lib/i18n'
 
 interface SectionCTAProps {
   text?: string
@@ -12,12 +13,16 @@ interface SectionCTAProps {
 }
 
 export default function SectionCTA({
-  text = 'Reserva Tu Lugar Ahora',
+  text,
   href = '#pricing',
   variant = 'primary',
   showSpots = true,
-  spotsText = 'Solo 12 lugares disponibles',
+  spotsText,
 }: SectionCTAProps) {
+  const { language } = useLanguage()
+
+  const defaultText = text || (language === 'es' ? 'Reserva Tu Lugar Ahora' : 'Reserve Your Spot Now')
+  const defaultSpotsText = spotsText || (language === 'es' ? 'Solo 12 lugares disponibles' : 'Only 12 spots available')
   const isPrimary = variant === 'primary'
 
   return (
@@ -36,7 +41,7 @@ export default function SectionCTA({
           }
         `}
       >
-        {text}
+        {defaultText}
         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
       </motion.a>
 
@@ -48,7 +53,7 @@ export default function SectionCTA({
           className="flex items-center justify-center gap-2 mt-2"
         >
           <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-          <span className="text-red-400 font-semibold text-sm">{spotsText}</span>
+          <span className="text-red-400 font-semibold text-sm">{defaultSpotsText}</span>
         </motion.div>
       )}
     </div>
