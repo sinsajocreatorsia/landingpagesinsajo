@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       monthlyRevenue,
       teamSize,
       challenges,
+      challengeOther,
       primaryGoal,
       expectedOutcome,
       currentTools,
@@ -28,13 +29,21 @@ export async function POST(request: Request) {
       ? `Otro: ${industryOther}`
       : industry
 
+    // Process challenges: if "other" is selected, replace with custom text
+    let finalChallenges = challenges || []
+    if (challenges?.includes('other') && challengeOther) {
+      finalChallenges = challenges.map((c: string) =>
+        c === 'other' ? `Otro: ${challengeOther}` : c
+      )
+    }
+
     // Calculate profile completion percentage
     const fields = [
       businessName,
       finalIndustry,
       yearsInBusiness,
       teamSize,
-      challenges?.length > 0,
+      finalChallenges?.length > 0,
       primaryGoal,
       aiExperience,
       communicationPreference,
@@ -50,7 +59,7 @@ export async function POST(request: Request) {
       years_in_business: yearsInBusiness ? parseInt(yearsInBusiness) : null,
       monthly_revenue: monthlyRevenue || null,
       team_size: teamSize || null,
-      challenges: challenges || [],
+      challenges: finalChallenges,
       primary_goal: primaryGoal || null,
       expected_outcome: expectedOutcome || null,
       current_tools: currentTools || [],
@@ -135,7 +144,7 @@ export async function POST(request: Request) {
           yearsInBusiness: yearsInBusiness ? parseInt(yearsInBusiness) : undefined,
           monthlyRevenue: monthlyRevenue || undefined,
           teamSize: teamSize || undefined,
-          challenges: challenges || [],
+          challenges: finalChallenges,
           primaryGoal: primaryGoal || undefined,
           expectedOutcome: expectedOutcome || undefined,
           currentTools: currentTools || [],
@@ -163,7 +172,7 @@ export async function POST(request: Request) {
           industry: finalIndustry || '',
           yearsInBusiness: yearsInBusiness || '',
           teamSize: teamSize || '',
-          challenges: challenges || [],
+          challenges: finalChallenges,
           primaryGoal: primaryGoal || '',
           currentTools: currentTools || [],
           aiExperience: aiExperience || '',
