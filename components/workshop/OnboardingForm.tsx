@@ -31,6 +31,7 @@ interface FormData {
   monthlyRevenue: string
   teamSize: string
   challenges: string[]
+  challengeOther: string
   primaryGoal: string
   expectedOutcome: string
   currentTools: string[]
@@ -55,6 +56,7 @@ const CHALLENGES = [
   { id: 'team_management', label: 'Gestión de equipo', emoji: '👥' },
   { id: 'scaling', label: 'Escalar operaciones', emoji: '📈' },
   { id: 'automation', label: 'Automatización', emoji: '🤖' },
+  { id: 'other', label: 'Otro desafío', emoji: '➕' },
 ]
 
 const INDUSTRIES = [
@@ -94,6 +96,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
     monthlyRevenue: '',
     teamSize: '',
     challenges: [],
+    challengeOther: '',
     primaryGoal: '',
     expectedOutcome: '',
     currentTools: [],
@@ -133,6 +136,10 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
         }
         return formData.businessName && formData.industry
       case 2:
+        // If "other" is selected, require the custom challenge text
+        if (formData.challenges.includes('other')) {
+          return formData.challenges.length > 0 && formData.challengeOther.trim()
+        }
         return formData.challenges.length > 0
       case 3:
         return formData.primaryGoal
@@ -391,6 +398,27 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   </motion.button>
                 ))}
               </div>
+
+              {/* Show text input when "Otro" is selected */}
+              {formData.challenges.includes('other') && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4"
+                >
+                  <label className="block text-sm font-medium text-[#022133] mb-2">
+                    Describe tu desafío *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.challengeOther}
+                    onChange={(e) => updateFormData('challengeOther', e.target.value)}
+                    placeholder="Ej: Integración de sistemas, Retención de clientes, etc."
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133] placeholder:text-gray-400"
+                  />
+                </motion.div>
+              )}
             </>
           )}
 
