@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       businessName,
       businessType,
       industry,
+      industryOther,
       yearsInBusiness,
       monthlyRevenue,
       teamSize,
@@ -22,10 +23,15 @@ export async function POST(request: Request) {
       bestContactTime,
     } = await request.json()
 
+    // If "Otro" is selected, use the custom industry text
+    const finalIndustry = industry === 'Otro' && industryOther
+      ? `Otro: ${industryOther}`
+      : industry
+
     // Calculate profile completion percentage
     const fields = [
       businessName,
-      industry,
+      finalIndustry,
       yearsInBusiness,
       teamSize,
       challenges?.length > 0,
@@ -40,7 +46,7 @@ export async function POST(request: Request) {
     const profileData = {
       business_name: businessName,
       business_type: businessType || null,
-      industry: industry,
+      industry: finalIndustry,
       years_in_business: yearsInBusiness ? parseInt(yearsInBusiness) : null,
       monthly_revenue: monthlyRevenue || null,
       team_size: teamSize || null,
@@ -125,7 +131,7 @@ export async function POST(request: Request) {
           email: registration.email || '',
           businessName: businessName || undefined,
           businessType: businessType || undefined,
-          industry: industry || undefined,
+          industry: finalIndustry || undefined,
           yearsInBusiness: yearsInBusiness ? parseInt(yearsInBusiness) : undefined,
           monthlyRevenue: monthlyRevenue || undefined,
           teamSize: teamSize || undefined,
@@ -154,7 +160,7 @@ export async function POST(request: Request) {
           customerName: registration.full_name || 'Participante',
           customerEmail: registration.email || '',
           businessName: businessName || '',
-          industry: industry || '',
+          industry: finalIndustry || '',
           yearsInBusiness: yearsInBusiness || '',
           teamSize: teamSize || '',
           challenges: challenges || [],
