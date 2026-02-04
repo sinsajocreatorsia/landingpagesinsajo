@@ -31,7 +31,7 @@ export default function WorkshopConfirmation({
   workshopTime = '9:00 AM - 12:00 PM',
   amount = '$100',
   paymentMethod = 'tarjeta',
-  location = '110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023',
+  location = 'Blue Bean - 110 N Ankeny Blvd, Suite 200, Ankeny, IA',
   whatsappLink = '',
 }: WorkshopConfirmationProps) {
   const previewText = `¡Tu lugar en el workshop "IA para Empresarias Exitosas" está confirmado!`
@@ -139,10 +139,10 @@ export default function WorkshopConfirmation({
               Próximos Pasos
             </Heading>
             <Text style={listItem}>
-              <strong>1.</strong> 📱 Únete a nuestro grupo de WhatsApp (recibirás el link pronto)
+              <strong>1.</strong> 📱 <Link href="https://chat.whatsapp.com/GBt795XCeRH3LNw5PEBQEj" style={link}>Únete a nuestra comunidad de WhatsApp</Link>
             </Text>
             <Text style={listItem}>
-              <strong>2.</strong> 📍 En el grupo de WhatsApp te daremos todas las indicaciones previas al workshop (ubicación exacta, qué traer, etc.)
+              <strong>2.</strong> 📍 En el grupo de WhatsApp te daremos todas las indicaciones previas al workshop (qué traer, horarios de llegada, etc.)
             </Text>
             <Text style={listItem}>
               <strong>3.</strong> 📅 Agrega el evento a tu calendario
