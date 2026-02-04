@@ -133,7 +133,7 @@ export default function ProfileReminder({
               <strong>Hora:</strong> 9:00 AM - 12:00 PM (EST)
             </Text>
             <Text style={workshopDetail}>
-              <strong>Ubicación:</strong> 110 N Ankeny Blvd, Ste 200, Ankeny, IA 50023
+              <strong>Ubicación:</strong> Blue Bean - 110 N Ankeny Blvd, Suite 200, Ankeny, IA
             </Text>
           </Section>
 
