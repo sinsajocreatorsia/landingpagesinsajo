@@ -313,11 +313,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
 
               {/* Show text input when "Otro" is selected */}
               {formData.industry === 'Otro' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
+                <div className="animate-fadeIn">
                   <label className="block text-sm font-medium text-[#022133] mb-2">
                     Describe tu industria *
                   </label>
@@ -328,7 +324,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                     placeholder="Ej: Agricultura orgánica, Manufactura textil, etc."
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133] placeholder:text-gray-400"
                   />
-                </motion.div>
+                </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
@@ -401,12 +397,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
 
               {/* Show text input when "Otro" is selected */}
               {formData.challenges.includes('other') && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4"
-                >
+                <div className="mt-4 animate-fadeIn">
                   <label className="block text-sm font-medium text-[#022133] mb-2">
                     Describe tu desafío *
                   </label>
@@ -417,7 +408,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                     placeholder="Ej: Integración de sistemas, Retención de clientes, etc."
                     className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133] placeholder:text-gray-400"
                   />
-                </motion.div>
+                </div>
               )}
             </>
           )}
