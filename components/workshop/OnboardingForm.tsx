@@ -26,6 +26,7 @@ interface FormData {
   businessName: string
   businessType: string
   industry: string
+  industryOther: string
   yearsInBusiness: string
   monthlyRevenue: string
   teamSize: string
@@ -88,6 +89,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
     businessName: '',
     businessType: '',
     industry: '',
+    industryOther: '',
     yearsInBusiness: '',
     monthlyRevenue: '',
     teamSize: '',
@@ -125,6 +127,10 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
   const canProceed = () => {
     switch (currentStep) {
       case 1:
+        // If "Otro" is selected, require the custom industry text
+        if (formData.industry === 'Otro') {
+          return formData.businessName && formData.industryOther.trim()
+        }
         return formData.businessName && formData.industry
       case 2:
         return formData.challenges.length > 0
@@ -280,7 +286,13 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                 </label>
                 <select
                   value={formData.industry}
-                  onChange={(e) => updateFormData('industry', e.target.value)}
+                  onChange={(e) => {
+                    updateFormData('industry', e.target.value)
+                    // Clear the custom field if not "Otro"
+                    if (e.target.value !== 'Otro') {
+                      updateFormData('industryOther', '')
+                    }
+                  }}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133]"
                 >
                   <option value="">Selecciona tu industria</option>
@@ -291,6 +303,26 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
                   ))}
                 </select>
               </div>
+
+              {/* Show text input when "Otro" is selected */}
+              {formData.industry === 'Otro' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <label className="block text-sm font-medium text-[#022133] mb-2">
+                    Describe tu industria *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.industryOther}
+                    onChange={(e) => updateFormData('industryOther', e.target.value)}
+                    placeholder="Ej: Agricultura orgánica, Manufactura textil, etc."
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#2CB6D7] outline-none transition-all bg-white text-[#022133] placeholder:text-gray-400"
+                  />
+                </motion.div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
