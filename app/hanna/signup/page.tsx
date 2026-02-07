@@ -277,7 +277,7 @@ export default function HannaSignupPage() {
                   type="text"
                   value={formData.couponCode}
                   onChange={handleChange}
-                  placeholder="WORKSHOP2026"
+                  placeholder="Ingresa tu código"
                   className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] focus:ring-2 focus:ring-[#2CB6D7]/20 transition-all uppercase"
                 />
                 <button
