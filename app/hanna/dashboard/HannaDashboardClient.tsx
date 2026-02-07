@@ -37,7 +37,6 @@ import {
 import { MessageContent } from '@/components/hanna/MessageContent'
 import { ToneConfigDialog, type ToneConfig } from '@/components/hanna/ToneConfigDialog'
 import { ThemeProvider, useTheme, type ThemeId } from '@/lib/theme-context'
-import { Palette } from 'lucide-react'
 
 interface DashboardProps {
   user: {

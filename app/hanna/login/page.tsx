@@ -86,13 +86,15 @@ function LoginForm() {
           transition={{ type: 'spring', damping: 15 }}
           className="w-20 h-20 mx-auto mb-4"
         >
-          <Image
-            src="/images/sinsajo-logo-1.png"
-            alt="Sinsajo Creators"
-            width={80}
-            height={80}
-            className="object-contain"
-          />
+          <Link href="/hanna">
+            <Image
+              src="/images/sinsajo-logo-1.png"
+              alt="Sinsajo Creators"
+              width={80}
+              height={80}
+              className="object-contain cursor-pointer hover:opacity-80 transition-opacity"
+            />
+          </Link>
         </motion.div>
         <h1 className="text-3xl font-bold text-white mb-2">Bienvenida a Hanna</h1>
         <p className="text-white/60">Tu asistente de marketing con IA</p>

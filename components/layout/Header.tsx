@@ -16,8 +16,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Hide this header on workshop pages (they have their own header)
-  if (pathname?.startsWith('/academy/workshop')) {
+  // Hide this header on pages that have their own header/navigation
+  if (pathname?.startsWith('/academy/workshop') || pathname?.startsWith('/hanna')) {
     return null
   }
 
