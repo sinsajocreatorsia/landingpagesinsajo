@@ -161,13 +161,15 @@ export default function HannaSignupPage() {
             transition={{ type: 'spring', damping: 15 }}
             className="w-20 h-20 mx-auto mb-4"
           >
-            <Image
-              src="/images/sinsajo-logo-1.png"
-              alt="Sinsajo Creators"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
+            <Link href="/hanna/login">
+              <Image
+                src="/images/sinsajo-logo-1.png"
+                alt="Sinsajo Creators"
+                width={80}
+                height={80}
+                className="object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              />
+            </Link>
           </motion.div>
           <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
           <p className="text-white/60">Comienza gratis - 5 mensajes/día</p>
