@@ -5,6 +5,23 @@ import { sendConfirmationEmail } from '@/lib/emails'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
+// GET handler to verify webhook endpoint exists
+export async function GET() {
+  return NextResponse.json({
+    status: 'ok',
+    message: 'Stripe webhook endpoint is active',
+    endpoint: '/api/webhooks/stripe',
+    method: 'POST only - This endpoint receives webhooks from Stripe',
+    events: [
+      'checkout.session.completed',
+      'checkout.session.expired',
+      'payment_intent.succeeded',
+      'payment_intent.payment_failed',
+      'charge.refunded'
+    ]
+  })
+}
+
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -91,6 +108,12 @@ export async function POST(request: Request) {
   if (event.type === 'checkout.session.expired') {
     const session = event.data.object as Stripe.Checkout.Session
     console.log('Checkout session expired for:', session.customer_email)
+  }
+
+  // Handle payment_intent.succeeded event
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent
+    console.log('Payment intent succeeded:', paymentIntent.id, 'Amount:', paymentIntent.amount / 100, paymentIntent.currency?.toUpperCase())
   }
 
   // Handle payment failed event
