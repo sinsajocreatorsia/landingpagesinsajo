@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createBrowserClient } from '@supabase/ssr'
 import {
@@ -23,6 +24,7 @@ import {
   MicOff,
   Volume2,
   VolumeX,
+  Palette,
 } from 'lucide-react'
 import {
   speakText,
@@ -34,6 +36,8 @@ import {
 } from '@/lib/hanna/voice'
 import { MessageContent } from '@/components/hanna/MessageContent'
 import { ToneConfigDialog, type ToneConfig } from '@/components/hanna/ToneConfigDialog'
+import { ThemeProvider, useTheme, type ThemeId } from '@/lib/theme-context'
+import { Palette } from 'lucide-react'
 
 interface DashboardProps {
   user: {
@@ -56,7 +60,17 @@ interface Message {
   timestamp: Date
 }
 
-export default function HannaDashboardClient({ user, profile }: DashboardProps) {
+export default function HannaDashboardClient(props: DashboardProps) {
+  return (
+    <ThemeProvider userId={props.user.id}>
+      <HannaDashboardInner {...props} />
+    </ThemeProvider>
+  )
+}
+
+function HannaDashboardInner({ user, profile }: DashboardProps) {
+  const { theme, themeId, setTheme, themes: allThemes } = useTheme()
+  const [showThemePicker, setShowThemePicker] = useState(false)
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
@@ -312,7 +326,7 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
         />
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-[#022133] to-[#200F5D] flex">
+      <div className="min-h-screen flex" style={{ background: `linear-gradient(to bottom right, ${theme.colors.bgFrom}, ${theme.colors.bgTo})` }}>
       {/* Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -332,13 +346,14 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25 }}
-              className="fixed left-0 top-0 bottom-0 w-72 bg-[#022133] border-r border-white/10 z-50 flex flex-col"
+              className="fixed left-0 top-0 bottom-0 w-72 border-r z-50 flex flex-col"
+              style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}
             >
               {/* Sidebar Header */}
               <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] flex items-center justify-center">
-                    <span className="text-xl">🤖</span>
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h2 className="text-white font-bold">Hanna</h2>
@@ -441,7 +456,7 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen">
         {/* Header */}
-        <header className="bg-[#022133]/80 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center gap-4">
+        <header className="backdrop-blur-md border-b px-4 py-3 flex items-center gap-4" style={{ backgroundColor: theme.colors.headerBg, borderColor: theme.colors.cardBorder }}>
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -449,13 +464,13 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
             <Menu className="w-6 h-6" />
           </button>
 
-          <div className="flex-1 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] flex items-center justify-center">
-              <span className="text-xl">🤖</span>
+          <div className="flex-1 flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+              <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
             </div>
-            <div>
-              <h1 className="text-white font-bold">Hanna</h1>
-              <p className="text-white/50 text-xs">Tu asistente de marketing IA</p>
+            <div className="min-w-0">
+              <h1 className="font-bold" style={{ color: theme.colors.textPrimary }}>Hanna</h1>
+              <p className="text-xs truncate" style={{ color: theme.colors.textMuted }}>Tu asistente de marketing IA</p>
             </div>
           </div>
 
@@ -476,6 +491,45 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
               <span className="text-white/80 text-sm font-medium">Pro</span>
             </div>
           )}
+
+          {/* Theme Picker */}
+          <div className="relative">
+            <button
+              onClick={() => setShowThemePicker(!showThemePicker)}
+              className="p-2 rounded-full transition-colors"
+              style={{ backgroundColor: theme.colors.inputBg, color: theme.colors.textSecondary }}
+              title="Cambiar tema"
+            >
+              <Palette className="w-5 h-5" />
+            </button>
+            {showThemePicker && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowThemePicker(false)} />
+                <div className="absolute right-0 top-full mt-2 z-50 p-3 rounded-xl border shadow-xl min-w-[180px]" style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}>
+                  <p className="text-xs font-medium mb-2" style={{ color: theme.colors.textMuted }}>Tema</p>
+                  <div className="space-y-1">
+                    {(Object.keys(allThemes) as ThemeId[]).map((id) => (
+                      <button
+                        key={id}
+                        onClick={() => { setTheme(id); setShowThemePicker(false) }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left"
+                        style={{
+                          backgroundColor: themeId === id ? theme.colors.accent + '20' : 'transparent',
+                          color: themeId === id ? theme.colors.accent : theme.colors.textSecondary,
+                        }}
+                      >
+                        <div className="w-5 h-5 rounded-full border" style={{
+                          background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
+                          borderColor: themeId === id ? theme.colors.accent : theme.colors.cardBorder,
+                        }} />
+                        <span className="text-sm">{allThemes[id].name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Voice Toggle (Pro only) */}
           {profile.plan === 'pro' && voiceSupport.tts && (
@@ -503,21 +557,27 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
               >
                 <div className={`flex items-start gap-3 max-w-[85%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
                   {/* Avatar */}
-                  <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${
-                    message.role === 'user'
-                      ? 'bg-[#C7517E]'
-                      : 'bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE]'
-                  }`}>
-                    <span className="text-lg">{message.role === 'user' ? '👩' : '🤖'}</span>
-                  </div>
+                  {message.role === 'user' ? (
+                    <div className="w-10 h-10 rounded-full flex-shrink-0 bg-[#C7517E] flex items-center justify-center text-white font-medium">
+                      {user.fullName.charAt(0).toUpperCase()}
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden">
+                      <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+                    </div>
+                  )}
 
                   {/* Message Bubble */}
                   <div
                     className={`rounded-2xl px-5 py-4 ${
                       message.role === 'user'
-                        ? 'bg-[#C7517E] text-white rounded-tr-sm'
-                        : 'bg-white/10 backdrop-blur-sm text-white rounded-tl-sm border border-white/10'
+                        ? 'text-white rounded-tr-sm'
+                        : 'backdrop-blur-sm rounded-tl-sm border'
                     }`}
+                    style={message.role === 'user'
+                      ? { backgroundColor: theme.colors.bubbleUser }
+                      : { backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder, color: theme.colors.textPrimary }
+                    }
                   >
                     <MessageContent content={message.content} />
                   </div>
@@ -534,10 +594,10 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
               className="flex justify-start"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] flex items-center justify-center">
-                  <span className="text-lg">🤖</span>
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                  <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-4 rounded-tl-sm border border-white/10">
+                <div className="backdrop-blur-sm rounded-2xl px-5 py-4 rounded-tl-sm border" style={{ backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder }}>
                   <div className="flex gap-1">
                     <motion.span
                       animate={{ opacity: [0.4, 1, 0.4] }}
@@ -591,7 +651,7 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-white/10 bg-[#022133]/50 backdrop-blur-md">
+        <div className="p-4 border-t backdrop-blur-md" style={{ borderColor: theme.colors.cardBorder, backgroundColor: theme.colors.inputAreaBg }}>
           {/* Limit Warning */}
           {profile.plan === 'free' && messagesRemaining <= 1 && messagesRemaining > 0 && (
             <div className="mb-3 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-200 text-sm flex items-center justify-between">
@@ -650,7 +710,8 @@ export default function HannaDashboardClient({ user, profile }: DashboardProps) 
                     : 'Actualiza a Pro para continuar...'
                 }
                 disabled={isLoading || isListening || (profile.plan === 'free' && messagesRemaining <= 0)}
-                className="w-full px-5 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-[#2CB6D7] focus:outline-none focus:ring-2 focus:ring-[#2CB6D7]/20 disabled:opacity-50"
+                className="w-full px-5 py-4 rounded-full border focus:outline-none focus:ring-2 disabled:opacity-50"
+                style={{ backgroundColor: theme.colors.inputBg, borderColor: theme.colors.inputBorder, color: theme.colors.textPrimary, '--tw-ring-color': theme.colors.accent + '33' } as React.CSSProperties}
               />
             </div>
 
