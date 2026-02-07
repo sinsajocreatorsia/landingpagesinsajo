@@ -212,7 +212,7 @@ function UpgradeContent() {
                     setCouponValid(null)
                     setCouponMessage(null)
                   }}
-                  placeholder="WORKSHOP2026"
+                  placeholder="Ingresa tu código"
                   className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase"
                 />
                 <button
@@ -311,8 +311,8 @@ function UpgradeContent() {
               a: 'Tu historial se mantiene, pero solo podrás ver los últimos 7 días como usuario gratuito.',
             },
             {
-              q: '¿El cupón del workshop sigue vigente?',
-              a: 'El cupón WORKSHOP2026 te da 3 meses gratis de Hanna Pro. Válido hasta Junio 2026.',
+              q: '¿Tengo un código de cupón, dónde lo uso?',
+              a: 'Ingresa tu código en el campo de cupón arriba y presiona "Validar" para aplicar tu descuento.',
             },
           ].map((faq) => (
             <div

@@ -412,27 +412,6 @@ export default function HannaLandingPage() {
             ))}
           </div>
 
-          {/* Workshop Coupon Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 bg-gradient-to-r from-[#2CB6D7]/20 to-[#36B3AE]/20 border border-[#2CB6D7]/30 rounded-2xl p-6 text-center"
-          >
-            <h4 className="text-white font-bold mb-2">
-              ¿Asististe al Workshop "IA para Empresarias Exitosas"?
-            </h4>
-            <p className="text-white/70 mb-4">
-              Usa el código <span className="font-mono bg-white/10 px-2 py-1 rounded">WORKSHOP2026</span> para obtener 3 meses gratis de Hanna Pro.
-            </p>
-            <Link
-              href="/hanna/signup"
-              className="inline-flex items-center gap-2 text-[#2CB6D7] hover:text-[#36B3AE] font-medium"
-            >
-              Aplicar cupón al registrarte
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </motion.div>
         </div>
       </section>
 
