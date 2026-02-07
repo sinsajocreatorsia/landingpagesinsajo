@@ -386,6 +386,9 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
 
 // Business profile type
 interface BusinessProfileData {
+  display_name?: string | null
+  gender?: string | null
+  country?: string | null
   business_name?: string | null
   business_type?: string | null
   target_audience?: string | null
@@ -417,8 +420,27 @@ async function buildPersonalizedPrompt(
 
   let personalizedPrompt = basePrompt
 
+  // Add personal context (name, gender)
+  if (businessProfile.display_name || businessProfile.gender) {
+    personalizedPrompt += `\n\nInformación personal:`
+    if (businessProfile.display_name) {
+      personalizedPrompt += `\n- Nombre: ${businessProfile.display_name}`
+    }
+    if (businessProfile.gender) {
+      const genderMap: Record<string, string> = {
+        female: 'Femenino - usa lenguaje femenino (ej: "amiga", "reina", "hermana")',
+        male: 'Masculino - usa lenguaje masculino (ej: "amigo", "hermano", "crack")',
+        non_binary: 'No binario - usa lenguaje neutro (ej: "amigue", evita pronombres de género)',
+      }
+      personalizedPrompt += `\n- Género: ${genderMap[businessProfile.gender] || businessProfile.gender}`
+    }
+    if (businessProfile.country) {
+      personalizedPrompt += `\n- País: ${businessProfile.country}`
+    }
+  }
+
   if (businessProfile.business_name || businessProfile.business_type) {
-    personalizedPrompt += `\n\nInformación del negocio de la usuaria:`
+    personalizedPrompt += `\n\nInformación del negocio:`
     if (businessProfile.business_name) {
       personalizedPrompt += `\n- Nombre del negocio: ${businessProfile.business_name}`
     }
