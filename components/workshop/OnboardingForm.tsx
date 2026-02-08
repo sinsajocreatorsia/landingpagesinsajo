@@ -313,7 +313,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
 
               {/* Show text input when "Otro" is selected */}
               {formData.industry === 'Otro' && (
-                <div className="animate-fadeIn">
+                <div className="animate-fade-in">
                   <label className="block text-sm font-medium text-[#022133] mb-2">
                     Describe tu industria *
                   </label>
@@ -397,7 +397,7 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
 
               {/* Show text input when "Otro" is selected */}
               {formData.challenges.includes('other') && (
-                <div className="mt-4 animate-fadeIn">
+                <div className="mt-4 animate-fade-in">
                   <label className="block text-sm font-medium text-[#022133] mb-2">
                     Describe tu desafío *
                   </label>
