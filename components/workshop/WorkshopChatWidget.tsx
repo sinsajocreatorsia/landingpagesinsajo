@@ -320,8 +320,8 @@ export default function WorkshopChatWidget() {
                   className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
                   {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                      <Image src="/images/lisa-frente.png" alt="Lisa" width={32} height={32} className="object-cover w-full h-full" />
                     </div>
                   )}
                   <div
