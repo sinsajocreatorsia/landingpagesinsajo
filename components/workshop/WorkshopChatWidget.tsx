@@ -116,24 +116,24 @@ export default function WorkshopChatWidget() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/hanna/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
+          message: input,
+          mode: 'workshop',
+          history: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content
           })),
-          language,
-          context: 'workshop'
         })
       })
 
       const data = await response.json()
       setIsLoading(false)
 
-      if (data.message) {
-        await sendProgressiveMessages(data.message)
+      if (data.success && data.response) {
+        await sendProgressiveMessages(data.response)
       }
     } catch (error) {
       console.error('Error sending message:', error)
