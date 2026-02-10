@@ -112,12 +112,12 @@ export const translations = {
     // Chat Widget
     chat: {
       greeting: {
-        line1: '¡Hola! Soy <strong>Hanna</strong> y te doy la bienvenida al Workshop',
+        line1: '¡Hola! Soy <strong>Lisa</strong> y te doy la bienvenida al Workshop',
         line2: '<strong>"IA para Empresarias Exitosas"</strong> - De Dueña Agotada a Estratega Imparable',
         line3: 'Gracias por tu interés en transformar tu negocio con IA. Este workshop exclusivo te enseñará a recuperar 10+ horas semanales automatizando las tareas que te tienen atrapada.',
         line4: '¿Cómo te llamas? Me encantaría conocerte y contarte más sobre lo que aprenderás el 7 de Marzo.',
       },
-      typing: 'Hanna está escribiendo',
+      typing: 'Lisa está escribiendo',
       placeholder: 'Escribe tu mensaje...',
       quickActions: ['¿Qué aprenderé?', '¿Cuál es el precio?', 'Cuéntame más'],
       advisor: 'Asesora del Workshop',
@@ -277,12 +277,12 @@ export const translations = {
     // Chat Widget
     chat: {
       greeting: {
-        line1: "Hi! I'm <strong>Hanna</strong> and I welcome you to the Workshop",
+        line1: "Hi! I'm <strong>Lisa</strong> and I welcome you to the Workshop",
         line2: '<strong>"AI for Successful Business Women"</strong> - From Exhausted Owner to Unstoppable Strategist',
         line3: 'Thank you for your interest in transforming your business with AI. This exclusive workshop will teach you how to recover 10+ hours weekly by automating the tasks that have you trapped.',
         line4: "What's your name? I'd love to meet you and tell you more about what you'll learn on March 7th.",
       },
-      typing: 'Hanna is typing',
+      typing: 'Lisa is typing',
       placeholder: 'Type your message...',
       quickActions: ["What will I learn?", "What's the price?", 'Tell me more'],
       advisor: 'Workshop Advisor',
