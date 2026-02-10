@@ -25,7 +25,7 @@ export default function HannaWorkshopPage() {
 
   // Initial greeting - Enthusiastic style
   useEffect(() => {
-    const greeting = `¡Hola amiga! 👋✨ Soy Hanna y estoy SÚPER emocionada de que estés aquí.
+    const greeting = `¡Hola amiga! 👋✨ Soy Lisa y estoy SÚPER emocionada de que estés aquí.
 
 ¿Te imaginas tener un asistente que trabaje por ti 24/7 mientras tú duermes? 😴💰 ¡Eso es lo que vas a aprender!
 
@@ -151,7 +151,7 @@ Este workshop es **PRESENCIAL** (nada de Zoom aburrido 😉) y 100% en **Españo
               <span className="text-xl">🤖</span>
             </div>
             <div>
-              <h1 className="text-white font-bold">Hanna</h1>
+              <h1 className="text-white font-bold">Lisa</h1>
               <p className="text-white/60 text-xs">Asistente del Workshop</p>
             </div>
           </div>
@@ -251,7 +251,7 @@ Este workshop es **PRESENCIAL** (nada de Zoom aburrido 😉) y 100% en **Españo
             >
               <div className="bg-[#2CB6D7]/20 text-[#2CB6D7] px-4 py-2 rounded-full text-sm flex items-center gap-2">
                 <Volume2 className="w-4 h-4 animate-pulse" />
-                Hanna está hablando...
+                Lisa está hablando...
               </div>
             </motion.div>
           )}
