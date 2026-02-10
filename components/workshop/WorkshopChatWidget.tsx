@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, MessageCircle, Sparkles } from 'lucide-react'
+import { X, Send } from 'lucide-react'
+import Image from 'next/image'
 import DOMPurify from 'isomorphic-dompurify'
 import { processMessage } from '@/lib/utils/messageFormatter'
 import { useLanguage } from '@/lib/i18n'
@@ -166,11 +167,16 @@ export default function WorkshopChatWidget() {
           onClick={handleOpenChat}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative w-16 h-16 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing flex items-center justify-center"
+          className="relative w-16 h-16 rounded-full shadow-lg hover:shadow-2xl transition-all cursor-grab active:cursor-grabbing flex items-center justify-center overflow-hidden"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <MessageCircle size={28} className="text-white" />
+          <Image
+            src="/images/lisa-frente.png"
+            alt="Lisa"
+            fill
+            className="object-cover"
+          />
 
           {/* Online indicator */}
           <motion.div
@@ -206,7 +212,6 @@ export default function WorkshopChatWidget() {
               transition={{ duration: 0.2 }}
             >
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#C7517E]" />
                 <span>{t.chat.askAboutWorkshop}</span>
               </div>
               <div className="absolute -bottom-2 right-4 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
@@ -230,13 +235,19 @@ export default function WorkshopChatWidget() {
             <div className="bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-full overflow-hidden">
+                    <Image
+                      src="/images/lisa-frente.png"
+                      alt="Lisa"
+                      width={48}
+                      height={48}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">Hanna</h3>
+                  <h3 className="text-white font-bold text-lg">Lisa</h3>
                   <p className="text-white/80 text-sm">
                     {t.chat.advisor}
                   </p>
@@ -254,15 +265,15 @@ export default function WorkshopChatWidget() {
 
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto bg-[#022133] space-y-4">
-              {/* Hanna typing indicator before greeting */}
+              {/* Lisa typing indicator before greeting */}
               {messages.length === 0 && isGreetingTyping && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/lisa-frente.png" alt="Lisa" width={32} height={32} className="object-cover w-full h-full" />
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-2xl rounded-tl-none border border-[#2CB6D7]/20">
                     <div className="flex items-center gap-2">
@@ -284,8 +295,8 @@ export default function WorkshopChatWidget() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/lisa-frente.png" alt="Lisa" width={32} height={32} className="object-cover w-full h-full" />
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4 border border-[#2CB6D7]/20 max-w-[85%]">
                     <p className="text-white text-sm mb-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t.chat.greeting.line1) }} />
@@ -342,8 +353,8 @@ export default function WorkshopChatWidget() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/lisa-frente.png" alt="Lisa" width={32} height={32} className="object-cover w-full h-full" />
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-[#2CB6D7]/20">
                     <div className="flex gap-1">
@@ -363,8 +374,8 @@ export default function WorkshopChatWidget() {
                   exit={{ opacity: 0 }}
                   className="flex justify-start gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#C7517E] to-[#2CB6D7] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/lisa-frente.png" alt="Lisa" width={32} height={32} className="object-cover w-full h-full" />
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-[#2CB6D7]/20">
                     <div className="flex items-center gap-2">
