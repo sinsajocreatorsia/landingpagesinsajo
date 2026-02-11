@@ -22,7 +22,7 @@ export default function SectionCTA({
   const { language } = useLanguage()
 
   const defaultText = text || (language === 'es' ? 'Reserva Tu Lugar Ahora' : 'Reserve Your Spot Now')
-  const defaultSpotsText = spotsText || (language === 'es' ? 'Solo 12 lugares disponibles' : 'Only 12 spots available')
+  const defaultSpotsText = spotsText || (language === 'es' ? 'Solo 7 lugares disponibles' : 'Only 7 spots available')
   const isPrimary = variant === 'primary'
 
   return (

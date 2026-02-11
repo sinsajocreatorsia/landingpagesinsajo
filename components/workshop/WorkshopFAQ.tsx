@@ -31,7 +31,7 @@ const faqData: FAQItem[] = [
   },
   {
     question: '¿Cuántos lugares hay disponibles?',
-    answer: 'Limitamos este workshop a solo 12 participantes. Este número reducido permite una experiencia de aprendizaje más personalizada, donde cada asistente recibe atención individual y puede resolver todas sus dudas en tiempo real.',
+    answer: 'Limitamos este workshop a solo 7 participantes. Este número reducido permite una experiencia de aprendizaje ultra-personalizada, donde cada asistente recibe atención individual y puede resolver todas sus dudas en tiempo real.',
   },
   {
     question: '¿Este es el único workshop disponible?',
