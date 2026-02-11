@@ -68,7 +68,7 @@ export default function WorkshopPricing() {
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-2 animate-pulse">
               <span className="w-2 h-2 bg-red-500 rounded-full" />
               <span className="text-red-600 font-semibold text-sm">
-                Solo 12 lugares disponibles - Cupo limitado
+                Solo 7 lugares disponibles - Cupo limitado
               </span>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function WorkshopPricing() {
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <Check className="w-5 h-5 text-[#36B3AE]" />
-              <span className="text-sm">Cupo limitado a 12 personas</span>
+              <span className="text-sm">Cupo limitado a 7 personas</span>
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <svg className="w-5 h-5 text-[#36B3AE]" fill="currentColor" viewBox="0 0 24 24">

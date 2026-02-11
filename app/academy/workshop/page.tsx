@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'IA para Empresarias Exitosas - Workshop',
-    description: 'Recupera 10+ horas semanales con automatización IA. Solo 12 lugares.',
+    description: 'Recupera 10+ horas semanales con automatización IA. Solo 7 lugares.',
     images: ['/images/workshop-og.png'],
   },
 }

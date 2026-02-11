@@ -35,7 +35,7 @@ Este workshop es **PRESENCIAL** (nada de Zoom aburrido 😉) y 100% en **Españo
 • 📅 Cuándo y dónde es
 • 💡 Qué vas a aprender (spoiler: ¡cosas INCREÍBLES!)
 • 👩‍💼 Quién es Giovanna
-• 💳 Cómo asegurar tu lugar (¡solo quedan 12 cupos!)`
+• 💳 Cómo asegurar tu lugar (¡solo quedan 7 cupos!)`
 
     const initialMsg: Message = {
       id: 'initial',

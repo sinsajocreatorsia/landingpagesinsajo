@@ -15,7 +15,7 @@ export const translations = {
       subtitle: 'Domina la IA para recuperar 10+ horas semanales y escalar tu negocio sin trabajar más',
       cta: 'Reserva Tu Lugar Ahora',
       learnMore: 'Conoce más',
-      spots: 'Solo 12 lugares disponibles',
+      spots: 'Solo 7 lugares disponibles',
       live: 'Evento en vivo',
       duration: '4 horas intensivas',
       certificate: 'Certificado incluido',
@@ -75,7 +75,7 @@ export const translations = {
     // SectionCTA
     sectionCTA: {
       default: 'Reserva Tu Lugar Ahora',
-      spots: 'Solo 12 lugares disponibles',
+      spots: 'Solo 7 lugares disponibles',
     },
     // Pricing
     pricing: {
@@ -180,7 +180,7 @@ export const translations = {
       subtitle: 'Master AI to recover 10+ hours weekly and scale your business without working more',
       cta: 'Reserve Your Spot Now',
       learnMore: 'Learn more',
-      spots: 'Only 12 spots available',
+      spots: 'Only 7 spots available',
       live: 'Live event',
       duration: '4 intensive hours',
       certificate: 'Certificate included',
@@ -240,7 +240,7 @@ export const translations = {
     // SectionCTA
     sectionCTA: {
       default: 'Reserve Your Spot Now',
-      spots: 'Only 12 spots available',
+      spots: 'Only 7 spots available',
     },
     // Pricing
     pricing: {
@@ -261,7 +261,7 @@ export const translations = {
       ],
       cta: 'Secure My Spot',
       guarantee: '7-day satisfaction guarantee',
-      spots: 'Only 5 spots remaining',
+      spots: 'Only 7 spots remaining',
     },
     // Footer
     footer: {
