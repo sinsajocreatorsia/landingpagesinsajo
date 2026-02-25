@@ -13,6 +13,36 @@ function getTable(tableName: string) {
   return (supabaseAdmin.from(tableName) as ReturnType<typeof supabaseAdmin.from>)
 }
 
+function log(eventType: string, eventId: string, message: string) {
+  console.log(`[Stripe Webhook] [${eventType}] [${eventId}] ${message}`)
+}
+
+// Check if event was already processed (idempotency)
+async function isEventProcessed(eventId: string): Promise<boolean> {
+  const { data } = await getTable('stripe_webhook_events')
+    .select('id')
+    .eq('event_id', eventId)
+    .single()
+  return !!data
+}
+
+// Record event as processed
+async function recordEvent(eventId: string, eventType: string) {
+  await getTable('stripe_webhook_events')
+    .insert({ event_id: eventId, event_type: eventType } as Record<string, unknown>)
+}
+
+// Extract subscription ID from invoice (handles different Stripe API structures)
+function getSubscriptionIdFromInvoice(invoice: Stripe.Invoice): string | null {
+  const invoiceWithParent = invoice as Stripe.Invoice & {
+    parent?: { subscription_details?: { subscription?: string } }
+    subscription_details?: { subscription?: string }
+  }
+  return invoiceWithParent.parent?.subscription_details?.subscription
+    || invoiceWithParent.subscription_details?.subscription
+    || null
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.text()
@@ -30,12 +60,22 @@ export async function POST(request: Request) {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err) {
-      console.error('Webhook signature verification failed:', err)
+      console.error('[Stripe Webhook] Signature verification failed:', err)
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
       )
     }
+
+    // Idempotency check
+    const alreadyProcessed = await isEventProcessed(event.id)
+    if (alreadyProcessed) {
+      log(event.type, event.id, 'Event already processed, skipping')
+      return NextResponse.json({ received: true })
+    }
+
+    // Record event before processing to prevent race conditions
+    await recordEvent(event.id, event.type)
 
     // Handle the event
     switch (event.type) {
@@ -44,12 +84,10 @@ export async function POST(request: Request) {
         const userId = session.metadata?.user_id
 
         if (userId && session.subscription) {
-          // Get subscription details
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string
           )
 
-          // Update user profile to Pro
           await getTable('profiles')
             .update({
               plan: 'pro',
@@ -62,7 +100,7 @@ export async function POST(request: Request) {
             } as Record<string, unknown>)
             .eq('id', userId)
 
-          console.log(`User ${userId} upgraded to Pro`)
+          log(event.type, event.id, `User ${userId} upgraded to Pro`)
         }
         break
       }
@@ -85,7 +123,7 @@ export async function POST(request: Request) {
             } as Record<string, unknown>)
             .eq('id', userId)
 
-          console.log(`User ${userId} subscription updated to ${status}`)
+          log(event.type, event.id, `User ${userId} subscription status: ${status}`)
         }
         break
       }
@@ -95,7 +133,6 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.user_id
 
         if (userId) {
-          // Downgrade to free
           await getTable('profiles')
             .update({
               plan: 'free',
@@ -105,23 +142,16 @@ export async function POST(request: Request) {
             } as Record<string, unknown>)
             .eq('id', userId)
 
-          console.log(`User ${userId} subscription cancelled, downgraded to free`)
+          log(event.type, event.id, `User ${userId} subscription cancelled, downgraded to free`)
         }
         break
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        // Get subscription ID from invoice using parent field
-        const invoiceWithParent = invoice as Stripe.Invoice & {
-          parent?: { subscription_details?: { subscription?: string } }
-          subscription_details?: { subscription?: string }
-        }
-        const subscriptionId = invoiceWithParent.parent?.subscription_details?.subscription
-          || invoiceWithParent.subscription_details?.subscription
+        const subscriptionId = getSubscriptionIdFromInvoice(invoice)
 
         if (subscriptionId) {
-          // Get subscription to find user
           const subscription = await stripe.subscriptions.retrieve(subscriptionId)
           const userId = subscription.metadata?.user_id
 
@@ -132,19 +162,41 @@ export async function POST(request: Request) {
               } as Record<string, unknown>)
               .eq('id', userId)
 
-            console.log(`User ${userId} payment failed, marked as past_due`)
+            log(event.type, event.id, `User ${userId} payment failed, marked as past_due`)
+          }
+        }
+        break
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice
+        const subscriptionId = getSubscriptionIdFromInvoice(invoice)
+
+        if (subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+          const userId = subscription.metadata?.user_id
+
+          if (userId) {
+            await getTable('profiles')
+              .update({
+                subscription_status: 'active',
+                plan: 'pro',
+              } as Record<string, unknown>)
+              .eq('id', userId)
+
+            log(event.type, event.id, `User ${userId} payment confirmed, subscription active`)
           }
         }
         break
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        log(event.type, event.id, 'Unhandled event type')
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Webhook error:', error)
+    console.error('[Stripe Webhook] Handler error:', error)
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

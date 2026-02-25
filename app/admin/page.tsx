@@ -234,7 +234,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600 font-medium">Usuarios Pro</span>
                 <span className="font-bold text-green-600">
-                  {stats.users.pro} × $19.99 = ${(stats.users.pro * 19.99).toFixed(2)}
+                  {stats.users.pro} × $19 = ${(stats.users.pro * 19).toFixed(2)}
                 </span>
               </div>
             </div>

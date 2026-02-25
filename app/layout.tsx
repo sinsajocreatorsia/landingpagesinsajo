@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/lib/contexts/ThemeContext";
 import Header from "@/components/layout/Header";
 import FacebookPixel from "@/components/analytics/FacebookPixel";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import JsonLd, { organizationSchema, websiteSchema } from "@/components/seo/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,18 +19,51 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SINSAJO CREATORS - AI Agents that Work While You Sleep",
-  description: "Automate customer service, qualify leads and close sales 24/7 with personalized AI agents. Reduce costs 80%, scale without limits. Free demo.",
-  keywords: ["AI agents", "automation", "chatbot", "artificial intelligence", "customer service", "sales automation"],
+  metadataBase: new URL('https://www.screatorsai.com'),
+  title: {
+    default: 'Sinsajo Creators - Agentes de IA que Trabajan Mientras Duermes',
+    template: '%s | Sinsajo Creators',
+  },
+  description: 'Automatiza atención al cliente, califica leads y cierra ventas 24/7 con agentes de IA personalizados. Reduce costos 80%, escala sin límites. Workshops y herramientas de IA para empresarias.',
+  keywords: [
+    'agentes de IA', 'automatización negocios', 'inteligencia artificial empresas',
+    'chatbot IA', 'atención al cliente IA', 'automatizar ventas',
+    'AI agents', 'business automation', 'Sinsajo Creators',
+    'IA para empresarias', 'workshop inteligencia artificial',
+  ],
+  authors: [{ name: 'Sinsajo Creators' }],
+  creator: 'Sinsajo Creators',
   icons: {
     icon: '/icon.png',
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: "SINSAJO CREATORS - AI Agents for Your Business",
-    description: "Automate customer service, qualify leads and close sales 24/7. Reduce costs 80%.",
-    type: "website",
-    locale: "en_US",
+    title: 'Sinsajo Creators - Agentes de IA para Tu Negocio',
+    description: 'Automatiza atención al cliente, califica leads y cierra ventas 24/7 con agentes de IA. Reduce costos 80%.',
+    type: 'website',
+    locale: 'es_ES',
+    alternateLocale: 'en_US',
+    siteName: 'Sinsajo Creators',
+    images: ['/images/sinsajo-logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sinsajo Creators - Agentes de IA para Tu Negocio',
+    description: 'Automatiza tu negocio con IA. Agentes personalizados que trabajan 24/7.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: '/',
   },
 };
 
@@ -39,8 +73,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
+        <JsonLd data={organizationSchema} />
+        <JsonLd data={websiteSchema} />
         <GoogleAnalytics />
         <FacebookPixel />
       </head>

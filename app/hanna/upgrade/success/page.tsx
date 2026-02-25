@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
-import { Crown, CheckCircle, ArrowRight, Sparkles, MessageSquare, Mic, User } from 'lucide-react'
+import { Crown, CheckCircle, ArrowRight, Sparkles, MessageSquare, Mic, User, CreditCard } from 'lucide-react'
 
 export default function UpgradeSuccessPage() {
   const [showConfetti, setShowConfetti] = useState(false)
@@ -138,6 +138,14 @@ export default function UpgradeSuccessPage() {
             className="w-full py-4 px-4 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
           >
             Configurar mi perfil de negocio
+          </Link>
+
+          <Link
+            href="/hanna/billing"
+            className="w-full py-4 px-4 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+          >
+            <CreditCard className="w-5 h-5" />
+            Ver mi facturación
           </Link>
         </motion.div>
 

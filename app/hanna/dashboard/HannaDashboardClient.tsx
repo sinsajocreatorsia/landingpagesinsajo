@@ -18,6 +18,7 @@ import {
   Sparkles,
   History,
   User,
+  CreditCard,
   ChevronRight,
   Loader2,
   Mic,
@@ -76,6 +77,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [messagesRemaining, setMessagesRemaining] = useState(profile.messagesRemaining)
+  const [sessionId, setSessionId] = useState<string | null>(null)
 
   // Tone configuration
   const [showToneConfig, setShowToneConfig] = useState(false)
@@ -163,6 +165,48 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     setShowToneConfig(false)
   }
 
+  // Create a new session in the database
+  const createSession = useCallback(async (title?: string): Promise<string | null> => {
+    try {
+      const res = await fetch('/api/hanna/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title || 'Nueva conversación' }),
+      })
+      const data = await res.json()
+      if (data.success && data.session?.id) {
+        setSessionId(data.session.id)
+        return data.session.id
+      }
+    } catch (error) {
+      console.error('Error creating session:', error)
+    }
+    return null
+  }, [])
+
+  // Start a new conversation
+  const handleNewChat = useCallback(() => {
+    setSessionId(null)
+    setMessages([])
+    setSidebarOpen(false)
+    // Re-trigger greeting
+    const styleGreeting: Record<string, string> = {
+      energetic: '¡Hola! 🔥 Soy Hanna, y estoy aquí para ayudarte a ROMPERLA en tu negocio.',
+      calm: 'Hola, soy Hanna. Me da gusto poder acompañarte en el crecimiento estratégico de tu negocio.',
+      professional: 'Buen día. Soy Hanna, consultora estratégica de negocios. Será un placer asesorarte.',
+      friendly: `¡Hola ${user.fullName.split(' ')[0]}! 💙 Soy Hanna, tu amiga consultora de negocios.`,
+    }
+    const greeting = toneConfig
+      ? styleGreeting[toneConfig.style]
+      : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
+    setMessages([{
+      id: 'initial',
+      role: 'assistant',
+      content: greeting,
+      timestamp: new Date(),
+    }])
+  }, [user.fullName, toneConfig])
+
   // Send message
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return
@@ -190,6 +234,13 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     setIsLoading(true)
 
     try {
+      // Create session on first user message if none exists
+      let currentSessionId = sessionId
+      if (!currentSessionId) {
+        const firstWords = text.trim().substring(0, 50)
+        currentSessionId = await createSession(firstWords)
+      }
+
       // Pro users send more conversation history for better context
       const historyLimit = profile.plan === 'pro' ? 20 : 10
 
@@ -199,6 +250,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
         body: JSON.stringify({
           message: text.trim(),
           userId: user.id,
+          sessionId: currentSessionId,
           toneConfig: toneConfig,
           history: messages.slice(-historyLimit).map(m => ({
             role: m.role,
@@ -255,7 +307,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, isLoading, user.id, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig])
+  }, [messages, isLoading, user.id, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession])
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -369,7 +421,10 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
               {/* New Chat Button */}
               <div className="p-4">
-                <button className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white flex items-center gap-2 transition-colors">
+                <button
+                  onClick={handleNewChat}
+                  className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white flex items-center gap-2 transition-colors"
+                >
                   <Plus className="w-5 h-5" />
                   Nueva conversación
                 </button>
@@ -404,6 +459,13 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 >
                   <Settings className="w-5 h-5" />
                   Configuración
+                </Link>
+                <Link
+                  href="/hanna/billing"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  Facturación
                 </Link>
               </nav>
 

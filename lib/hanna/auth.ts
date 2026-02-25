@@ -134,9 +134,11 @@ export const HANNA_PROTECTED_ROUTES = [
   '/hanna/history',
   '/hanna/settings',
   '/hanna/profile',
+  '/hanna/billing',
 ]
 
 export const HANNA_AUTH_ROUTES = [
   '/hanna/login',
   '/hanna/signup',
+  '/hanna/forgot-password',
 ]

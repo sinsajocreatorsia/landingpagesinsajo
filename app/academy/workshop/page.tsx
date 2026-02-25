@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import JsonLd, { workshopEventSchema, workshopFaqSchema } from '@/components/seo/JsonLd'
 import WorkshopLayout from '@/components/workshop/WorkshopLayout'
 import WorkshopHeader from '@/components/workshop/WorkshopHeader'
 import WorkshopHero from '@/components/workshop/WorkshopHero'
@@ -16,7 +17,15 @@ import WorkshopChatWidget from '@/components/workshop/WorkshopChatWidget'
 export const metadata: Metadata = {
   title: 'IA para Empresarias Exitosas - Workshop | Sinsajo Creators',
   description: 'Workshop exclusivo de estrategia IA para empresarias de habla hispana. De Dueña Agotada a Estratega Imparable. Recupera 10+ horas semanales. Sábado 7 de Marzo 2026.',
-  keywords: ['workshop IA', 'inteligencia artificial negocios', 'automatización empresas', 'empresarias exitosas', 'Sinsajo Creators'],
+  keywords: [
+    'workshop IA', 'inteligencia artificial negocios', 'automatización empresas',
+    'empresarias exitosas', 'Sinsajo Creators', 'workshop inteligencia artificial',
+    'IA para emprendedoras', 'automatizar negocio con IA', 'curso IA empresarias',
+    'taller inteligencia artificial', 'AI workshop latinas', 'escalar negocio con IA',
+  ],
+  alternates: {
+    canonical: '/academy/workshop',
+  },
   openGraph: {
     title: 'IA para Empresarias Exitosas - De Dueña Agotada a Estratega Imparable',
     description: 'Workshop exclusivo para empresarias de habla hispana. Aprende a escalar tu negocio con agentes de IA. Sábado, 7 de Marzo 2026.',
@@ -26,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'IA para Empresarias Exitosas - Workshop',
-    description: 'Recupera 10+ horas semanales con automatización IA. Solo 7 lugares.',
+    description: 'Recupera 10+ horas semanales con automatización IA. Solo 5 lugares.',
     images: ['/images/workshop-og.png'],
   },
 }
@@ -34,6 +43,8 @@ export const metadata: Metadata = {
 export default function WorkshopPage() {
   return (
     <WorkshopLayout>
+      <JsonLd data={workshopEventSchema} />
+      <JsonLd data={workshopFaqSchema} />
       <div className="workshop-page">
         {/* Workshop-specific Header */}
         <WorkshopHeader />

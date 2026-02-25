@@ -68,13 +68,19 @@ export default function WorkshopPricing() {
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-2 animate-pulse">
               <span className="w-2 h-2 bg-red-500 rounded-full" />
               <span className="text-red-600 font-semibold text-sm">
-                Solo 7 lugares disponibles - Cupo limitado
+                Solo 5 lugares disponibles - Cupo limitado
               </span>
             </div>
           </div>
 
           {/* Price */}
           <div className="text-center mb-8">
+            {/* Launch price badge */}
+            <div className="mb-3">
+              <span className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full px-4 py-1.5 text-sm font-bold">
+                🔥 PRECIO DE LANZAMIENTO — Válido hasta el 28 de febrero
+              </span>
+            </div>
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl text-[#022133]/50 line-through">$197</span>
               <span className="bg-gradient-to-r from-[#36B3AE] to-[#2CB6D7] text-white text-sm font-bold px-3 py-1 rounded-full flex items-center gap-1">
@@ -86,6 +92,9 @@ export default function WorkshopPricing() {
               <span className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-[#022133] to-[#200F5D] bg-clip-text text-transparent">$100</span>
               <span className="text-2xl text-[#022133]/60">USD</span>
             </div>
+            <p className="text-sm text-[#022133]/50 mt-1">
+              Después del 28 de febrero, el precio vuelve a <span className="font-semibold text-[#022133]/70">$197 USD</span>
+            </p>
             <p className="text-[#022133]/60 mt-2">Pago único - Sin suscripciones - Resultados garantizados</p>
           </div>
 
@@ -104,8 +113,34 @@ export default function WorkshopPricing() {
             ))}
           </div>
 
+          {/* Discount explanation */}
+          <div className="mt-4 mb-4 p-3 bg-blue-50 rounded-xl border border-blue-100">
+            <p className="text-sm text-[#022133]/70 leading-relaxed">
+              💡 <span className="font-medium">¿Por qué este precio?</span> Este es el primer
+              Workshop Fundacional y queremos que las primeras participantes tengan acceso
+              preferencial. El precio de lanzamiento es exclusivo para esta primera edición.
+            </p>
+          </div>
+
           {/* Payment Buttons */}
           <PaymentButtons price="100" workshopName="IA para Empresarias Exitosas - Workshop" />
+
+          {/* Guarantee */}
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">🛡️</span>
+              <div>
+                <p className="font-semibold text-green-800 text-sm">
+                  Garantía Sinsajo — 100% Sin Riesgo
+                </p>
+                <p className="text-green-700/80 text-xs mt-1 leading-relaxed">
+                  Si al terminar el workshop no sientes que recuperarás al menos 10 horas
+                  semanales con lo aprendido, te devolvemos el 100% de tu inversión. Sin
+                  preguntas, sin complicaciones.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Trust badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-8 pt-8 border-t border-gray-200">
@@ -115,7 +150,7 @@ export default function WorkshopPricing() {
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <Check className="w-5 h-5 text-[#36B3AE]" />
-              <span className="text-sm">Cupo limitado a 7 personas</span>
+              <span className="text-sm">Cupo limitado a 5 personas</span>
             </div>
             <div className="flex items-center gap-2 text-[#022133]/60">
               <svg className="w-5 h-5 text-[#36B3AE]" fill="currentColor" viewBox="0 0 24 24">
