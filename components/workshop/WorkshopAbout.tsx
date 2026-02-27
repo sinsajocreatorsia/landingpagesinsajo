@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Target, Lightbulb, XCircle, Clock, TrendingUp, Zap } from 'lucide-react'
+import { Target, Lightbulb, Heart, Clock, TrendingUp, Zap } from 'lucide-react'
 import SectionCTA from './SectionCTA'
 import { useLanguage } from '@/lib/i18n'
 
@@ -57,14 +57,14 @@ export default function WorkshopAbout() {
           ],
         },
         {
-          icon: XCircle,
-          title: '¿Qué NO es este workshop?',
+          icon: Heart,
+          title: 'Este workshop es para ti si...',
           color: '#C7517E',
           items: [
-            'No es para principiantes sin negocio',
-            'No es teoría genérica sin aplicación',
-            'No es un webinar de 2 horas que olvidarás',
-            'No es contenido que encuentras gratis en YouTube',
+            'Sientes que trabajas demasiado y mereces ganar más',
+            'Quieres crecer sin sacrificar más tiempo de tu vida',
+            'Estás lista para que la IA trabaje para ti, no al revés',
+            'Tienes hambre de resultados reales y estrategia poderosa',
           ],
         },
       ],
@@ -104,14 +104,14 @@ export default function WorkshopAbout() {
           ],
         },
         {
-          icon: XCircle,
-          title: 'What this workshop is NOT',
+          icon: Heart,
+          title: 'This workshop is for you if...',
           color: '#C7517E',
           items: [
-            'Not for beginners without a business',
-            'Not generic theory without application',
-            'Not a 2-hour webinar you will forget',
-            'Not content you can find free on YouTube',
+            'You feel like you work too much and deserve to earn more',
+            'You want to grow without sacrificing more of your time',
+            "You're ready for AI to work for you, not the other way around",
+            "You're hungry for real results and powerful strategy",
           ],
         },
       ],
