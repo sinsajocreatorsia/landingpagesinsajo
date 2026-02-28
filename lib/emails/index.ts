@@ -64,6 +64,7 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       paymentMethod: data.paymentMethod || 'tarjeta',
       location: data.location || 'Blue Bean - 110 N Ankeny Blvd, Suite 200, Ankeny, IA',
       whatsappLink: data.whatsappLink,
+      profileUrl: data.profileUrl,
     }),
   },
   reminder_24h: {
@@ -266,6 +267,9 @@ export async function sendConfirmationEmail({
   paymentMethod: string
   registrationId: string
 }): Promise<EmailResult> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.screatorsai.com'
+  const profileUrl = `${baseUrl}/academy/workshop/success?registrationId=${registrationId}`
+
   return sendEmail({
     to,
     type: 'confirmation',
@@ -276,6 +280,7 @@ export async function sendConfirmationEmail({
       amount: `$${amount}`,
       paymentMethod,
       location: 'Blue Bean - 110 N Ankeny Blvd, Suite 200, Ankeny, IA',
+      profileUrl,
     },
     registrationId,
   })

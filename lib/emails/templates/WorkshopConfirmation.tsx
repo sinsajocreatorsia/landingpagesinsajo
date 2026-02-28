@@ -23,6 +23,7 @@ interface WorkshopConfirmationProps {
   paymentMethod: string
   location?: string
   whatsappLink?: string
+  profileUrl?: string
 }
 
 export default function WorkshopConfirmation({
@@ -33,6 +34,7 @@ export default function WorkshopConfirmation({
   paymentMethod = 'tarjeta',
   location = 'Blue Bean - 110 N Ankeny Blvd, Suite 200, Ankeny, IA',
   whatsappLink = '',
+  profileUrl = '',
 }: WorkshopConfirmationProps) {
   const previewText = `¡Tu lugar en el workshop "IA para Empresarias Exitosas" está confirmado!`
 
@@ -132,6 +134,20 @@ export default function WorkshopConfirmation({
               </Column>
             </Row>
           </Section>
+
+          {/* Profile Form CTA */}
+          {profileUrl && (
+            <Section style={profileBox}>
+              <Text style={profileTitle}>✍️ Personaliza tu experiencia</Text>
+              <Text style={profileDesc}>
+                Completa este breve formulario (2 min) para que podamos adaptar el workshop
+                a las necesidades específicas de tu negocio.
+              </Text>
+              <Button style={profileButton} href={profileUrl}>
+                Completar mi perfil →
+              </Button>
+            </Section>
+          )}
 
           {/* Next Steps */}
           <Section style={content}>
@@ -454,4 +470,38 @@ const footerLinks = {
 const footerLink = {
   color: '#2CB6D7',
   textDecoration: 'none',
+}
+
+const profileBox = {
+  backgroundColor: '#fdf2f8',
+  padding: '24px 30px',
+  margin: '0',
+  borderLeft: '4px solid #C7517E',
+  textAlign: 'center' as const,
+}
+
+const profileTitle = {
+  color: '#022133',
+  fontSize: '18px',
+  fontWeight: '700',
+  margin: '0 0 8px 0',
+}
+
+const profileDesc = {
+  color: '#374151',
+  fontSize: '15px',
+  lineHeight: '22px',
+  margin: '0 0 16px 0',
+}
+
+const profileButton = {
+  backgroundColor: '#C7517E',
+  borderRadius: '8px',
+  color: '#FCFEFB',
+  fontSize: '16px',
+  fontWeight: '700',
+  padding: '14px 32px',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'inline-block',
 }

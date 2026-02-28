@@ -53,15 +53,29 @@ function SuccessContent() {
       }
 
       if (sessionId || regIdFromUrl) {
-        try {
-          const response = await fetch(apiUrl)
-          if (response.ok) {
-            const data = await response.json()
-            setRegistrationId(data.registrationId)
-            setCustomerName(data.customerName || '')
+        // Retry up to 5 times with 2s delay — webhook may not have fired yet
+        const MAX_RETRIES = 5
+        const RETRY_DELAY = 2000
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+          try {
+            const response = await fetch(apiUrl)
+            if (response.ok) {
+              const data = await response.json()
+              if (data.registrationId) {
+                setRegistrationId(data.registrationId)
+                setCustomerName(data.customerName || '')
+                break
+              }
+              setCustomerName(data.customerName || '')
+            }
+          } catch (error) {
+            console.error('Error fetching session:', error)
+            break
           }
-        } catch (error) {
-          console.error('Error fetching session:', error)
+          // Wait before retrying only if not the last attempt
+          if (attempt < MAX_RETRIES - 1) {
+            await new Promise((res) => setTimeout(res, RETRY_DELAY))
+          }
         }
       }
       setLoading(false)
