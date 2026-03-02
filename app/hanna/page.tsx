@@ -182,7 +182,7 @@ export default function HannaLandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="animate-[fadeInUp_0.6s_ease-out_both]">
+          <div>
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
               <Sparkles className="w-4 h-4 text-[#2CB6D7]" />
@@ -251,7 +251,7 @@ export default function HannaLandingPage() {
           </div>
 
           {/* Hero Image/Demo */}
-          <div className="mt-16 relative animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
+          <div className="mt-16 relative">
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6 max-w-3xl mx-auto">
               <div className="bg-[#022133] rounded-xl overflow-hidden">
                 {/* Chat Preview */}
