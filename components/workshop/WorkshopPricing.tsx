@@ -125,23 +125,6 @@ export default function WorkshopPricing() {
           {/* Payment Buttons */}
           <PaymentButtons price="100" workshopName="IA para Empresarias Exitosas - Workshop" />
 
-          {/* Guarantee */}
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">🛡️</span>
-              <div>
-                <p className="font-semibold text-green-800 text-sm">
-                  Garantía Sinsajo — 100% Sin Riesgo
-                </p>
-                <p className="text-green-700/80 text-xs mt-1 leading-relaxed">
-                  Si al terminar el workshop no sientes que recuperarás al menos 10 horas
-                  semanales con lo aprendido, te devolvemos el 100% de tu inversión. Sin
-                  preguntas, sin complicaciones.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Trust badges */}
           <div className="flex flex-wrap justify-center gap-6 mt-8 pt-8 border-t border-gray-200">
             <div className="flex items-center gap-2 text-[#022133]/60">
