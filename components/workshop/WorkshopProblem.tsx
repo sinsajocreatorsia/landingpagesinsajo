@@ -102,7 +102,7 @@ export default function WorkshopProblem() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+        <div className="text-center mb-16 animate-on-scroll transition-all duration-700">
           <span className="inline-block bg-[#C7517E]/20 text-[#C7517E] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             {t.badge}
           </span>
@@ -119,7 +119,7 @@ export default function WorkshopProblem() {
           {t.problems.map((problem, index) => (
             <div
               key={index}
-              className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 bg-[#022133]/50 backdrop-blur-sm border border-[#C7517E]/20 rounded-2xl p-6 hover:border-[#C7517E]/50 group"
+              className="animate-on-scroll transition-all duration-700 bg-[#022133]/50 backdrop-blur-sm border border-[#C7517E]/20 rounded-2xl p-6 hover:border-[#C7517E]/50 group"
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               <div className="flex items-start gap-4">
@@ -136,7 +136,7 @@ export default function WorkshopProblem() {
         </div>
 
         {/* The Question */}
-        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500 text-center bg-gradient-to-r from-[#C7517E]/20 to-[#2CB6D7]/20 border border-[#2CB6D7]/30 rounded-2xl p-8 max-w-3xl mx-auto">
+        <div className="animate-on-scroll transition-all duration-700 delay-500 text-center bg-gradient-to-r from-[#C7517E]/20 to-[#2CB6D7]/20 border border-[#2CB6D7]/30 rounded-2xl p-8 max-w-3xl mx-auto">
           <p className="text-2xl md:text-3xl font-bold text-[#FCFEFB] mb-4">
             &quot;{t.question}&quot;
           </p>

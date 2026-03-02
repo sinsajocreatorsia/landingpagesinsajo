@@ -134,7 +134,7 @@ export default function WorkshopAbout() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+        <div className="text-center mb-16 animate-on-scroll transition-all duration-700">
           <span className="inline-block bg-[#2CB6D7]/10 text-[#2CB6D7] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             {t.badge}
           </span>
@@ -148,7 +148,7 @@ export default function WorkshopAbout() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+        <div className="grid grid-cols-3 gap-4 md:gap-8 mb-16 animate-on-scroll transition-all duration-700 delay-100">
           {t.stats.map((stat, index) => (
             <div
               key={index}
@@ -173,7 +173,7 @@ export default function WorkshopAbout() {
           {t.cards.map((card, index) => (
             <div
               key={index}
-              className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl group"
+              className="animate-on-scroll transition-all duration-700 bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl group"
               style={{ transitionDelay: `${(index + 2) * 100}ms` }}
             >
               <div
@@ -203,7 +203,7 @@ export default function WorkshopAbout() {
         </div>
 
         {/* Section CTA */}
-        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
+        <div className="animate-on-scroll transition-all duration-700 delay-500">
           <SectionCTA text={t.cta} />
         </div>
       </div>

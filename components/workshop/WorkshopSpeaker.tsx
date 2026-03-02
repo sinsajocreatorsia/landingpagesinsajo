@@ -33,7 +33,7 @@ export default function WorkshopSpeaker() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Image */}
-          <div className="relative flex justify-center animate-on-scroll opacity-0 translate-x-[-50px] transition-all duration-700">
+          <div className="relative flex justify-center animate-on-scroll transition-all duration-700">
             <div className="relative">
               {/* Decorative circle */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#2CB6D7] to-[#200F5D] rounded-full scale-105 opacity-20 animate-pulse" />
@@ -53,7 +53,7 @@ export default function WorkshopSpeaker() {
           </div>
 
           {/* Content */}
-          <div className="space-y-4 sm:space-y-6 animate-on-scroll opacity-0 translate-x-[50px] transition-all duration-700 delay-200 mt-8 lg:mt-0 min-w-0 max-w-md lg:max-w-lg">
+          <div className="space-y-4 sm:space-y-6 animate-on-scroll transition-all duration-700 delay-200 mt-8 lg:mt-0 min-w-0 max-w-md lg:max-w-lg">
             <span className="inline-block bg-[#C7517E]/10 text-[#C7517E] font-semibold px-4 py-2 rounded-full text-sm">
               TU PRESENTADORA
             </span>

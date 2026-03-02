@@ -106,7 +106,7 @@ export default function WorkshopMethodology() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+        <div className="text-center mb-16 animate-on-scroll transition-all duration-700">
           <span className="inline-block bg-[#36B3AE]/10 text-[#36B3AE] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             {t.badge}
           </span>
@@ -124,7 +124,7 @@ export default function WorkshopMethodology() {
           {t.pillars.map((pillar, index) => (
             <div
               key={index}
-              className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 group"
+              className="animate-on-scroll transition-all duration-700 group"
               style={{ transitionDelay: `${index * 150}ms` }}
             >
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 h-full relative overflow-hidden">
@@ -182,7 +182,7 @@ export default function WorkshopMethodology() {
         </div>
 
         {/* Section CTA */}
-        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-500">
+        <div className="animate-on-scroll transition-all duration-700 delay-500">
           <SectionCTA text={t.cta} variant="secondary" />
         </div>
       </div>

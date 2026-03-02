@@ -58,7 +58,7 @@ export default function WorkshopTestimonials() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+        <div className="text-center mb-16 animate-on-scroll transition-all duration-700">
           <span className="inline-block bg-[#36B3AE]/20 text-[#36B3AE] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             {t.testimonials.badge}
           </span>
@@ -72,7 +72,7 @@ export default function WorkshopTestimonials() {
         </div>
 
         {/* Featured Testimonial */}
-        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
+        <div className="animate-on-scroll transition-all duration-700 delay-200">
           <div className="bg-[#022133]/50 backdrop-blur-sm border border-[#2CB6D7]/20 rounded-3xl p-8 md:p-12 max-w-4xl mx-auto relative">
             {/* Quote icon */}
             <div className="absolute -top-6 left-8 bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] rounded-full p-4">
@@ -154,7 +154,7 @@ export default function WorkshopTestimonials() {
         </div>
 
         {/* Stats bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-400">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 animate-on-scroll transition-all duration-700 delay-400">
           {t.testimonials.stats.map((stat, i) => (
             <div key={i} className="text-center p-4">
               <div className="text-2xl md:text-3xl font-bold text-[#2CB6D7]">{stat.value}</div>

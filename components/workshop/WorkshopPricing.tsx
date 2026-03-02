@@ -46,7 +46,7 @@ export default function WorkshopPricing() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+        <div className="text-center mb-12 animate-on-scroll transition-all duration-700">
           <span className="inline-block bg-[#C7517E]/20 text-[#C7517E] font-semibold px-4 py-2 rounded-full text-sm mb-4">
             INVERSIÓN
           </span>
@@ -59,7 +59,7 @@ export default function WorkshopPricing() {
         </div>
 
         {/* Pricing Card */}
-        <div className="animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200 bg-[#FCFEFB] rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+        <div className="animate-on-scroll transition-all duration-700 delay-200 bg-[#FCFEFB] rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
           {/* Decorative corner */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2CB6D7]/10 to-transparent rounded-bl-full" />
 
@@ -162,7 +162,7 @@ export default function WorkshopPricing() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-8 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-400">
+        <div className="text-center mt-8 animate-on-scroll transition-all duration-700 delay-400">
           <p className="text-[#FCFEFB]/80 mb-2">
             &quot;El interés compuesto de tu libertad empieza ahora.&quot;
           </p>
