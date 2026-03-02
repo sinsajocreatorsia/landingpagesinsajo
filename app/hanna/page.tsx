@@ -3,13 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
 import { createBrowserClient } from '@supabase/ssr'
 import {
   MessageSquare,
   Sparkles,
-  Zap,
-  Crown,
   Check,
   ArrowRight,
   Mic,
@@ -185,11 +182,7 @@ export default function HannaLandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="animate-[fadeInUp_0.6s_ease-out_both]">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
               <Sparkles className="w-4 h-4 text-[#2CB6D7]" />
@@ -255,15 +248,10 @@ export default function HannaLandingPage() {
                 <span>3h+ ahorradas/día</span>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Hero Image/Demo */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-16 relative"
-          >
+          <div className="mt-16 relative animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6 max-w-3xl mx-auto">
               <div className="bg-[#022133] rounded-xl overflow-hidden">
                 {/* Chat Preview */}
@@ -314,7 +302,7 @@ export default function HannaLandingPage() {
             {/* Decorative Elements */}
             <div className="absolute -top-4 -left-4 w-20 h-20 bg-[#2CB6D7]/20 rounded-full blur-xl" />
             <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[#C7517E]/20 rounded-full blur-xl" />
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -332,12 +320,8 @@ export default function HannaLandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <motion.div
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
                 className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-[#2CB6D7]/50 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2CB6D7]/20 to-[#36B3AE]/20 flex items-center justify-center mb-4 group-hover:from-[#2CB6D7]/30 group-hover:to-[#36B3AE]/30 transition-colors">
@@ -345,7 +329,7 @@ export default function HannaLandingPage() {
                 </div>
                 <h3 className="text-white font-semibold text-lg mb-2">{feature.title}</h3>
                 <p className="text-white/60">{feature.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -365,12 +349,8 @@ export default function HannaLandingPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
-              <motion.div
+              <div
                 key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
                 className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
               >
                 <div className="flex items-center gap-4 mb-4">
@@ -388,7 +368,7 @@ export default function HannaLandingPage() {
                     <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -408,12 +388,8 @@ export default function HannaLandingPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {plans.map((plan, index) => (
-              <motion.div
+              <div
                 key={plan.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
                 className={`relative rounded-2xl p-8 ${
                   plan.popular
                     ? 'bg-gradient-to-br from-[#C7517E]/20 to-[#200F5D]/20 border-2 border-[#C7517E]'
@@ -455,7 +431,7 @@ export default function HannaLandingPage() {
                 >
                   {isLoggedIn ? 'Ir al Dashboard' : plan.cta}
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
 
@@ -465,10 +441,7 @@ export default function HannaLandingPage() {
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+          <div
             className="bg-gradient-to-br from-[#C7517E]/20 to-[#200F5D]/40 rounded-3xl p-12 border border-white/10"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -493,7 +466,7 @@ export default function HannaLandingPage() {
                 </>
               )}
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
