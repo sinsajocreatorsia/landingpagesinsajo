@@ -13,6 +13,7 @@ import WorkshopPricing from '@/components/workshop/WorkshopPricing'
 import WorkshopFAQ from '@/components/workshop/WorkshopFAQ'
 import WorkshopFooter from '@/components/workshop/WorkshopFooter'
 import WorkshopChatWidget from '@/components/workshop/WorkshopChatWidget'
+import LastSpotPopup from '@/components/workshop/LastSpotPopup'
 
 export const metadata: Metadata = {
   title: 'IA para Empresarias Exitosas - Workshop | Sinsajo Creators',
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'IA para Empresarias Exitosas - Workshop',
-    description: 'Recupera 10+ horas semanales con automatización IA. Solo 5 lugares.',
+    description: 'Recupera 10+ horas semanales con automatización IA. ¡Último lugar disponible!',
     images: ['/images/workshop-og.png'],
   },
 }
@@ -83,6 +84,9 @@ export default function WorkshopPage() {
 
         {/* Workshop-specific Chat Widget with auto-greeting */}
         <WorkshopChatWidget />
+
+        {/* Last spot popup - shows after 3 seconds */}
+        <LastSpotPopup />
       </div>
     </WorkshopLayout>
   )

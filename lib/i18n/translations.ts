@@ -15,7 +15,7 @@ export const translations = {
       subtitle: 'Domina la IA para recuperar 10+ horas semanales y escalar tu negocio sin trabajar más',
       cta: 'Reserva Tu Lugar Ahora',
       learnMore: 'Conoce más',
-      spots: 'Solo 5 lugares disponibles',
+      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
       live: 'Evento en vivo',
       duration: '4 horas intensivas',
       certificate: 'Certificado incluido',
@@ -75,7 +75,7 @@ export const translations = {
     // SectionCTA
     sectionCTA: {
       default: 'Reserva Tu Lugar Ahora',
-      spots: 'Solo 5 lugares disponibles',
+      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
     },
     // Pricing
     pricing: {
@@ -96,7 +96,7 @@ export const translations = {
       ],
       cta: 'Asegurar Mi Lugar',
       guarantee: 'Garantía de satisfacción de 7 días',
-      spots: 'Solo quedan 5 lugares disponibles',
+      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
     },
     // Footer
     footer: {
@@ -180,7 +180,7 @@ export const translations = {
       subtitle: 'Master AI to recover 10+ hours weekly and scale your business without working more',
       cta: 'Reserve Your Spot Now',
       learnMore: 'Learn more',
-      spots: 'Only 5 spots available',
+      spots: '🔥 LAST SPOT AVAILABLE!',
       live: 'Live event',
       duration: '4 intensive hours',
       certificate: 'Certificate included',
@@ -240,7 +240,7 @@ export const translations = {
     // SectionCTA
     sectionCTA: {
       default: 'Reserve Your Spot Now',
-      spots: 'Only 5 spots available',
+      spots: '🔥 LAST SPOT AVAILABLE!',
     },
     // Pricing
     pricing: {
@@ -261,7 +261,7 @@ export const translations = {
       ],
       cta: 'Secure My Spot',
       guarantee: '7-day satisfaction guarantee',
-      spots: 'Only 5 spots remaining',
+      spots: '🔥 LAST SPOT REMAINING!',
     },
     // Footer
     footer: {

@@ -104,7 +104,7 @@ export const workshopFaqSchema = {
       name: '¿Cuántos lugares hay disponibles?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Limitamos este workshop a solo 5 participantes. Este número reducido permite una experiencia de aprendizaje ultra-personalizada, donde cada asistente recibe atención individual.',
+        text: '¡Queda solo 1 lugar! Este workshop es ultra-íntimo con un grupo reducido que permite una experiencia de aprendizaje personalizada con atención individual.',
       },
     },
     {
