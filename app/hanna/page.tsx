@@ -1,9 +1,5 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { createBrowserClient } from '@supabase/ssr'
 import {
   MessageSquare,
   Sparkles,
@@ -15,7 +11,6 @@ import {
   TrendingUp,
   Users,
   Star,
-  LayoutDashboard,
 } from 'lucide-react'
 
 const features = [
@@ -90,32 +85,12 @@ const plans = [
       'Respuestas adaptadas a tu marca',
     ],
     cta: 'Comenzar con Pro',
-    ctaLink: '/hanna/signup',
+    ctaLink: '/hanna/signup?plan=pro',
     popular: true,
   },
 ]
 
 export default function HannaLandingPage() {
-  const [activeTestimonial, setActiveTestimonial] = useState(0)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isAuthLoading, setIsAuthLoading] = useState(true)
-
-  useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    supabase.auth.getUser()
-      .then(({ data: { user } }) => {
-        setIsLoggedIn(!!user)
-      })
-      .catch(() => {
-        setIsLoggedIn(false)
-      })
-      .finally(() => {
-        setIsAuthLoading(false)
-      })
-  }, [])
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#022133] via-[#0a2e47] to-[#200F5D]">
@@ -149,32 +124,18 @@ export default function HannaLandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            {isAuthLoading ? (
-              <div className="w-28 h-10 bg-white/10 animate-pulse rounded-lg" />
-            ) : isLoggedIn ? (
-              <Link
-                href="/hanna/dashboard"
-                className="px-4 py-2 bg-gradient-to-r from-[#2CB6D7] to-[#1a9ab5] text-white font-medium rounded-lg hover:from-[#36c4e6] hover:to-[#2CB6D7] transition-all flex items-center gap-2"
-              >
-                <LayoutDashboard className="w-4 h-4" />
-                Ir al Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/hanna/login"
-                  className="px-4 py-2 text-white/80 hover:text-white transition-colors"
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  href="/hanna/signup"
-                  className="px-4 py-2 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-medium rounded-lg hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
-                >
-                  Comenzar Gratis
-                </Link>
-              </>
-            )}
+            <Link
+              href="/hanna/login"
+              className="px-4 py-2 text-white/80 hover:text-white transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              href="/hanna/signup"
+              className="px-4 py-2 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-medium rounded-lg hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
+            >
+              Crear Cuenta
+            </Link>
           </div>
         </div>
       </header>
@@ -206,25 +167,13 @@ export default function HannaLandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              {isAuthLoading ? (
-                <div className="w-48 h-14 bg-white/10 animate-pulse rounded-xl" />
-              ) : isLoggedIn ? (
-                <Link
-                  href="/hanna/dashboard"
-                  className="px-8 py-4 bg-gradient-to-r from-[#2CB6D7] to-[#1a9ab5] text-white font-semibold rounded-xl hover:from-[#36c4e6] hover:to-[#2CB6D7] transition-all flex items-center gap-2 shadow-lg shadow-[#2CB6D7]/30"
-                >
-                  <LayoutDashboard className="w-5 h-5" />
-                  Ir al Dashboard
-                </Link>
-              ) : (
-                <Link
-                  href="/hanna/signup"
-                  className="px-8 py-4 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all flex items-center gap-2 shadow-lg shadow-[#C7517E]/30"
-                >
-                  Comenzar Gratis
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              )}
+              <Link
+                href="/hanna/signup"
+                className="px-8 py-4 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all flex items-center gap-2 shadow-lg shadow-[#C7517E]/30"
+              >
+                Comenzar Gratis
+                <ArrowRight className="w-5 h-5" />
+              </Link>
               <a
                 href="#demo"
                 className="px-8 py-4 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all"
@@ -422,14 +371,14 @@ export default function HannaLandingPage() {
                 </ul>
 
                 <Link
-                  href={isLoggedIn ? '/hanna/dashboard' : plan.ctaLink}
+                  href={plan.ctaLink}
                   className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-all ${
                     plan.popular
                       ? 'bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white hover:from-[#d4608d] hover:to-[#C7517E]'
                       : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
                   }`}
                 >
-                  {isLoggedIn ? 'Ir al Dashboard' : plan.cta}
+                  {plan.cta}
                 </Link>
               </div>
             ))}
@@ -451,20 +400,11 @@ export default function HannaLandingPage() {
               Empieza gratis hoy y descubre cómo la IA puede transformar tu marketing.
             </p>
             <Link
-              href={isLoggedIn ? '/hanna/dashboard' : '/hanna/signup'}
+              href="/hanna/signup"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all shadow-lg shadow-[#C7517E]/30"
             >
-              {isLoggedIn ? (
-                <>
-                  <LayoutDashboard className="w-5 h-5" />
-                  Ir al Dashboard
-                </>
-              ) : (
-                <>
-                  Crear mi cuenta gratis
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
+              Crear mi cuenta gratis
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>

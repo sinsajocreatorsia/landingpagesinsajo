@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
 })
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_HANNA!
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_HANNA || ''
 
 // Helper to get untyped table
 function getTable(tableName: string) {
@@ -44,6 +44,11 @@ function getSubscriptionIdFromInvoice(invoice: Stripe.Invoice): string | null {
 }
 
 export async function POST(request: Request) {
+  if (!webhookSecret) {
+    console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET_HANNA is not configured')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+  }
+
   try {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')

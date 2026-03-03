@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { analyzeProfile, saveAnalysis, getAnalysis } from '@/lib/hanna/analysis'
+import { requireAdmin } from '@/lib/auth-guard'
 
 // Type definitions for Supabase query results
 interface WorkshopProfileData {
@@ -26,29 +27,13 @@ interface RegistrationWithProfile {
   workshop_profiles: WorkshopProfileData[] | null
 }
 
-// Admin API key check
-function isAuthorized(request: Request): boolean {
-  const authHeader = request.headers.get('authorization')
-  const expectedKey = `Bearer ${process.env.ADMIN_API_KEY}`
-
-  if (process.env.NODE_ENV !== 'production') {
-    return true // Allow in development
-  }
-
-  return authHeader === expectedKey
-}
-
 /**
  * POST /api/admin/hanna/analyze
- * Analyze a single participant's profile
+ * Analyze a single participant's profile (requires admin auth)
  */
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     const { registrationId, forceReanalyze = false } = await request.json()
@@ -162,12 +147,8 @@ export async function POST(request: Request) {
  * Get existing analysis for a participant
  */
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { couponsTable, profilesTable, redemptionsTable } from '@/lib/supabase-helpers'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAuth, rateLimit } from '@/lib/auth-guard'
 
 // Helper for checking existing redemptions
 async function getExistingRedemption(couponId: string, userId: string) {
@@ -13,6 +14,14 @@ async function getExistingRedemption(couponId: string, userId: string) {
 }
 
 export async function POST(request: Request) {
+  // Rate limit: 5 requests per minute
+  const rateLimitResponse = rateLimit(request, { maxRequests: 5, windowMs: 60_000 })
+  if (rateLimitResponse) return rateLimitResponse
+
+  // Require authenticated user
+  const { user, error: authError } = await requireAuth()
+  if (authError) return authError
+
   try {
     const { code, userId } = await request.json()
 
@@ -20,6 +29,14 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, error: 'Código y usuario requeridos' },
         { status: 400 }
+      )
+    }
+
+    // Verify the authenticated user matches the requested userId
+    if (user!.id !== userId) {
+      return NextResponse.json(
+        { success: false, error: 'No autorizado para redimir cupones para otro usuario' },
+        { status: 403 }
       )
     }
 

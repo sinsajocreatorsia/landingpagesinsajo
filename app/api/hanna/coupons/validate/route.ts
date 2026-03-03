@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server'
 import { couponsTable } from '@/lib/supabase-helpers'
+import { checkRateLimit, getClientIp } from '@/lib/utils/rateLimit'
 
 export async function POST(request: Request) {
+  // Rate limit: 3 attempts per minute per IP to prevent brute-force
+  const ip = getClientIp(request)
+  const rateLimitResult = checkRateLimit(`coupon-validate:${ip}`, { limit: 3, windowSec: 60 })
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { valid: false, error: 'Demasiados intentos. Espera un momento.' },
+      { status: 429 }
+    )
+  }
+
   try {
     const { code } = await request.json()
 

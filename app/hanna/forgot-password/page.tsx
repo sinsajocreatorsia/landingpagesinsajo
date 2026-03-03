@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/hanna/login`,
+        redirectTo: `${window.location.origin}/hanna/reset-password`,
       })
 
       if (resetError) {

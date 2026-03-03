@@ -141,4 +141,5 @@ export const HANNA_AUTH_ROUTES = [
   '/hanna/login',
   '/hanna/signup',
   '/hanna/forgot-password',
+  '/hanna/reset-password',
 ]

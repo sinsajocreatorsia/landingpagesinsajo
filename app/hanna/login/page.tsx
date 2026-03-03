@@ -8,16 +8,38 @@ import { motion } from 'framer-motion'
 import { createBrowserClient } from '@supabase/ssr'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react'
 
+// Whitelist of valid redirect paths to prevent open redirect attacks
+const VALID_REDIRECTS = [
+  '/hanna/dashboard',
+  '/hanna/upgrade',
+  '/hanna/settings',
+  '/hanna/profile',
+  '/hanna/billing',
+  '/hanna/history',
+  '/admin',
+]
+
+function sanitizeRedirect(redirect: string | null): string {
+  const fallback = '/hanna/dashboard'
+  if (!redirect) return fallback
+  if (redirect.includes('://') || redirect.startsWith('//')) return fallback
+  if (VALID_REDIRECTS.some(valid => redirect.startsWith(valid))) return redirect
+  return fallback
+}
+
 // Inner component that uses useSearchParams
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/hanna/dashboard'
+  const redirectTo = sanitizeRedirect(searchParams.get('redirect'))
+  const errorParam = searchParams.get('error')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(
+    errorParam === 'auth_failed' ? 'Error de autenticación. Por favor intenta de nuevo.' : null
+  )
   const [isLoading, setIsLoading] = useState(false)
 
   const supabase = createBrowserClient(
@@ -141,7 +163,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>

@@ -7,11 +7,16 @@ import { sendProfileReminderEmail } from '@/lib/emails'
 
 export async function GET(request: Request) {
   try {
-    // Verify cron secret for security
+    // Verify cron secret for security (always required)
     const authHeader = request.headers.get('authorization')
     const cronSecret = process.env.CRON_SECRET
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    if (!cronSecret) {
+      console.error('CRON_SECRET is not configured')
+      return NextResponse.json({ error: 'Cron not configured' }, { status: 500 })
+    }
+
+    if (authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

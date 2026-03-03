@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// GET - Get single coupon
+// GET - Get single coupon (requires admin auth)
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
+
   try {
     const { id } = await params
 
@@ -30,18 +34,21 @@ export async function GET(
     return NextResponse.json(
       {
         error: 'Error al obtener cupón',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        // Error details logged server-side only
       },
       { status: 500 }
     )
   }
 }
 
-// PATCH - Update coupon
+// PATCH - Update coupon (requires admin auth)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
+
   try {
     const { id } = await params
     const body = await request.json()
@@ -100,18 +107,21 @@ export async function PATCH(
     return NextResponse.json(
       {
         error: 'Error al actualizar cupón',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        // Error details logged server-side only
       },
       { status: 500 }
     )
   }
 }
 
-// DELETE - Deactivate coupon (soft delete)
+// DELETE - Deactivate coupon (requires admin auth)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
+
   try {
     const { id } = await params
 
@@ -135,7 +145,7 @@ export async function DELETE(
     return NextResponse.json(
       {
         error: 'Error al desactivar cupón',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        // Error details logged server-side only
       },
       { status: 500 }
     )

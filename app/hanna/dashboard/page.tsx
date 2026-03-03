@@ -1,12 +1,30 @@
 import { redirect } from 'next/navigation'
-import { getUserWithProfile } from '@/lib/hanna/auth'
+import { getUserWithProfile, createServerSupabaseClient } from '@/lib/hanna/auth'
 import HannaDashboardClient from './HannaDashboardClient'
 
 export default async function HannaDashboardPage() {
-  const { user, profile } = await getUserWithProfile()
+  let { user, profile } = await getUserWithProfile()
 
   if (!user) {
     redirect('/hanna/login')
+  }
+
+  // Safety net: create profile if it doesn't exist (e.g., callback failed)
+  if (!profile) {
+    const supabase = await createServerSupabaseClient()
+    await supabase.from('profiles').insert({
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+      avatar_url: user.user_metadata?.avatar_url,
+      plan: 'free',
+      subscription_status: 'active',
+      messages_today: 0,
+    })
+
+    // Re-fetch profile
+    const fresh = await getUserWithProfile()
+    profile = fresh.profile
   }
 
   return (

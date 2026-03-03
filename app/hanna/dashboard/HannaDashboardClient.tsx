@@ -26,6 +26,8 @@ import {
   Volume2,
   VolumeX,
   Palette,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react'
 import {
   speakText,
@@ -70,7 +72,7 @@ export default function HannaDashboardClient(props: DashboardProps) {
 
 function HannaDashboardInner({ user, profile }: DashboardProps) {
   const { theme, themeId, setTheme, themes: allThemes } = useTheme()
-  const [showThemePicker, setShowThemePicker] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
@@ -114,44 +116,69 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     }
   }, [profile.plan])
 
-  // Check for tone configuration on mount
+  // Open sidebar by default on desktop
   useEffect(() => {
-    const storedConfig = localStorage.getItem(`hanna-tone-${user.id}`)
-    if (storedConfig) {
-      try {
-        setToneConfig(JSON.parse(storedConfig))
-      } catch (e) {
-        // Invalid JSON, show config dialog
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      setSidebarOpen(true)
+    }
+  }, [])
+
+  // Check for tone configuration on mount (Supabase metadata > localStorage fallback)
+  useEffect(() => {
+    async function loadToneConfig() {
+      // Try Supabase user metadata first
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      const metaConfig = authUser?.user_metadata?.tone_config
+      if (metaConfig && typeof metaConfig === 'object' && metaConfig.style) {
+        setToneConfig(metaConfig as ToneConfig)
+        // Sync to localStorage as cache
+        localStorage.setItem(`hanna-tone-${user.id}`, JSON.stringify(metaConfig))
+        return
+      }
+
+      // Fallback to localStorage
+      const storedConfig = localStorage.getItem(`hanna-tone-${user.id}`)
+      if (storedConfig) {
+        try {
+          const parsed = JSON.parse(storedConfig)
+          setToneConfig(parsed)
+          // Migrate to Supabase metadata
+          await supabase.auth.updateUser({ data: { tone_config: parsed } })
+        } catch {
+          setShowToneConfig(true)
+        }
+      } else {
+        // First time user - show tone config dialog
         setShowToneConfig(true)
       }
-    } else {
-      // First time user - show tone config dialog
-      setShowToneConfig(true)
     }
-  }, [user.id])
+    loadToneConfig()
+  }, [user.id, supabase.auth])
 
-  // Initial greeting (after tone config)
-  useEffect(() => {
-    if (toneConfig === null && !showToneConfig) return // Wait for config
-
-    const styleGreeting = {
+  // Generate greeting based on tone config
+  const getGreeting = useCallback((): string => {
+    const styleGreeting: Record<string, string> = {
       energetic: '¡Hola! 🔥 Soy Hanna, y estoy aquí para ayudarte a ROMPERLA en tu negocio.',
       calm: 'Hola, soy Hanna. Me da gusto poder acompañarte en el crecimiento estratégico de tu negocio.',
       professional: 'Buen día. Soy Hanna, consultora estratégica de negocios. Será un placer asesorarte.',
       friendly: `¡Hola ${user.fullName.split(' ')[0]}! 💙 Soy Hanna, tu amiga consultora de negocios.`,
     }
-
-    const greeting = toneConfig
+    return toneConfig
       ? styleGreeting[toneConfig.style]
       : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
+  }, [user.fullName, toneConfig])
+
+  // Initial greeting (after tone config)
+  useEffect(() => {
+    if (toneConfig === null && !showToneConfig) return // Wait for config
 
     setMessages([{
       id: 'initial',
       role: 'assistant',
-      content: greeting,
+      content: getGreeting(),
       timestamp: new Date(),
     }])
-  }, [user.fullName, toneConfig, showToneConfig])
+  }, [user.fullName, toneConfig, showToneConfig, getGreeting])
 
   // Auto-scroll
   useEffect(() => {
@@ -159,10 +186,12 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   }, [messages])
 
   // Handle tone configuration complete
-  const handleToneConfigComplete = (config: ToneConfig) => {
+  const handleToneConfigComplete = async (config: ToneConfig) => {
     setToneConfig(config)
     localStorage.setItem(`hanna-tone-${user.id}`, JSON.stringify(config))
     setShowToneConfig(false)
+    // Persist to Supabase user metadata
+    await supabase.auth.updateUser({ data: { tone_config: config } })
   }
 
   // Create a new session in the database
@@ -189,23 +218,13 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     setSessionId(null)
     setMessages([])
     setSidebarOpen(false)
-    // Re-trigger greeting
-    const styleGreeting: Record<string, string> = {
-      energetic: '¡Hola! 🔥 Soy Hanna, y estoy aquí para ayudarte a ROMPERLA en tu negocio.',
-      calm: 'Hola, soy Hanna. Me da gusto poder acompañarte en el crecimiento estratégico de tu negocio.',
-      professional: 'Buen día. Soy Hanna, consultora estratégica de negocios. Será un placer asesorarte.',
-      friendly: `¡Hola ${user.fullName.split(' ')[0]}! 💙 Soy Hanna, tu amiga consultora de negocios.`,
-    }
-    const greeting = toneConfig
-      ? styleGreeting[toneConfig.style]
-      : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
     setMessages([{
       id: 'initial',
       role: 'assistant',
-      content: greeting,
+      content: getGreeting(),
       timestamp: new Date(),
     }])
-  }, [user.fullName, toneConfig])
+  }, [getGreeting])
 
   // Send message
   const sendMessage = useCallback(async (text: string) => {
@@ -249,7 +268,6 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text.trim(),
-          userId: user.id,
           sessionId: currentSessionId,
           toneConfig: toneConfig,
           history: messages.slice(-historyLimit).map(m => ({
@@ -307,7 +325,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, isLoading, user.id, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession])
+  }, [messages, isLoading, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession])
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -367,6 +385,28 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     setVoiceEnabled(!voiceEnabled)
   }, [isSpeaking, voiceEnabled])
 
+  // Feedback (thumbs up/down) tracking
+  const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 1 | -1>>({})
+
+  const handleFeedback = useCallback(async (messageId: string, rating: 1 | -1) => {
+    setFeedbackGiven(prev => ({ ...prev, [messageId]: rating }))
+
+    if (!sessionId) return
+    try {
+      await fetch('/api/hanna/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          messageIndex: messages.findIndex(m => m.id === messageId),
+          rating,
+        }),
+      })
+    } catch {
+      // Silently fail - feedback is non-critical
+    }
+  }, [sessionId, messages])
+
   return (
     <>
       {/* Tone Configuration Dialog */}
@@ -378,28 +418,20 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       )}
 
       <div className="min-h-screen flex" style={{ background: `linear-gradient(to bottom right, ${theme.colors.bgFrom}, ${theme.colors.bgTo})` }}>
-      {/* Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-            />
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        />
+      )}
 
-            {/* Sidebar Panel */}
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="fixed left-0 top-0 bottom-0 w-72 border-r z-50 flex flex-col"
-              style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}
-            >
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <aside
+          className="fixed inset-y-0 left-0 w-72 border-r z-50 flex flex-col lg:sticky lg:top-0 lg:z-auto lg:h-screen flex-shrink-0"
+          style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}
+        >
               {/* Sidebar Header */}
               <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -413,7 +445,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 text-white/60 hover:text-white lg:hidden"
+                  className="p-2 text-white/60 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -431,7 +463,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
               </div>
 
               {/* Menu Items */}
-              <nav className="flex-1 p-4 space-y-2">
+              <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
                 <Link
                   href="/hanna/dashboard"
                   className="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-xl text-white"
@@ -468,6 +500,29 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                   Facturación
                 </Link>
               </nav>
+
+              {/* Theme Section */}
+              <div className="px-4 py-3 border-t border-white/10">
+                <div className="flex items-center gap-2 mb-3">
+                  <Palette className="w-4 h-4" style={{ color: theme.colors.textMuted }} />
+                  <p className="text-xs font-medium" style={{ color: theme.colors.textMuted }}>Tema</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {(Object.keys(allThemes) as ThemeId[]).map((id) => (
+                    <button
+                      key={id}
+                      onClick={() => setTheme(id)}
+                      className="w-8 h-8 rounded-full border-2 transition-all hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
+                        borderColor: themeId === id ? theme.colors.accent : 'transparent',
+                        boxShadow: themeId === id ? `0 0 0 2px ${theme.colors.accent}40` : 'none',
+                      }}
+                      title={allThemes[id].name}
+                    />
+                  ))}
+                </div>
+              </div>
 
               {/* Upgrade Banner (Free users only) */}
               {profile.plan === 'free' && (
@@ -509,17 +564,15 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                   Cerrar sesión
                 </button>
               </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+        </aside>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen">
         {/* Header */}
         <header className="backdrop-blur-md border-b px-4 py-3 flex items-center gap-4" style={{ backgroundColor: theme.colors.headerBg, borderColor: theme.colors.cardBorder }}>
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <Menu className="w-6 h-6" />
@@ -553,45 +606,6 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             </div>
           )}
 
-          {/* Theme Picker */}
-          <div className="relative">
-            <button
-              onClick={() => setShowThemePicker(!showThemePicker)}
-              className="p-2 rounded-full transition-colors"
-              style={{ backgroundColor: theme.colors.inputBg, color: theme.colors.textSecondary }}
-              title="Cambiar tema"
-            >
-              <Palette className="w-5 h-5" />
-            </button>
-            {showThemePicker && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowThemePicker(false)} />
-                <div className="absolute right-0 top-full mt-2 z-50 p-3 rounded-xl border shadow-xl min-w-[180px]" style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}>
-                  <p className="text-xs font-medium mb-2" style={{ color: theme.colors.textMuted }}>Tema</p>
-                  <div className="space-y-1">
-                    {(Object.keys(allThemes) as ThemeId[]).map((id) => (
-                      <button
-                        key={id}
-                        onClick={() => { setTheme(id); setShowThemePicker(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left"
-                        style={{
-                          backgroundColor: themeId === id ? theme.colors.accent + '20' : 'transparent',
-                          color: themeId === id ? theme.colors.accent : theme.colors.textSecondary,
-                        }}
-                      >
-                        <div className="w-5 h-5 rounded-full border" style={{
-                          background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
-                          borderColor: themeId === id ? theme.colors.accent : theme.colors.cardBorder,
-                        }} />
-                        <span className="text-sm">{allThemes[id].name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
           {/* Voice Toggle (Pro only) */}
           {profile.plan === 'pro' && voiceSupport.tts && (
             <button
@@ -604,6 +618,43 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
               {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
             </button>
           )}
+
+          {/* User Profile Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center p-1 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full bg-[#C7517E] flex items-center justify-center text-white text-sm font-medium ring-2 ring-white/20">
+                {user.fullName.charAt(0).toUpperCase()}
+              </div>
+            </button>
+            {showUserMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+                <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-xl border shadow-xl overflow-hidden" style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}>
+                  <div className="p-3 border-b" style={{ borderColor: theme.colors.cardBorder }}>
+                    <p className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>{user.fullName}</p>
+                    <p className="text-xs" style={{ color: theme.colors.textMuted }}>{user.email}</p>
+                  </div>
+                  <div className="p-1">
+                    <Link href="/hanna/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors" style={{ color: theme.colors.textSecondary }}>
+                      <User className="w-4 h-4" />
+                      <span className="text-sm">Mi Perfil</span>
+                    </Link>
+                    <Link href="/hanna/settings" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors" style={{ color: theme.colors.textSecondary }}>
+                      <Settings className="w-4 h-4" />
+                      <span className="text-sm">Configuración</span>
+                    </Link>
+                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left" style={{ color: theme.colors.textSecondary }}>
+                      <LogOut className="w-4 h-4" />
+                      <span className="text-sm">Cerrar sesión</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </header>
 
         {/* Messages Area */}
@@ -629,18 +680,50 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                   )}
 
                   {/* Message Bubble */}
-                  <div
-                    className={`rounded-2xl px-5 py-4 ${
-                      message.role === 'user'
-                        ? 'text-white rounded-tr-sm'
-                        : 'backdrop-blur-sm rounded-tl-sm border'
-                    }`}
-                    style={message.role === 'user'
-                      ? { backgroundColor: theme.colors.bubbleUser }
-                      : { backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder, color: theme.colors.textPrimary }
-                    }
-                  >
-                    <MessageContent content={message.content} />
+                  <div>
+                    <div
+                      className={`rounded-2xl px-5 py-4 ${
+                        message.role === 'user'
+                          ? 'text-white rounded-tr-sm'
+                          : 'backdrop-blur-sm rounded-tl-sm border'
+                      }`}
+                      style={message.role === 'user'
+                        ? { backgroundColor: theme.colors.bubbleUser }
+                        : { backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder, color: theme.colors.textPrimary }
+                      }
+                    >
+                      <MessageContent content={message.content} />
+                    </div>
+
+                    {/* Feedback buttons for assistant messages (not initial greeting) */}
+                    {message.role === 'assistant' && message.id !== 'initial' && (
+                      <div className="flex items-center gap-1 mt-1 ml-1">
+                        <button
+                          onClick={() => handleFeedback(message.id, 1)}
+                          className={`p-1 rounded transition-colors ${
+                            feedbackGiven[message.id] === 1
+                              ? 'text-green-400'
+                              : 'text-white/20 hover:text-white/50'
+                          }`}
+                          title="Buena respuesta"
+                          disabled={!!feedbackGiven[message.id]}
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleFeedback(message.id, -1)}
+                          className={`p-1 rounded transition-colors ${
+                            feedbackGiven[message.id] === -1
+                              ? 'text-red-400'
+                              : 'text-white/20 hover:text-white/50'
+                          }`}
+                          title="Mala respuesta"
+                          disabled={!!feedbackGiven[message.id]}
+                        >
+                          <ThumbsDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

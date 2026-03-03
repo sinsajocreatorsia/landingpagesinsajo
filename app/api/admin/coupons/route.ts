@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// GET - List all coupons
+// GET - List all coupons (requires admin auth)
 export async function GET(request: Request) {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
+
   try {
     const { searchParams } = new URL(request.url)
     const activeOnly = searchParams.get('active') === 'true'
@@ -29,15 +33,18 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         error: 'Error al obtener cupones',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        // Error details logged server-side only (see console)
       },
       { status: 500 }
     )
   }
 }
 
-// POST - Create new coupon
+// POST - Create new coupon (requires admin auth)
 export async function POST(request: Request) {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
+
   try {
     const body = await request.json()
     const {
@@ -114,7 +121,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: 'Error al crear cupón',
-        details: error instanceof Error ? error.message : 'Error desconocido',
+        // Error details logged server-side only (see console)
       },
       { status: 500 }
     )

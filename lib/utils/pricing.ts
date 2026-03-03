@@ -49,6 +49,24 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
     input: 0.50,
     output: 1.50,
   },
+  'google/gemini-2.0-flash-001': {
+    input: 0.10,
+    output: 0.40,
+  },
+  'google/gemini-2.5-pro-preview-06-05': {
+    input: 1.25,
+    output: 10.00,
+  },
+  'google/gemini-2.5-flash-preview-05-20': {
+    input: 0.15,
+    output: 0.60,
+  },
+
+  // Anthropic - additional models for smart routing
+  'anthropic/claude-sonnet-4': {
+    input: 3.00,
+    output: 15.00,
+  },
 }
 
 /**

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { supabaseAdmin } from '@/lib/supabase'
 import { calculateCosts } from '@/lib/utils/pricing'
+import { createServerSupabaseClient } from '@/lib/hanna/auth'
+import { selectModelForUser, type QueryCategory } from '@/lib/hanna/model-router'
 
 // Use OpenRouter for AI inference - Multiple clients for cost tracking
 let workshopClient: OpenAI | null = null
@@ -46,30 +48,9 @@ function getOpenAIClient(type: ClientType = 'saas'): OpenAI {
   return saasClient
 }
 
-// Hanna AI Models - Optimized per use case
-// Using Google Gemini 2.0 Flash - compatible with Google AI Studio provider
-// Workshop: Gemini 2.0 Flash - High quality, low volume, convincing conversations
-// SaaS (Free/Basic): Gemini 2.0 Flash - Good quality for general users
-// SaaS (Pro): Gemini 2.0 Flash - Strategic business consulting with Mermaid diagrams
-
-const WORKSHOP_MODEL = 'google/gemini-2.0-flash-001' // For workshop landing/chat
-const SAAS_BASIC_MODEL = 'google/gemini-2.0-flash-001' // For free/basic SaaS users
-const SAAS_PREMIUM_MODEL = 'google/gemini-2.0-flash-001' // For Pro users with business profiles
-
-// Helper function to select the right model
-function selectModel(mode: string | null, userPlan: string): string {
-  // If workshop mode, use workshop model
-  if (mode === 'workshop') {
-    return WORKSHOP_MODEL
-  }
-
-  // For SaaS: Pro users get premium model, others get basic
-  if (userPlan === 'pro') {
-    return SAAS_PREMIUM_MODEL
-  }
-
-  return SAAS_BASIC_MODEL
-}
+// Model selection is now handled by the Smart Model Router (lib/hanna/model-router.ts)
+// Free: Gemini 2.0 Flash (fast, economical)
+// Pro: Dynamic routing based on query type (Gemini 2.5 Pro, Claude Sonnet 4, etc.)
 
 // Tone configuration interface
 interface ToneConfig {
@@ -612,7 +593,7 @@ async function buildPersonalizedPrompt(
 
 export async function POST(request: Request) {
   try {
-    const { message, history = [], mode, userId, sessionId, toneConfig } = await request.json()
+    const { message, history = [], mode, sessionId, toneConfig } = await request.json()
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -624,10 +605,26 @@ export async function POST(request: Request) {
     // Limit message length to prevent abuse
     const sanitizedMessage = message.slice(0, 4000)
 
-    // Check message limits if userId provided (SaaS mode)
+    const isWorkshop = mode === 'workshop'
+
+    // Authenticate user for SaaS mode (workshop allows anonymous)
+    let authenticatedUserId: string | null = null
+    if (!isWorkshop) {
+      const supabase = await createServerSupabaseClient()
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      if (authError || !authUser) {
+        return NextResponse.json(
+          { error: 'No autorizado' },
+          { status: 401 }
+        )
+      }
+      authenticatedUserId = authUser.id
+    }
+
+    // Check message limits for authenticated SaaS users
     let messageLimit = { canSend: true, messagesRemaining: 999, plan: 'unknown' }
-    if (userId) {
-      messageLimit = await checkAndUpdateMessageLimit(userId)
+    if (authenticatedUserId) {
+      messageLimit = await checkAndUpdateMessageLimit(authenticatedUserId)
       if (!messageLimit.canSend) {
         return NextResponse.json(
           {
@@ -642,14 +639,13 @@ export async function POST(request: Request) {
 
     // Determine which system prompt to use (NEVER accept prompts from client)
     let activeSystemPrompt: string
-    const isWorkshop = mode === 'workshop'
 
     if (isWorkshop) {
       // Workshop mode - use hardcoded workshop prompt
       activeSystemPrompt = WORKSHOP_SYSTEM_PROMPT
-    } else if (userId) {
+    } else if (authenticatedUserId) {
       // SaaS mode - build personalized prompt with tone config
-      activeSystemPrompt = await buildPersonalizedPrompt(userId, toneConfig as ToneConfig | undefined)
+      activeSystemPrompt = await buildPersonalizedPrompt(authenticatedUserId, toneConfig as ToneConfig | undefined)
     } else {
       // Default prompt
       activeSystemPrompt = HANNA_SAAS_PROMPT
@@ -680,8 +676,16 @@ export async function POST(request: Request) {
       content: sanitizedMessage,
     })
 
-    // Select appropriate model and client based on context
-    const selectedModel = selectModel(isWorkshop ? 'workshop' : null, messageLimit.plan)
+    // Smart Model Router: select model based on plan, mode, and query content
+    const route = selectModelForUser(
+      messageLimit.plan,
+      isWorkshop ? 'workshop' : null,
+      sanitizedMessage,
+      recentHistory,
+    )
+
+    const selectedModel = route.model
+    const queryCategory: QueryCategory = route.category
 
     // Determine which API key to use: Workshop vs SaaS
     const clientType: ClientType = isWorkshop ? 'workshop' : 'saas'
@@ -689,39 +693,46 @@ export async function POST(request: Request) {
     // Call OpenRouter API with appropriate client
     const client = getOpenAIClient(clientType)
 
-    // Pro users get better parameters for quality responses
-    const apiParams = messageLimit.plan === 'pro'
-      ? {
-          model: selectedModel,
-          messages,
-          temperature: 0.8, // More creative for strategic consulting
-          max_tokens: 1500, // 3x longer responses for depth
-        }
-      : {
-          model: selectedModel,
-          messages,
-          temperature: 0.7,
-          max_tokens: 600, // Standard responses
-        }
+    const apiParams = {
+      model: selectedModel,
+      messages,
+      temperature: route.temperature,
+      max_tokens: route.maxTokens,
+    }
 
     const startTime = Date.now()
-    const completion = await client.chat.completions.create(apiParams)
+    let completion
+    try {
+      completion = await client.chat.completions.create(apiParams)
+    } catch (primaryError) {
+      // Fallback: retry with fallback model if primary fails
+      if (route.fallbackModel !== route.model) {
+        console.warn(`Primary model ${route.model} failed, falling back to ${route.fallbackModel}:`, primaryError)
+        completion = await client.chat.completions.create({
+          ...apiParams,
+          model: route.fallbackModel,
+        })
+      } else {
+        throw primaryError
+      }
+    }
     const responseTime = Date.now() - startTime
+    const actualModel = completion.model || selectedModel
 
     const responseText = completion.choices[0]?.message?.content || ''
     const inputTokens = completion.usage?.prompt_tokens || 0
     const outputTokens = completion.usage?.completion_tokens || 0
     const tokensUsed = completion.usage?.total_tokens || 0
 
-    // Calculate costs
-    const costs = calculateCosts(selectedModel, inputTokens, outputTokens)
+    // Calculate costs using actual model used (may differ if fallback triggered)
+    const costs = calculateCosts(actualModel, inputTokens, outputTokens)
 
-    // Log API usage for cost tracking
-    if (userId) {
+    // Log API usage for cost tracking + analytics
+    if (authenticatedUserId) {
       await (supabaseAdmin.from('api_usage_logs') as ReturnType<typeof supabaseAdmin.from>).insert({
-        user_id: userId,
+        user_id: authenticatedUserId,
         session_id: sessionId,
-        model: selectedModel,
+        model: actualModel,
         client_type: clientType,
         user_plan: messageLimit.plan,
         input_tokens: inputTokens,
@@ -732,31 +743,43 @@ export async function POST(request: Request) {
         total_cost: costs.totalCost,
         response_time_ms: responseTime,
         was_successful: true,
+        query_category: queryCategory,
+        model_selected: selectedModel,
+        response_length: responseText.length,
       })
     }
 
     // Save messages to database if sessionId provided
-    if (sessionId && userId) {
-      // Save user message - use type assertion for untyped table
-      await (supabaseAdmin.from('hanna_messages') as ReturnType<typeof supabaseAdmin.from>).insert({
-        session_id: sessionId,
-        role: 'user',
-        content: sanitizedMessage,
-        tokens_used: 0,
-      } as Record<string, unknown>)
-
-      // Save assistant message
-      await (supabaseAdmin.from('hanna_messages') as ReturnType<typeof supabaseAdmin.from>).insert({
-        session_id: sessionId,
-        role: 'assistant',
-        content: responseText,
-        tokens_used: tokensUsed,
-      } as Record<string, unknown>)
-
-      // Update session timestamp
-      await (supabaseAdmin.from('hanna_sessions') as ReturnType<typeof supabaseAdmin.from>)
-        .update({ updated_at: new Date().toISOString() } as Record<string, unknown>)
+    if (sessionId && authenticatedUserId) {
+      // Validate session belongs to authenticated user
+      const { data: sessionData } = await (supabaseAdmin.from('hanna_sessions') as ReturnType<typeof supabaseAdmin.from>)
+        .select('id')
         .eq('id', sessionId)
+        .eq('user_id', authenticatedUserId)
+        .single()
+
+      if (sessionData) {
+        // Save user message
+        await (supabaseAdmin.from('hanna_messages') as ReturnType<typeof supabaseAdmin.from>).insert({
+          session_id: sessionId,
+          role: 'user',
+          content: sanitizedMessage,
+          tokens_used: 0,
+        } as Record<string, unknown>)
+
+        // Save assistant message
+        await (supabaseAdmin.from('hanna_messages') as ReturnType<typeof supabaseAdmin.from>).insert({
+          session_id: sessionId,
+          role: 'assistant',
+          content: responseText,
+          tokens_used: tokensUsed,
+        } as Record<string, unknown>)
+
+        // Update session timestamp
+        await (supabaseAdmin.from('hanna_sessions') as ReturnType<typeof supabaseAdmin.from>)
+          .update({ updated_at: new Date().toISOString() } as Record<string, unknown>)
+          .eq('id', sessionId)
+      }
     }
 
     return NextResponse.json({
@@ -765,6 +788,8 @@ export async function POST(request: Request) {
       tokensUsed,
       messages_remaining: messageLimit.messagesRemaining,
       plan: messageLimit.plan,
+      model: actualModel,
+      queryCategory,
     })
   } catch (error) {
     console.error('Hanna chat error:', error)

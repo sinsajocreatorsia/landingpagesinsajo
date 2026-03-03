@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 
@@ -41,8 +42,8 @@ export default function HannaWidget({ initialMessage }: HannaWidgetProps) {
               className="relative group"
             >
               {/* Main Button */}
-              <div className="w-16 h-16 bg-gradient-to-br from-[#C7517E] to-[#200F5D] rounded-full shadow-lg flex items-center justify-center">
-                <span className="text-3xl">🤖</span>
+              <div className="w-16 h-16 bg-gradient-to-br from-[#C7517E] to-[#200F5D] rounded-full shadow-lg flex items-center justify-center overflow-hidden">
+                <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="object-cover" />
               </div>
 
               {/* Pulse Animation */}

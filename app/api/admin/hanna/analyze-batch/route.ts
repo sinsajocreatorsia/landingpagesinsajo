@@ -1,29 +1,14 @@
 import { NextResponse } from 'next/server'
 import { analyzeAllPendingProfiles } from '@/lib/hanna/analysis'
-
-// Admin API key check
-function isAuthorized(request: Request): boolean {
-  const authHeader = request.headers.get('authorization')
-  const expectedKey = `Bearer ${process.env.ADMIN_API_KEY}`
-
-  if (process.env.NODE_ENV !== 'production') {
-    return true // Allow in development
-  }
-
-  return authHeader === expectedKey
-}
+import { requireAdmin } from '@/lib/auth-guard'
 
 /**
  * POST /api/admin/hanna/analyze-batch
- * Analyze all participants who have completed profiles but no analysis yet
+ * Analyze all participants who have completed profiles but no analysis yet (requires admin auth)
  */
-export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
+export async function POST() {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     console.log('Starting batch analysis...')

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/auth-guard'
 
 // Type definitions for Supabase query results
 interface WorkshopProfile {
@@ -58,29 +59,13 @@ interface ParticipantRow {
   hanna_analysis: HannaAnalysis[] | null
 }
 
-// Admin API key check
-function isAuthorized(request: Request): boolean {
-  const authHeader = request.headers.get('authorization')
-  const expectedKey = `Bearer ${process.env.ADMIN_API_KEY}`
-
-  if (process.env.NODE_ENV !== 'production') {
-    return true // Allow in development
-  }
-
-  return authHeader === expectedKey
-}
-
 /**
  * GET /api/admin/participants
- * Get all participants with their profiles and analyses
+ * Get all participants with their profiles and analyses (requires admin auth)
  */
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)

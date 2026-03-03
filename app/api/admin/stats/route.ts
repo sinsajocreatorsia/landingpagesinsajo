@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/auth-guard'
 
 interface RegistrationRow {
   id: string
@@ -30,29 +31,13 @@ interface EmailRow {
   status: string
 }
 
-// Admin API key check
-function isAuthorized(request: Request): boolean {
-  const authHeader = request.headers.get('authorization')
-  const expectedKey = `Bearer ${process.env.ADMIN_API_KEY}`
-
-  if (process.env.NODE_ENV !== 'production') {
-    return true // Allow in development
-  }
-
-  return authHeader === expectedKey
-}
-
 /**
  * GET /api/admin/stats
- * Get dashboard statistics
+ * Get dashboard statistics (requires admin authentication)
  */
-export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
-  }
+export async function GET() {
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   try {
     // Get registration stats

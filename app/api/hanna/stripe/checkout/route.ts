@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServerSupabaseClient } from '@/lib/hanna/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { rateLimit } from '@/lib/auth-guard'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-12-15.clover',
@@ -28,6 +29,9 @@ function getTable(tableName: string) {
 }
 
 export async function POST(request: Request) {
+  // Rate limit: 5 checkout sessions per minute per IP
+  const rateLimitResponse = rateLimit(request, { maxRequests: 5, windowMs: 60_000 })
+  if (rateLimitResponse) return rateLimitResponse
   try {
     const supabase = await createServerSupabaseClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()

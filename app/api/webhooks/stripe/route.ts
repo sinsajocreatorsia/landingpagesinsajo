@@ -5,23 +5,6 @@ import { sendConfirmationEmail } from '@/lib/emails'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
-// GET handler to verify webhook endpoint exists
-export async function GET() {
-  return NextResponse.json({
-    status: 'ok',
-    message: 'Stripe webhook endpoint is active',
-    endpoint: '/api/webhooks/stripe',
-    method: 'POST only - This endpoint receives webhooks from Stripe',
-    events: [
-      'checkout.session.completed',
-      'checkout.session.expired',
-      'payment_intent.succeeded',
-      'payment_intent.payment_failed',
-      'charge.refunded'
-    ]
-  })
-}
-
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -54,6 +37,19 @@ export async function POST(request: Request) {
     const session = event.data.object as Stripe.Checkout.Session
 
     try {
+      // Idempotency: check if registration already exists for this payment
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: existing } = await (supabaseAdmin as any)
+        .from('workshop_registrations')
+        .select('id')
+        .eq('payment_id', session.id)
+        .single()
+
+      if (existing) {
+        console.log('[Workshop Webhook] Registration already exists for session:', session.id)
+        return NextResponse.json({ received: true })
+      }
+
       // Create registration in database (using type assertion to bypass strict typing)
       const registrationData = {
         email: session.customer_email || session.metadata?.customer_email || '',

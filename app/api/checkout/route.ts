@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { rateLimit } from '@/lib/auth-guard'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: Request) {
+  // Rate limit: 5 checkout sessions per minute per IP
+  const rateLimitResponse = rateLimit(request, { maxRequests: 5, windowMs: 60_000 })
+  if (rateLimitResponse) return rateLimitResponse
   try {
     const { email, name, phone, country, utm_source, utm_medium, utm_campaign } = await request.json()
 
