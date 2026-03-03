@@ -129,6 +129,9 @@ export function sanitizeRedirect(
 /**
  * Simple rate limit check (placeholder)
  */
-export function rateLimit(_identifier: string): { success: boolean } {
-  return { success: true };
+export function rateLimit(
+  _request: Request | string,
+  _options?: { maxRequests?: number; windowMs?: number },
+): null {
+  return null;
 }
