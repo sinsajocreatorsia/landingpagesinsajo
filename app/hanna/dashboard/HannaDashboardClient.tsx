@@ -407,6 +407,11 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     }
   }, [sessionId, messages])
 
+  const isLight = themeId === 'light'
+  const hoverBg = isLight ? 'hover:bg-black/5' : 'hover:bg-white/10'
+  const activeBg = isLight ? 'bg-black/5' : 'bg-white/10'
+  const borderClass = isLight ? 'border-black/10' : 'border-white/10'
+
   return (
     <>
       {/* Tone Configuration Dialog */}
@@ -433,19 +438,20 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}
         >
               {/* Sidebar Header */}
-              <div className="px-3 py-3 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+              <div className={`px-3 py-3 border-b ${borderClass} flex items-center justify-between flex-shrink-0`}>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                     <Image src="/images/hanna-ai.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h2 className="text-white font-semibold text-sm">Hanna</h2>
-                    <p className="text-white/50 text-[10px]">Tu asistente IA</p>
+                    <h2 className="font-semibold text-sm" style={{ color: theme.colors.textPrimary }}>Hanna</h2>
+                    <p className="text-[10px]" style={{ color: theme.colors.textMuted }}>Tu asistente IA</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1.5 text-white/60 hover:text-white transition-colors"
+                  className={`p-1.5 transition-colors ${hoverBg} rounded-md`}
+                  style={{ color: theme.colors.textMuted }}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -455,7 +461,8 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
               <div className="px-3 py-2 flex-shrink-0">
                 <button
                   onClick={handleNewChat}
-                  className="w-full py-2 px-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm flex items-center gap-2 transition-colors"
+                  className={`w-full py-2 px-3 ${activeBg} ${hoverBg} border ${borderClass} rounded-lg text-sm flex items-center gap-2 transition-colors`}
+                  style={{ color: theme.colors.textPrimary }}
                 >
                   <Plus className="w-4 h-4" />
                   Nueva conversación
@@ -466,35 +473,40 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
               <nav className="flex-1 px-3 py-1 space-y-0.5 overflow-y-auto min-h-0">
                 <Link
                   href="/hanna/dashboard"
-                  className="flex items-center gap-2.5 px-3 py-2 bg-white/10 rounded-lg text-white text-sm"
+                  className={`flex items-center gap-2.5 px-3 py-2 ${activeBg} rounded-lg text-sm`}
+                  style={{ color: theme.colors.textPrimary }}
                 >
                   <MessageSquare className="w-4 h-4" />
                   Chat
                 </Link>
                 <Link
                   href="/hanna/history"
-                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
+                  className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm`}
+                  style={{ color: theme.colors.textSecondary }}
                 >
                   <History className="w-4 h-4" />
                   Historial
                 </Link>
                 <Link
                   href="/hanna/profile"
-                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
+                  className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm`}
+                  style={{ color: theme.colors.textSecondary }}
                 >
                   <User className="w-4 h-4" />
                   Perfil de Negocio
                 </Link>
                 <Link
                   href="/hanna/settings"
-                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
+                  className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm`}
+                  style={{ color: theme.colors.textSecondary }}
                 >
                   <Settings className="w-4 h-4" />
                   Configuración
                 </Link>
                 <Link
                   href="/hanna/billing"
-                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
+                  className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm`}
+                  style={{ color: theme.colors.textSecondary }}
                 >
                   <CreditCard className="w-4 h-4" />
                   Facturación
@@ -504,7 +516,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
               {/* Bottom section - fixed */}
               <div className="flex-shrink-0">
                 {/* Theme Section */}
-                <div className="px-3 py-2 border-t border-white/10">
+                <div className={`px-3 py-2 border-t ${borderClass}`}>
                   <div className="flex items-center gap-2 mb-2">
                     <Palette className="w-3.5 h-3.5" style={{ color: theme.colors.textMuted }} />
                     <p className="text-[11px] font-medium" style={{ color: theme.colors.textMuted }}>Tema</p>
@@ -517,7 +529,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                         className="w-6 h-6 rounded-full border-2 transition-all hover:scale-110"
                         style={{
                           background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
-                          borderColor: themeId === id ? theme.colors.accent : 'transparent',
+                          borderColor: themeId === id ? theme.colors.accent : theme.colors.cardBorder,
                           boxShadow: themeId === id ? `0 0 0 2px ${theme.colors.accent}40` : 'none',
                         }}
                         title={allThemes[id].name}
@@ -532,9 +544,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                     <div className="bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-lg p-3">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Crown className="w-4 h-4 text-[#C7517E]" />
-                        <span className="text-white font-medium text-xs">Hanna Pro</span>
+                        <span className="font-medium text-xs" style={{ color: theme.colors.textPrimary }}>Hanna Pro</span>
                       </div>
-                      <p className="text-white/60 text-[11px] mb-2">Mensajes ilimitados, voz, y más.</p>
+                      <p className="text-[11px] mb-2" style={{ color: theme.colors.textMuted }}>Mensajes ilimitados, voz, y más.</p>
                       <Link
                         href="/hanna/upgrade"
                         className="block w-full py-1.5 px-3 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white text-center text-xs font-medium rounded-md hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
@@ -546,18 +558,19 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 )}
 
                 {/* User Section */}
-                <div className="px-3 py-2 border-t border-white/10">
+                <div className={`px-3 py-2 border-t ${borderClass}`}>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-[#C7517E] flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                       {user.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium text-xs truncate">{user.fullName}</p>
-                      <p className="text-white/50 text-[10px] truncate">{user.email}</p>
+                      <p className="font-medium text-xs truncate" style={{ color: theme.colors.textPrimary }}>{user.fullName}</p>
+                      <p className="text-[10px] truncate" style={{ color: theme.colors.textMuted }}>{user.email}</p>
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                      className={`p-1.5 ${hoverBg} rounded-md transition-colors`}
+                      style={{ color: theme.colors.textMuted }}
                       title="Cerrar sesión"
                     >
                       <LogOut className="w-3.5 h-3.5" />
