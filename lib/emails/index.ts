@@ -8,6 +8,7 @@ import WorkshopFollowUp from './templates/WorkshopFollowUp'
 import ProfileReminder from './templates/ProfileReminder'
 import ProfileSummary from './templates/ProfileSummary'
 import AdminProfileNotification from './templates/AdminProfileNotification'
+import WaitlistConfirmation from './templates/WaitlistConfirmation'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Admin email for notifications
@@ -38,6 +39,7 @@ export type EmailType =
   | 'follow_up'
   | 'profile_reminder'
   | 'profile_summary'
+  | 'waitlist_confirmation'
 
 interface SendEmailParams {
   to: string
@@ -134,6 +136,13 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       aiExperience: data.aiExperience || '',
       communicationPreference: data.communicationPreference || '',
       expectedOutcome: data.expectedOutcome || '',
+    }),
+  },
+  waitlist_confirmation: {
+    subject: '📋 ¡Estás en la lista de espera! - Workshop IA para Empresarias Exitosas',
+    templateFn: (data) => WaitlistConfirmation({
+      customerName: data.customerName || 'Empresaria',
+      position: parseInt(data.position || '1'),
     }),
   },
 }
@@ -469,6 +478,41 @@ export async function sendProfileSummaryEmail({
     },
     registrationId,
   })
+}
+
+/**
+ * Send waitlist confirmation email
+ */
+export async function sendWaitlistConfirmationEmail({
+  to,
+  customerName,
+  position,
+}: {
+  to: string
+  customerName: string
+  position: number
+}): Promise<EmailResult> {
+  try {
+    const html = await render(WaitlistConfirmation({ customerName, position }))
+
+    const { data: result, error } = await getResendClient().emails.send({
+      from: FROM_EMAIL,
+      to: [to],
+      subject: emailConfig.waitlist_confirmation.subject,
+      html,
+    })
+
+    if (error) {
+      console.error('Resend error (waitlist):', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, messageId: result?.id }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Waitlist email error:', error)
+    return { success: false, error: errorMessage }
+  }
 }
 
 /**

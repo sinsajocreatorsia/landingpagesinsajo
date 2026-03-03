@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, Flame, Clock, Users } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { X, ArrowRight, Users, CheckCircle } from 'lucide-react'
 
 export default function LastSpotPopup() {
   const [isVisible, setIsVisible] = useState(false)
@@ -73,32 +73,29 @@ export default function LastSpotPopup() {
 
           {/* Content */}
           <div className="relative z-10 p-6 sm:p-8 text-center">
-            {/* Urgency badge */}
-            <motion.div
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="inline-flex items-center gap-2 bg-red-500/20 border border-red-400/40 rounded-full px-4 py-1.5 mb-5"
-            >
-              <Flame className="w-4 h-4 text-red-400" />
-              <span className="text-red-300 font-bold text-xs tracking-widest uppercase">
-                Urgente
+            {/* CUPOS AGOTADOS badge */}
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-5">
+              <CheckCircle className="w-4 h-4 text-[#2CB6D7]" />
+              <span className="text-[#2CB6D7] font-bold text-xs tracking-widest uppercase">
+                Cupos Agotados
               </span>
-            </motion.div>
+            </div>
 
             {/* Main message */}
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
-              ¡Queda{' '}
-              <span className="bg-gradient-to-r from-[#C7517E] to-[#ff6b9d] bg-clip-text text-transparent">
-                1 solo lugar
+              ¡Workshop{' '}
+              <span className="bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] bg-clip-text text-transparent">
+                Completo
               </span>
               !
             </h3>
 
             <p className="text-[#FCFEFB]/80 text-base sm:text-lg mb-6 leading-relaxed">
-              Un grupo exclusivo de{' '}
-              <span className="text-[#2CB6D7] font-semibold">mujeres visionarias</span>{' '}
-              ya aseguró su lugar en el workshop. Solo falta{' '}
-              <span className="text-[#C7517E] font-semibold">UNA</span> para completar este grupo.
+              Las{' '}
+              <span className="text-[#2CB6D7] font-semibold">12 participantes</span>{' '}
+              ya aseguraron su lugar. Únete a la{' '}
+              <span className="text-[#C7517E] font-semibold">lista de espera</span>{' '}
+              para ser la primera en enterarte del próximo workshop.
             </p>
 
             <p className="text-[#FCFEFB]/60 text-sm mb-6 italic">
@@ -108,12 +105,8 @@ export default function LastSpotPopup() {
             {/* Info pills */}
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#2CB6D7]" />
-                <span className="text-white/80 text-xs font-medium">7 de Marzo, 9AM</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1.5">
                 <Users className="w-3.5 h-3.5 text-[#C7517E]" />
-                <span className="text-white/80 text-xs font-medium">Grupo ultra-íntimo</span>
+                <span className="text-white/80 text-xs font-medium">12/12 Cupos llenos</span>
               </div>
             </div>
 
@@ -124,12 +117,12 @@ export default function LastSpotPopup() {
               whileTap={{ scale: 0.97 }}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#C7517E] to-[#b8456f] hover:from-[#d4608d] hover:to-[#C7517E] text-white font-bold py-4 px-8 rounded-xl text-lg shadow-xl shadow-[#C7517E]/30 hover:shadow-2xl hover:shadow-[#C7517E]/40 transition-all duration-300 group"
             >
-              Quiero Ser Parte de Este Grupo
+              Unirme a la Lista de Espera
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
 
             <p className="text-white/40 text-xs mt-3">
-              Solo $100 USD — Precio de lanzamiento
+              Sin compromiso — Te avisamos cuando abramos inscripciones
             </p>
           </div>
         </div>

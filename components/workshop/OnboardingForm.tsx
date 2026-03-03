@@ -20,6 +20,8 @@ import confetti from 'canvas-confetti'
 interface OnboardingFormProps {
   registrationId: string
   onComplete?: () => void
+  apiEndpoint?: string
+  idFieldName?: string
 }
 
 interface FormData {
@@ -83,7 +85,12 @@ const CURRENT_TOOLS = [
   { id: 'none', label: 'Ninguna herramienta IA' },
 ]
 
-export default function OnboardingForm({ registrationId, onComplete }: OnboardingFormProps) {
+export default function OnboardingForm({
+  registrationId,
+  onComplete,
+  apiEndpoint = '/api/workshop/profile',
+  idFieldName = 'registrationId',
+}: OnboardingFormProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -154,11 +161,11 @@ export default function OnboardingForm({ registrationId, onComplete }: Onboardin
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/workshop/profile', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          registrationId,
+          [idFieldName]: registrationId,
           ...formData,
         }),
       })
