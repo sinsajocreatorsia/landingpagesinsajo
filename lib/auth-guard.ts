@@ -126,3 +126,9 @@ export function sanitizeRedirect(
 
   return fallback;
 }
+/**
+ * Simple rate limit check (placeholder)
+ */
+export function rateLimit(_identifier: string): { success: boolean } {
+  return { success: true };
+}
