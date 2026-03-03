@@ -2,7 +2,7 @@
 // HANNA SaaS Product - TypeScript Types
 // ============================================
 
-export type Plan = 'free' | 'pro'
+export type Plan = 'free' | 'pro' | 'business'
 export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due'
 export type MessageRole = 'user' | 'assistant' | 'system'
 export type CouponType = 'workshop' | 'promo' | 'referral'
@@ -155,6 +155,13 @@ export const PLAN_LIMITS = {
     voice_enabled: true,
     price: 19,
   },
+  business: {
+    messages_per_day: Infinity,
+    history_days: Infinity,
+    business_profile: true,
+    voice_enabled: true,
+    price: 49,
+  },
 } as const
 
 export const PLAN_FEATURES = {
@@ -169,7 +176,17 @@ export const PLAN_FEATURES = {
     'Perfil de negocio personalizado',
     'Voz (hablar con Hanna)',
     'Respuestas adaptadas a tu marca',
+    'Soporte por email',
+  ],
+  business: [
+    'Todo lo de Pro',
+    'Modelos IA Premium (Gemini Pro + Claude)',
+    'Análisis de negocio avanzado',
+    'Estrategia de marketing IA',
+    'Memoria de negocio extendida',
     'Soporte prioritario',
+    'Exportar conversaciones',
+    'Acceso anticipado a nuevas funciones',
   ],
 } as const
 

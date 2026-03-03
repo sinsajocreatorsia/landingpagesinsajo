@@ -94,8 +94,8 @@ export function calculateCosts(
 /**
  * Get base monthly price for a plan
  */
-export function getPlanPrice(plan: 'free' | 'pro'): number {
-  return plan === 'pro' ? 19.99 : 0
+export function getPlanPrice(plan: 'free' | 'pro' | 'business'): number {
+  return plan === 'business' ? 49 : plan === 'pro' ? 19.99 : 0
 }
 
 /**

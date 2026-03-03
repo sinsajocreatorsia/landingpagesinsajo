@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase'
+import { logAdminAction } from '@/lib/security/audit'
 
 /**
  * GET /api/admin/users/[userId]
@@ -201,6 +202,14 @@ export async function PATCH(
       )
     }
 
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'update_user',
+      targetType: 'user',
+      targetId: userId,
+      details: { updated_fields: Object.keys(results), ...results },
+    })
+
     return NextResponse.json({
       success: true,
       updated: results,
@@ -267,6 +276,14 @@ export async function DELETE(
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (deleteError) throw deleteError
+
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'delete_user',
+      targetType: 'user',
+      targetId: userId,
+      details: { deleted_email: targetAuth.user.email },
+    })
 
     return NextResponse.json({
       success: true,

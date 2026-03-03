@@ -1,13 +1,37 @@
-import { NextResponse } from 'next/server'
+import crypto from 'crypto'
+import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail, EmailType } from '@/lib/emails'
+import { emailLimiter, getClientIdentifier, rateLimitHeaders } from '@/lib/security/rate-limit'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Check for API key or admin auth
-    const authHeader = request.headers.get('authorization')
-    const expectedKey = `Bearer ${process.env.INTERNAL_API_KEY}`
+    // Rate limiting
+    const clientIp = getClientIdentifier(request)
+    const rateCheck = emailLimiter.check(clientIp)
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: rateLimitHeaders(rateCheck) }
+      )
+    }
 
-    if (authHeader !== expectedKey && process.env.NODE_ENV === 'production') {
+    // Auth required in ALL environments - timing-safe comparison
+    const authHeader = request.headers.get('authorization') || ''
+    const expectedKey = `Bearer ${process.env.INTERNAL_API_KEY || ''}`
+
+    if (!process.env.INTERNAL_API_KEY) {
+      console.error('INTERNAL_API_KEY is not configured')
+      return NextResponse.json(
+        { error: 'Service configuration error' },
+        { status: 500 }
+      )
+    }
+
+    const authBuffer = Buffer.from(authHeader)
+    const expectedBuffer = Buffer.from(expectedKey)
+
+    if (authBuffer.length !== expectedBuffer.length ||
+        !crypto.timingSafeEqual(authBuffer, expectedBuffer)) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -20,6 +44,14 @@ export async function POST(request: Request) {
     if (!to || !type) {
       return NextResponse.json(
         { error: 'Missing required fields: to, type' },
+        { status: 400 }
+      )
+    }
+
+    // Basic email format validation
+    if (typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
         { status: 400 }
       )
     }

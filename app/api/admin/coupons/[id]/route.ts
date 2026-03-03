@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/auth-guard'
+import { logAdminAction } from '@/lib/security/audit'
 
 // GET - Get single coupon (requires admin auth)
 export async function GET(
@@ -46,7 +47,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error: authError } = await requireAdmin()
+  const { user: adminCaller, error: authError } = await requireAdmin()
   if (authError) return authError
 
   try {
@@ -98,6 +99,14 @@ export async function PATCH(
 
     if (error) throw error
 
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'update_coupon',
+      targetType: 'coupon',
+      targetId: id,
+      details: { updated_fields: Object.keys(updates), ...updates },
+    })
+
     return NextResponse.json({
       success: true,
       coupon,
@@ -119,7 +128,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error: authError } = await requireAdmin()
+  const { user: adminCaller, error: authError } = await requireAdmin()
   if (authError) return authError
 
   try {
@@ -134,6 +143,14 @@ export async function DELETE(
       .single()
 
     if (error) throw error
+
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'deactivate_coupon',
+      targetType: 'coupon',
+      targetId: id,
+      details: { coupon_code: (coupon as Record<string, unknown>)?.code },
+    })
 
     return NextResponse.json({
       success: true,

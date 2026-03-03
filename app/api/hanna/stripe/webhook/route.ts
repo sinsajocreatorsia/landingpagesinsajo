@@ -93,9 +93,11 @@ export async function POST(request: Request) {
             session.subscription as string
           )
 
+          const checkoutPlan = subscription.metadata?.plan || 'pro'
+
           await getTable('profiles')
             .update({
-              plan: 'pro',
+              plan: checkoutPlan,
               subscription_status: 'active',
               stripe_subscription_id: subscription.id,
               plan_started_at: new Date().toISOString(),
@@ -105,7 +107,7 @@ export async function POST(request: Request) {
             } as Record<string, unknown>)
             .eq('id', userId)
 
-          log(event.type, event.id, `User ${userId} upgraded to Pro`)
+          log(event.type, event.id, `User ${userId} upgraded to ${checkoutPlan}`)
         }
         break
       }
@@ -124,7 +126,7 @@ export async function POST(request: Request) {
           await getTable('profiles')
             .update({
               subscription_status: status,
-              plan: status === 'cancelled' ? 'free' : 'pro',
+              plan: status === 'cancelled' ? 'free' : (subscription.metadata?.plan || 'pro'),
             } as Record<string, unknown>)
             .eq('id', userId)
 
@@ -185,7 +187,7 @@ export async function POST(request: Request) {
             await getTable('profiles')
               .update({
                 subscription_status: 'active',
-                plan: 'pro',
+                plan: subscription.metadata?.plan || 'pro',
               } as Record<string, unknown>)
               .eq('id', userId)
 

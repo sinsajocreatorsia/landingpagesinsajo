@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     // Calculate final price
-    const basePrice = plan === 'pro' ? 19.99 : 0 // Base price for pro plan
+    const basePrice = plan === 'business' ? 49 : plan === 'pro' ? 19.99 : 0
     let finalPrice = basePrice
 
     if (coupon.discount_type === 'percentage') {

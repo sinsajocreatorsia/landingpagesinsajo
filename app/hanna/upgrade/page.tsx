@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -13,9 +13,21 @@ import {
   Sparkles,
   Zap,
   Building2,
+  Flame,
 } from "lucide-react";
 
 type PlanType = "pro" | "business";
+
+interface LaunchData {
+  active: boolean;
+  remaining: number;
+  total: number;
+}
+
+const LAUNCH_PRICES: Record<PlanType, number> = {
+  pro: 9.99,
+  business: 19.99,
+};
 
 function UpgradeContent() {
   const searchParams = useSearchParams();
@@ -27,6 +39,38 @@ function UpgradeContent() {
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [launch, setLaunch] = useState<LaunchData | null>(null);
+
+  // Fetch launch spots on mount
+  useEffect(() => {
+    fetch("/api/hanna/launch/spots")
+      .then((r) => r.json())
+      .then((data: LaunchData) => {
+        if (data.active) {
+          setLaunch(data);
+          setCouponCode("FUNDADOR");
+          setCouponValid(true);
+          setCouponMessage(
+            selectedPlan === "business"
+              ? "59% de descuento en tu primer mes"
+              : "50% de descuento en tu primer mes"
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Update coupon message when plan changes during launch
+  useEffect(() => {
+    if (launch?.active && couponCode.toUpperCase() === "FUNDADOR") {
+      setCouponValid(true);
+      setCouponMessage(
+        selectedPlan === "business"
+          ? "59% de descuento en tu primer mes"
+          : "50% de descuento en tu primer mes"
+      );
+    }
+  }, [selectedPlan, launch, couponCode]);
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -78,11 +122,14 @@ function UpgradeContent() {
     }
   };
 
+  const isLaunchActive = launch?.active ?? false;
+
   const plans = [
     {
       id: "pro" as PlanType,
       name: "Pro",
-      price: 19,
+      price: 19.99,
+      launchPrice: isLaunchActive ? LAUNCH_PRICES.pro : null,
       icon: Crown,
       color: "#C7517E",
       description: "Para empresarias serias",
@@ -99,6 +146,7 @@ function UpgradeContent() {
       id: "business" as PlanType,
       name: "Business",
       price: 49,
+      launchPrice: isLaunchActive ? LAUNCH_PRICES.business : null,
       icon: Building2,
       color: "#2CB6D7",
       description: "Para negocios en crecimiento",
@@ -117,6 +165,7 @@ function UpgradeContent() {
   ];
 
   const selectedPlanData = plans.find((p) => p.id === selectedPlan)!;
+  const displayPrice = selectedPlanData.launchPrice ?? selectedPlanData.price;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -135,6 +184,29 @@ function UpgradeContent() {
           className="bg-yellow-500/20 border border-yellow-500/30 text-yellow-200 px-4 py-3 rounded-xl mb-6"
         >
           Pago cancelado. Puedes intentarlo de nuevo cuando quieras.
+        </motion.div>
+      )}
+
+      {/* Launch Banner */}
+      {isLaunchActive && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-4 mb-8 text-center"
+        >
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <Flame className="w-5 h-5 text-amber-400" />
+            <span className="text-amber-300 font-bold text-lg">
+              OFERTA DE LANZAMIENTO
+            </span>
+            <Flame className="w-5 h-5 text-amber-400" />
+          </div>
+          <p className="text-white/80 text-sm">
+            Solo para los primeros {launch?.total} fundadores.{" "}
+            <span className="text-amber-300 font-semibold">
+              Quedan {launch?.remaining} spots
+            </span>
+          </p>
         </motion.div>
       )}
 
@@ -197,10 +269,30 @@ function UpgradeContent() {
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-3xl font-bold text-white">
-                  ${plan.price}
-                </span>
-                <span className="text-white/50 text-sm">/mes</span>
+                {plan.launchPrice ? (
+                  <>
+                    <span className="text-white/40 text-lg line-through mr-2">
+                      ${plan.price}
+                    </span>
+                    <span
+                      className="text-3xl font-bold"
+                      style={{ color: plan.color }}
+                    >
+                      ${plan.launchPrice}
+                    </span>
+                    <span className="text-white/50 text-sm">/mes</span>
+                    <p className="text-white/40 text-xs mt-1">
+                      Primer mes, luego ${plan.price}/mes
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold text-white">
+                      ${plan.price}
+                    </span>
+                    <span className="text-white/50 text-sm">/mes</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -248,10 +340,27 @@ function UpgradeContent() {
             <p className="text-white/50 text-sm">Cancela cuando quieras</p>
           </div>
           <div className="text-right">
-            <span className="text-3xl font-bold text-white">
-              ${selectedPlanData.price}
-            </span>
-            <span className="text-white/50">/mes</span>
+            {selectedPlanData.launchPrice ? (
+              <>
+                <span className="text-white/40 text-lg line-through mr-1">
+                  ${selectedPlanData.price}
+                </span>
+                <span className="text-3xl font-bold text-green-400">
+                  ${displayPrice}
+                </span>
+                <span className="text-white/50">/mes</span>
+                <p className="text-green-400/70 text-xs mt-1">
+                  Precio fundador - primer mes
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="text-3xl font-bold text-white">
+                  ${displayPrice}
+                </span>
+                <span className="text-white/50">/mes</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -259,7 +368,7 @@ function UpgradeContent() {
         <div className="mb-6">
           <label className="block text-sm font-medium text-white/80 mb-2">
             <Gift className="inline w-4 h-4 mr-1" />
-            ¿Tienes un cupón?
+            {isLaunchActive ? "Cupón de lanzamiento aplicado" : "¿Tienes un cupón?"}
           </label>
           <div className="flex gap-2">
             <input
@@ -271,14 +380,21 @@ function UpgradeContent() {
                 setCouponMessage(null);
               }}
               placeholder="INGRESA TU CÓDIGO"
-              className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase text-sm"
+              readOnly={isLaunchActive && couponCode.toUpperCase() === "FUNDADOR"}
+              className={`flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase text-sm ${
+                isLaunchActive && couponCode.toUpperCase() === "FUNDADOR"
+                  ? "border-green-500/30 bg-green-500/10"
+                  : ""
+              }`}
             />
-            <button
-              onClick={validateCoupon}
-              className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white/80 hover:bg-white/20 transition-all text-sm"
-            >
-              Validar
-            </button>
+            {!(isLaunchActive && couponCode.toUpperCase() === "FUNDADOR") && (
+              <button
+                onClick={validateCoupon}
+                className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white/80 hover:bg-white/20 transition-all text-sm"
+              >
+                Validar
+              </button>
+            )}
           </div>
           {couponMessage && (
             <motion.p
@@ -327,9 +443,11 @@ function UpgradeContent() {
               ) : (
                 <Crown className="w-5 h-5" />
               )}
-              {couponValid
-                ? "Continuar con cupón"
-                : `Actualizar a ${selectedPlanData.name}`}
+              {isLaunchActive
+                ? `Ser Fundador ${selectedPlanData.name}`
+                : couponValid
+                  ? "Continuar con cupón"
+                  : `Actualizar a ${selectedPlanData.name}`}
             </>
           )}
         </button>

@@ -1,11 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { paymentLimiter, getClientIdentifier, rateLimitHeaders } from "@/lib/security/rate-limit";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export async function POST(request: Request) {
-  // Rate limiting handled server-side
+export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientIp = getClientIdentifier(request);
+    const rateCheck = paymentLimiter.check(clientIp);
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes. Intenta en un momento." },
+        { status: 429, headers: rateLimitHeaders(rateCheck) },
+      );
+    }
+
     const {
       email,
       name,
@@ -20,6 +30,14 @@ export async function POST(request: Request) {
     if (!email || !name) {
       return NextResponse.json(
         { error: "Email y nombre son requeridos" },
+        { status: 400 },
+      );
+    }
+
+    // Basic email format validation
+    if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: "Formato de email inválido" },
         { status: 400 },
       );
     }

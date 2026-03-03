@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendConfirmationEmail } from '@/lib/emails'
+import { paymentLimiter, getClientIdentifier, rateLimitHeaders } from '@/lib/security/rate-limit'
 
 const PAYPAL_API = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
@@ -29,13 +30,31 @@ async function getPayPalAccessToken() {
   return data.access_token
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientIp = getClientIdentifier(request)
+    const rateCheck = paymentLimiter.check(clientIp)
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intenta en un momento.' },
+        { status: 429, headers: rateLimitHeaders(rateCheck) }
+      )
+    }
+
     const { orderID, email, name, phone, country, utm_source, utm_medium, utm_campaign } = await request.json()
 
-    if (!orderID) {
+    if (!orderID || typeof orderID !== 'string') {
       return NextResponse.json(
         { error: 'Order ID es requerido' },
+        { status: 400 }
+      )
+    }
+
+    // Validate orderID format (PayPal order IDs are alphanumeric)
+    if (!/^[A-Z0-9]{10,30}$/i.test(orderID)) {
+      return NextResponse.json(
+        { error: 'Formato de Order ID inválido' },
         { status: 400 }
       )
     }
@@ -43,7 +62,7 @@ export async function POST(request: Request) {
     const accessToken = await getPayPalAccessToken()
 
     const response = await fetch(
-      `${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`,
+      `${PAYPAL_API}/v2/checkout/orders/${encodeURIComponent(orderID)}/capture`,
       {
         method: 'POST',
         headers: {
@@ -61,7 +80,6 @@ export async function POST(request: Request) {
         const captureAmount = data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
         const payerEmail = data.payer?.email_address || email
 
-        // Create registration in database (using type assertion to bypass strict typing)
         const registrationData = {
           email: payerEmail,
           full_name: name || `${data.payer?.name?.given_name || ''} ${data.payer?.name?.surname || ''}`.trim(),
@@ -108,8 +126,6 @@ export async function POST(request: Request) {
       } catch (dbError) {
         console.error('Database error:', dbError)
       }
-
-      console.log('PayPal payment completed for:', email)
     }
 
     return NextResponse.json(data)

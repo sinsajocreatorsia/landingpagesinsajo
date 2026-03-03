@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase'
+import { logAdminAction } from '@/lib/security/audit'
 
 // Type for the enriched user returned by GET
 interface UserListItem {
@@ -135,7 +136,7 @@ export async function GET(request: Request) {
  * Body: { email, password, full_name, plan }
  */
 export async function POST(request: Request) {
-  const { error: authError } = await requireAdmin()
+  const { user: adminCaller, error: authError } = await requireAdmin()
   if (authError) return authError
 
   try {
@@ -204,6 +205,14 @@ export async function POST(request: Request) {
       console.error('Error creating profile (user was created):', profileError)
       // User was created in auth but profile failed - return partial success
     }
+
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'create_user',
+      targetType: 'user',
+      targetId: newUser.id,
+      details: { email, plan: userPlan },
+    })
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { requireAdmin } from '@/lib/auth-guard'
+import { logAdminAction } from '@/lib/security/audit'
 
 // GET - List all coupons (requires admin auth)
 export async function GET(request: Request) {
@@ -42,7 +43,7 @@ export async function GET(request: Request) {
 
 // POST - Create new coupon (requires admin auth)
 export async function POST(request: Request) {
-  const { error: authError } = await requireAdmin()
+  const { user: adminCaller, error: authError } = await requireAdmin()
   if (authError) return authError
 
   try {
@@ -111,6 +112,14 @@ export async function POST(request: Request) {
       .single()
 
     if (error) throw error
+
+    await logAdminAction({
+      adminUserId: adminCaller!.id,
+      action: 'create_coupon',
+      targetType: 'coupon',
+      targetId: (coupon as Record<string, unknown>)?.id as string,
+      details: { code: code.toUpperCase(), discount_type, discount_value },
+    })
 
     return NextResponse.json({
       success: true,

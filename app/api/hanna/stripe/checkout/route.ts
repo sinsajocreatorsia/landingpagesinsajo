@@ -43,7 +43,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { couponCode } = await request.json()
+    const { plan = 'pro', couponCode } = await request.json()
+
+    // Validate plan parameter
+    if (plan !== 'pro' && plan !== 'business') {
+      return NextResponse.json(
+        { error: 'Plan no válido' },
+        { status: 400 }
+      )
+    }
 
     // Get user profile
     const { data: profileData } = await getTable('profiles')
@@ -53,8 +61,14 @@ export async function POST(request: Request) {
 
     const profile = profileData as ProfileData | null
 
-    // Check if already Pro
-    if (profile?.plan === 'pro') {
+    // Check if already on same or higher plan (allow pro -> business upgrade)
+    if (profile?.plan === 'business') {
+      return NextResponse.json(
+        { error: 'Ya tienes el plan Business' },
+        { status: 400 }
+      )
+    }
+    if (profile?.plan === 'pro' && plan === 'pro') {
       return NextResponse.json(
         { error: 'Ya tienes el plan Pro' },
         { status: 400 }
@@ -87,7 +101,9 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_HANNA_PRO!,
+          price: plan === 'business'
+            ? process.env.STRIPE_PRICE_HANNA_BUSINESS!
+            : process.env.STRIPE_PRICE_HANNA_PRO!,
           quantity: 1,
         },
       ],
@@ -95,20 +111,24 @@ export async function POST(request: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/hanna/upgrade?cancelled=true`,
       metadata: {
         user_id: user.id,
+        plan,
       },
       subscription_data: {
         metadata: {
           user_id: user.id,
+          plan,
         },
       },
     }
 
     // Apply coupon if provided
     if (couponCode) {
+      const upperCode = couponCode.toUpperCase()
+
       // Check if valid in our database (using discount_coupons table)
       const { data: couponData } = await getTable('discount_coupons')
         .select('*')
-        .eq('code', couponCode.toUpperCase())
+        .eq('code', upperCode)
         .eq('is_active', true)
         .single()
 
@@ -122,15 +142,30 @@ export async function POST(request: Request) {
             trial_period_days: coupon.free_months * 30,
           }
         } else if (coupon.discount_type === 'percentage' || coupon.discount_type === 'fixed') {
-          // Try to find a Stripe coupon with this code
-          try {
-            const stripeCoupons = await stripe.coupons.list({ limit: 100 })
-            const stripeCoupon = stripeCoupons.data.find(c => c.name === couponCode.toUpperCase())
-            if (stripeCoupon) {
-              sessionParams.discounts = [{ coupon: stripeCoupon.id }]
+          // Launch coupon FUNDADOR: map to plan-specific Stripe coupon
+          const stripeCouponId = upperCode === 'FUNDADOR'
+            ? (plan === 'business' ? 'FUNDADOR-BIZ-59' : 'FUNDADOR-PRO-50')
+            : null
+
+          if (stripeCouponId) {
+            // Use the mapped launch coupon directly by ID
+            try {
+              await stripe.coupons.retrieve(stripeCouponId)
+              sessionParams.discounts = [{ coupon: stripeCouponId }]
+            } catch {
+              console.log('Launch coupon not found in Stripe:', stripeCouponId)
             }
-          } catch (e) {
-            console.log('No Stripe coupon found:', couponCode)
+          } else {
+            // Regular coupon: find Stripe coupon by name
+            try {
+              const stripeCoupons = await stripe.coupons.list({ limit: 100 })
+              const stripeCoupon = stripeCoupons.data.find(c => c.name === upperCode)
+              if (stripeCoupon) {
+                sessionParams.discounts = [{ coupon: stripeCoupon.id }]
+              }
+            } catch {
+              console.log('No Stripe coupon found:', upperCode)
+            }
           }
         }
       }

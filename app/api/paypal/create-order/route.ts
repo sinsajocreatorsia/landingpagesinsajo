@@ -1,8 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { paymentLimiter, getClientIdentifier, rateLimitHeaders } from '@/lib/security/rate-limit'
 
 const PAYPAL_API = process.env.NODE_ENV === 'production'
   ? 'https://api-m.paypal.com'
   : 'https://api-m.sandbox.paypal.com'
+
+// Server-side fixed price - NEVER accept price from client
+const WORKSHOP_PRICE = '100.00'
 
 async function getPayPalAccessToken() {
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
@@ -27,11 +31,21 @@ async function getPayPalAccessToken() {
   return data.access_token
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { email, name, price, workshopName } = await request.json()
+    // Rate limiting
+    const clientIp = getClientIdentifier(request)
+    const rateCheck = paymentLimiter.check(clientIp)
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intenta en un momento.' },
+        { status: 429, headers: rateLimitHeaders(rateCheck) }
+      )
+    }
 
-    // Validación
+    const { email, name } = await request.json()
+
+    // Validate required fields
     if (!email || !name) {
       return NextResponse.json(
         { error: 'Email y nombre son requeridos' },
@@ -39,8 +53,15 @@ export async function POST(request: Request) {
       )
     }
 
+    // Basic email format validation
+    if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: 'Formato de email inválido' },
+        { status: 400 }
+      )
+    }
+
     const accessToken = await getPayPalAccessToken()
-    const workshopPrice = price || '100.00'
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.screatorsai.com'
 
     const response = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
@@ -55,9 +76,9 @@ export async function POST(request: Request) {
           {
             amount: {
               currency_code: 'USD',
-              value: workshopPrice,
+              value: WORKSHOP_PRICE,
             },
-            description: workshopName || 'Latina Smart-Scaling Workshop - 7 de Marzo 2026',
+            description: 'Latina Smart-Scaling Workshop - 7 de Marzo 2026',
             custom_id: `workshop_${Date.now()}_${email.replace('@', '_at_')}`,
             soft_descriptor: 'SINSAJO WORKSHOP',
           },

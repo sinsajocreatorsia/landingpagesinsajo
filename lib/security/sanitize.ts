@@ -106,6 +106,37 @@ const INJECTION_PATTERNS = [
   /```\s*system/i,
   /end\s+of\s+(system\s+)?(prompt|instructions?|message)/i,
   /beginning\s+of\s+(user\s+)?(prompt|message)/i,
+
+  // Spanish injection patterns
+  /ignora\s+(todas?\s+)?(las\s+)?(instrucciones?|reglas?|indicaciones?)\s+(previas?|anteriores?)/i,
+  /olvida\s+(todo|todas?\s+tus)\s*(instrucciones?|reglas?|indicaciones?)?/i,
+  /nuevas?\s+(instrucciones?|reglas?|indicaciones?)\s*:/i,
+  /ahora\s+eres\s+/i,
+  /actua\s+como\s+(si\s+fueras|un|una)\s+/i,
+  /finge\s+(que\s+eres|ser)/i,
+  /muestrame\s+(tu|el)\s+(prompt|instrucciones?|configuracion)/i,
+  /dime\s+(tu|tus|el)\s+(prompt|instrucciones?|reglas?|configuracion)/i,
+  /revela\s+(tu|tus|el)\s+(prompt|instrucciones?|reglas?|configuracion)/i,
+  /repite\s+(tu|tus|el)\s+(prompt|instrucciones?|mensaje\s+de\s+sistema)/i,
+  /cual(es)?\s+son\s+tus\s+(instrucciones?|reglas?|indicaciones?)/i,
+  /como\s+fuiste\s+(programad[ao]|cread[ao]|configurad[ao])/i,
+  /modo\s+(desarrollador|dios|sin\s+filtros?|sin\s+restricciones?)/i,
+
+  // Translation-based extraction attacks (any language)
+  /traduc[eir]\s+(tu|tus|el|las?)\s+(prompt|instrucciones?|reglas?|configuracion)/i,
+  /translate\s+(into|to|in)\s+\w+\s+(your|the)\s+(prompt|instructions?|rules?)/i,
+  /resum[eir]\s+(tu|tus|el|las?)\s+(prompt|instrucciones?|reglas?|configuracion)/i,
+  /summarize\s+(your|the)\s+(prompt|instructions?|rules?|configuration)/i,
+  /paraphrase\s+(your|the)\s+(prompt|instructions?|rules?)/i,
+  /parafrase[ao]?\s+(tu|tus|el|las?)\s+(prompt|instrucciones?|reglas?)/i,
+  /escribe\s+(un\s+)?(poema|historia|cancion|cuento)\s+(sobre|acerca\s+de)\s+tus\s+(instrucciones?|reglas?|prompt)/i,
+  /write\s+(a\s+)?(poem|story|song)\s+about\s+your\s+(instructions?|rules?|prompt)/i,
+
+  // Progressive extraction / behavioral mapping
+  /que\s+(no\s+)?puedes\s+hacer/i,
+  /cuales\s+son\s+tus\s+limita(ciones|ntes)/i,
+  /what\s+are\s+your\s+(limitations?|restrictions?|boundaries)/i,
+  /what\s+can.?t\s+you\s+do/i,
 ]
 
 /**
