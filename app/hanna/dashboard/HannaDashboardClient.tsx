@@ -429,140 +429,141 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       {/* Sidebar */}
       {sidebarOpen && (
         <aside
-          className="fixed inset-y-0 left-0 w-72 border-r z-50 flex flex-col lg:sticky lg:top-0 lg:z-auto lg:h-screen flex-shrink-0"
+          className="fixed inset-y-0 left-0 w-64 border-r z-50 flex flex-col lg:sticky lg:top-0 lg:z-auto lg:h-screen flex-shrink-0"
           style={{ backgroundColor: theme.colors.sidebarBg, borderColor: theme.colors.cardBorder }}
         >
               {/* Sidebar Header */}
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                    <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+              <div className="px-3 py-3 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src="/images/hanna-ai.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h2 className="text-white font-bold">Hanna</h2>
-                    <p className="text-white/50 text-xs">Tu asistente IA</p>
+                    <h2 className="text-white font-semibold text-sm">Hanna</h2>
+                    <p className="text-white/50 text-[10px]">Tu asistente IA</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 text-white/60 hover:text-white transition-colors"
+                  className="p-1.5 text-white/60 hover:text-white transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* New Chat Button */}
-              <div className="p-4">
+              {/* New Chat Button - fixed */}
+              <div className="px-3 py-2 flex-shrink-0">
                 <button
                   onClick={handleNewChat}
-                  className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white flex items-center gap-2 transition-colors"
+                  className="w-full py-2 px-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm flex items-center gap-2 transition-colors"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-4 h-4" />
                   Nueva conversación
                 </button>
               </div>
 
-              {/* Menu Items */}
-              <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+              {/* Menu Items - scrollable */}
+              <nav className="flex-1 px-3 py-1 space-y-0.5 overflow-y-auto min-h-0">
                 <Link
                   href="/hanna/dashboard"
-                  className="flex items-center gap-3 px-4 py-3 bg-white/10 rounded-xl text-white"
+                  className="flex items-center gap-2.5 px-3 py-2 bg-white/10 rounded-lg text-white text-sm"
                 >
-                  <MessageSquare className="w-5 h-5" />
+                  <MessageSquare className="w-4 h-4" />
                   Chat
                 </Link>
                 <Link
                   href="/hanna/history"
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
                 >
-                  <History className="w-5 h-5" />
+                  <History className="w-4 h-4" />
                   Historial
                 </Link>
                 <Link
                   href="/hanna/profile"
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
                 >
-                  <User className="w-5 h-5" />
+                  <User className="w-4 h-4" />
                   Perfil de Negocio
                 </Link>
                 <Link
                   href="/hanna/settings"
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-4 h-4" />
                   Configuración
                 </Link>
                 <Link
                   href="/hanna/billing"
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl text-white/70 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors text-sm"
                 >
-                  <CreditCard className="w-5 h-5" />
+                  <CreditCard className="w-4 h-4" />
                   Facturación
                 </Link>
               </nav>
 
-              {/* Theme Section */}
-              <div className="px-4 py-3 border-t border-white/10">
-                <div className="flex items-center gap-2 mb-3">
-                  <Palette className="w-4 h-4" style={{ color: theme.colors.textMuted }} />
-                  <p className="text-xs font-medium" style={{ color: theme.colors.textMuted }}>Tema</p>
+              {/* Bottom section - fixed */}
+              <div className="flex-shrink-0">
+                {/* Theme Section */}
+                <div className="px-3 py-2 border-t border-white/10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Palette className="w-3.5 h-3.5" style={{ color: theme.colors.textMuted }} />
+                    <p className="text-[11px] font-medium" style={{ color: theme.colors.textMuted }}>Tema</p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {(Object.keys(allThemes) as ThemeId[]).map((id) => (
+                      <button
+                        key={id}
+                        onClick={() => setTheme(id)}
+                        className="w-6 h-6 rounded-full border-2 transition-all hover:scale-110"
+                        style={{
+                          background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
+                          borderColor: themeId === id ? theme.colors.accent : 'transparent',
+                          boxShadow: themeId === id ? `0 0 0 2px ${theme.colors.accent}40` : 'none',
+                        }}
+                        title={allThemes[id].name}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {(Object.keys(allThemes) as ThemeId[]).map((id) => (
-                    <button
-                      key={id}
-                      onClick={() => setTheme(id)}
-                      className="w-8 h-8 rounded-full border-2 transition-all hover:scale-105"
-                      style={{
-                        background: `linear-gradient(135deg, ${allThemes[id].colors.bgFrom}, ${allThemes[id].colors.bgTo})`,
-                        borderColor: themeId === id ? theme.colors.accent : 'transparent',
-                        boxShadow: themeId === id ? `0 0 0 2px ${theme.colors.accent}40` : 'none',
-                      }}
-                      title={allThemes[id].name}
-                    />
-                  ))}
-                </div>
-              </div>
 
-              {/* Upgrade Banner (Free users only) */}
-              {profile.plan === 'free' && (
-                <div className="p-4">
-                  <div className="bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Crown className="w-5 h-5 text-[#C7517E]" />
-                      <span className="text-white font-medium">Hanna Pro</span>
+                {/* Upgrade Banner (Free users only) */}
+                {profile.plan === 'free' && (
+                  <div className="px-3 py-2">
+                    <div className="bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-lg p-3">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Crown className="w-4 h-4 text-[#C7517E]" />
+                        <span className="text-white font-medium text-xs">Hanna Pro</span>
+                      </div>
+                      <p className="text-white/60 text-[11px] mb-2">Mensajes ilimitados, voz, y más.</p>
+                      <Link
+                        href="/hanna/upgrade"
+                        className="block w-full py-1.5 px-3 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white text-center text-xs font-medium rounded-md hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
+                      >
+                        Actualizar a Pro
+                      </Link>
                     </div>
-                    <p className="text-white/60 text-sm mb-3">
-                      Mensajes ilimitados, voz, y más.
-                    </p>
-                    <Link
-                      href="/hanna/upgrade"
-                      className="block w-full py-2 px-4 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white text-center text-sm font-medium rounded-lg hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
-                    >
-                      Actualizar a Pro
-                    </Link>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* User Section */}
-              <div className="p-4 border-t border-white/10">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-[#C7517E] flex items-center justify-center text-white font-medium">
-                    {user.fullName.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{user.fullName}</p>
-                    <p className="text-white/50 text-xs truncate">{user.email}</p>
+                {/* User Section */}
+                <div className="px-3 py-2 border-t border-white/10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-[#C7517E] flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                      {user.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium text-xs truncate">{user.fullName}</p>
+                      <p className="text-white/50 text-[10px] truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                      title="Cerrar sesión"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Cerrar sesión
-                </button>
               </div>
         </aside>
       )}
