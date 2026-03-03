@@ -587,7 +587,8 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
         <header className="backdrop-blur-md border-b px-4 py-3 flex items-center gap-4" style={{ backgroundColor: theme.colors.headerBg, borderColor: theme.colors.cardBorder }}>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className={`p-2 ${hoverBg} rounded-lg transition-colors`}
+            style={{ color: theme.colors.textMuted }}
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -604,9 +605,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
           {/* Message Counter (Free users) */}
           {profile.plan === 'free' && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full">
-              <Sparkles className="w-4 h-4 text-[#2CB6D7]" />
-              <span className="text-white/80 text-sm">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: theme.colors.cardBg }}>
+              <Sparkles className="w-4 h-4" style={{ color: theme.colors.accent }} />
+              <span className="text-sm" style={{ color: theme.colors.textSecondary }}>
                 {messagesRemaining} / 5 mensajes
               </span>
             </div>
@@ -616,7 +617,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           {profile.plan === 'pro' && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-full">
               <Crown className="w-4 h-4 text-[#C7517E]" />
-              <span className="text-white/80 text-sm font-medium">Pro</span>
+              <span className="text-sm font-medium" style={{ color: theme.colors.textSecondary }}>Pro</span>
             </div>
           )}
 
@@ -625,8 +626,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             <button
               onClick={toggleVoice}
               className={`p-2 rounded-full transition-colors ${
-                voiceEnabled ? 'bg-[#2CB6D7] text-white' : 'bg-white/10 text-white/60'
+                voiceEnabled ? 'bg-[#2CB6D7] text-white' : hoverBg
               }`}
+              style={voiceEnabled ? {} : { color: theme.colors.textMuted, backgroundColor: theme.colors.cardBg }}
               title={voiceEnabled ? 'Desactivar voz' : 'Activar voz'}
             >
               {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
@@ -637,9 +639,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center p-1 rounded-full hover:bg-white/10 transition-colors"
+              className={`flex items-center p-1 rounded-full ${hoverBg} transition-colors`}
             >
-              <div className="w-9 h-9 rounded-full bg-[#C7517E] flex items-center justify-center text-white text-sm font-medium ring-2 ring-white/20">
+              <div className="w-9 h-9 rounded-full bg-[#C7517E] flex items-center justify-center text-white text-sm font-medium ring-2" style={{ '--tw-ring-color': theme.colors.cardBorder } as React.CSSProperties}>
                 {user.fullName.charAt(0).toUpperCase()}
               </div>
             </button>
@@ -652,15 +654,15 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                     <p className="text-xs" style={{ color: theme.colors.textMuted }}>{user.email}</p>
                   </div>
                   <div className="p-1">
-                    <Link href="/hanna/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors" style={{ color: theme.colors.textSecondary }}>
+                    <Link href="/hanna/profile" onClick={() => setShowUserMenu(false)} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${hoverBg} transition-colors`} style={{ color: theme.colors.textSecondary }}>
                       <User className="w-4 h-4" />
                       <span className="text-sm">Mi Perfil</span>
                     </Link>
-                    <Link href="/hanna/settings" onClick={() => setShowUserMenu(false)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors" style={{ color: theme.colors.textSecondary }}>
+                    <Link href="/hanna/settings" onClick={() => setShowUserMenu(false)} className={`flex items-center gap-2 px-3 py-2 rounded-lg ${hoverBg} transition-colors`} style={{ color: theme.colors.textSecondary }}>
                       <Settings className="w-4 h-4" />
                       <span className="text-sm">Configuración</span>
                     </Link>
-                    <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left" style={{ color: theme.colors.textSecondary }}>
+                    <button onClick={handleLogout} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg ${hoverBg} transition-colors text-left`} style={{ color: theme.colors.textSecondary }}>
                       <LogOut className="w-4 h-4" />
                       <span className="text-sm">Cerrar sesión</span>
                     </button>
@@ -717,7 +719,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                           className={`p-1 rounded transition-colors ${
                             feedbackGiven[message.id] === 1
                               ? 'text-green-400'
-                              : 'text-white/20 hover:text-white/50'
+                              : (isLight ? 'text-black/20 hover:text-black/50' : 'text-white/20 hover:text-white/50')
                           }`}
                           title="Buena respuesta"
                           disabled={!!feedbackGiven[message.id]}
@@ -729,7 +731,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                           className={`p-1 rounded transition-colors ${
                             feedbackGiven[message.id] === -1
                               ? 'text-red-400'
-                              : 'text-white/20 hover:text-white/50'
+                              : (isLight ? 'text-black/20 hover:text-black/50' : 'text-white/20 hover:text-white/50')
                           }`}
                           title="Mala respuesta"
                           disabled={!!feedbackGiven[message.id]}
@@ -822,10 +824,10 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
           {/* No Messages Left */}
           {profile.plan === 'free' && messagesRemaining <= 0 && (
-            <div className="mb-3 px-4 py-3 bg-[#C7517E]/20 border border-[#C7517E]/30 rounded-lg text-white flex items-center justify-between">
+            <div className="mb-3 px-4 py-3 bg-[#C7517E]/20 border border-[#C7517E]/30 rounded-lg flex items-center justify-between" style={{ color: theme.colors.textPrimary }}>
               <div>
                 <p className="font-medium">¡Límite alcanzado!</p>
-                <p className="text-white/60 text-sm">Actualiza a Pro para mensajes ilimitados</p>
+                <p className="text-sm" style={{ color: theme.colors.textMuted }}>Actualiza a Pro para mensajes ilimitados</p>
               </div>
               <Link
                 href="/hanna/upgrade"
@@ -846,7 +848,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 className={`p-4 rounded-full transition-all ${
                   isListening
                     ? 'bg-red-500 text-white animate-pulse'
-                    : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                    : (isLight ? 'bg-black/5 text-black/60 hover:bg-black/10 hover:text-black' : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white')
                 } disabled:opacity-50`}
                 title={isListening ? 'Detener grabación' : 'Hablar'}
               >
@@ -888,16 +890,16 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
           {/* Voice Status (Pro only) */}
           {profile.plan === 'pro' && (voiceSupport.tts || voiceSupport.stt) && (
-            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-white/40">
+            <div className="mt-3 flex items-center justify-center gap-4 text-xs" style={{ color: theme.colors.textMuted }}>
               {voiceSupport.tts && (
                 <span className="flex items-center gap-1">
-                  <span className={voiceEnabled ? 'text-green-500' : 'text-white/40'}>●</span>
+                  <span className={voiceEnabled ? 'text-green-500' : (isLight ? 'text-black/40' : 'text-white/40')}>●</span>
                   Voz {voiceEnabled ? 'activada' : 'desactivada'}
                 </span>
               )}
               {voiceSupport.stt && (
                 <span className="flex items-center gap-1">
-                  <span className={isListening ? 'text-red-500 animate-pulse' : 'text-white/40'}>●</span>
+                  <span className={isListening ? 'text-red-500 animate-pulse' : (isLight ? 'text-black/40' : 'text-white/40')}>●</span>
                   {isListening ? 'Escuchando...' : 'Pulsa el micrófono para hablar'}
                 </span>
               )}
