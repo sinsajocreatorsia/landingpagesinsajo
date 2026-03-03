@@ -2,8 +2,8 @@ export const translations = {
   es: {
     // Header
     header: {
-      reserveSpot: 'Reservar Lugar',
-      reserve: 'Reservar',
+      reserveSpot: 'Lista de Espera',
+      reserve: 'Espera',
       lightMode: 'Modo claro',
       darkMode: 'Modo oscuro',
     },
@@ -13,9 +13,9 @@ export const translations = {
       title: 'De Dueña Agotada a',
       titleHighlight: 'Estratega Imparable',
       subtitle: 'Domina la IA para recuperar 10+ horas semanales y escalar tu negocio sin trabajar más',
-      cta: 'Reserva Tu Lugar Ahora',
+      cta: 'Unirme a la Lista de Espera',
       learnMore: 'Conoce más',
-      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
+      spots: '✅ CUPOS AGOTADOS — 12/12',
       live: 'Evento en vivo',
       duration: '4 horas intensivas',
       certificate: 'Certificado incluido',
@@ -74,12 +74,12 @@ export const translations = {
     },
     // SectionCTA
     sectionCTA: {
-      default: 'Reserva Tu Lugar Ahora',
-      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
+      default: 'Unirme a la Lista de Espera',
+      spots: '✅ CUPOS AGOTADOS — 12/12',
     },
     // Pricing
     pricing: {
-      badge: 'INVERSIÓN',
+      badge: 'LISTA DE ESPERA',
       title: 'Tu Transformación Comienza Aquí',
       subtitle: 'Una inversión que se paga sola en la primera semana de implementación.',
       originalPrice: '$497',
@@ -94,9 +94,9 @@ export const translations = {
         'Acceso al grupo privado de Telegram',
         'Sesión de Q&A exclusiva',
       ],
-      cta: 'Asegurar Mi Lugar',
-      guarantee: 'Garantía de satisfacción de 7 días',
-      spots: '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!',
+      cta: 'Unirme a la Lista de Espera',
+      guarantee: 'Sin compromiso — Te avisamos cuando abramos inscripciones',
+      spots: '✅ CUPOS AGOTADOS — 12/12',
     },
     // Footer
     footer: {
@@ -167,8 +167,8 @@ export const translations = {
   en: {
     // Header
     header: {
-      reserveSpot: 'Reserve Spot',
-      reserve: 'Reserve',
+      reserveSpot: 'Waitlist',
+      reserve: 'Waitlist',
       lightMode: 'Light mode',
       darkMode: 'Dark mode',
     },
@@ -178,9 +178,9 @@ export const translations = {
       title: 'From Exhausted Owner to',
       titleHighlight: 'Unstoppable Strategist',
       subtitle: 'Master AI to recover 10+ hours weekly and scale your business without working more',
-      cta: 'Reserve Your Spot Now',
+      cta: 'Join the Waitlist',
       learnMore: 'Learn more',
-      spots: '🔥 LAST SPOT AVAILABLE!',
+      spots: '✅ SOLD OUT — 12/12',
       live: 'Live event',
       duration: '4 intensive hours',
       certificate: 'Certificate included',
@@ -239,8 +239,8 @@ export const translations = {
     },
     // SectionCTA
     sectionCTA: {
-      default: 'Reserve Your Spot Now',
-      spots: '🔥 LAST SPOT AVAILABLE!',
+      default: 'Join the Waitlist',
+      spots: '✅ SOLD OUT — 12/12',
     },
     // Pricing
     pricing: {
@@ -259,9 +259,9 @@ export const translations = {
         'Access to private Telegram group',
         'Exclusive Q&A session',
       ],
-      cta: 'Secure My Spot',
-      guarantee: '7-day satisfaction guarantee',
-      spots: '🔥 LAST SPOT REMAINING!',
+      cta: 'Join the Waitlist',
+      guarantee: 'No commitment — We\'ll notify you when registration opens',
+      spots: '✅ SOLD OUT — 12/12',
     },
     // Footer
     footer: {

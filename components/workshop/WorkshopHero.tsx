@@ -171,8 +171,8 @@ export default function WorkshopHero() {
               </a>
               <div className="flex items-center gap-2 text-[#FCFEFB]">
                 <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-red-400 font-semibold">{t.hero.spots}</span>
+                  <span className="w-2 h-2 bg-[#2CB6D7] rounded-full" />
+                  <span className="text-[#2CB6D7] font-semibold">{t.hero.spots}</span>
                 </div>
               </div>
             </div>

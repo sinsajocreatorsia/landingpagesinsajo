@@ -21,8 +21,8 @@ export default function SectionCTA({
 }: SectionCTAProps) {
   const { language } = useLanguage()
 
-  const defaultText = text || (language === 'es' ? 'Reserva Tu Lugar Ahora' : 'Reserve Your Spot Now')
-  const defaultSpotsText = spotsText || (language === 'es' ? '🔥 ¡ÚLTIMO LUGAR DISPONIBLE!' : '🔥 LAST SPOT AVAILABLE!')
+  const defaultText = text || (language === 'es' ? 'Unirme a la Lista de Espera' : 'Join the Waitlist')
+  const defaultSpotsText = spotsText || (language === 'es' ? '✅ CUPOS AGOTADOS — 12/12' : '✅ SOLD OUT — 12/12')
   const isPrimary = variant === 'primary'
 
   return (
@@ -52,8 +52,8 @@ export default function SectionCTA({
           transition={{ delay: 0.3 }}
           className="flex items-center justify-center gap-2 mt-2"
         >
-          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-          <span className="text-red-400 font-semibold text-sm">{defaultSpotsText}</span>
+          <span className="w-2 h-2 bg-[#2CB6D7] rounded-full" />
+          <span className="text-[#2CB6D7] font-semibold text-sm">{defaultSpotsText}</span>
         </motion.div>
       )}
     </div>
