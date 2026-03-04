@@ -80,10 +80,16 @@ export async function POST(request: Request) {
 
     // Calculate final price
     const basePrice = plan === 'business' ? 49 : plan === 'pro' ? 19.99 : 0
+    let discountPct = coupon.discount_value
     let finalPrice = basePrice
 
+    // FUNDADOR uses different Stripe coupons per plan (59% for business, 50% for pro)
+    if (coupon.code === 'FUNDADOR' && plan === 'business') {
+      discountPct = 59
+    }
+
     if (coupon.discount_type === 'percentage') {
-      finalPrice = basePrice * (1 - coupon.discount_value / 100)
+      finalPrice = basePrice * (1 - discountPct / 100)
     } else if (coupon.discount_type === 'fixed') {
       finalPrice = Math.max(0, basePrice - coupon.discount_value)
     }
@@ -93,13 +99,13 @@ export async function POST(request: Request) {
       coupon: {
         code: coupon.code,
         discount_type: coupon.discount_type,
-        discount_value: coupon.discount_value,
+        discount_value: discountPct,
       },
       pricing: {
         base_price: basePrice,
         discount_amount:
           coupon.discount_type === 'percentage'
-            ? basePrice * (coupon.discount_value / 100)
+            ? basePrice * (discountPct / 100)
             : Math.min(coupon.discount_value, basePrice),
         final_price: finalPrice,
         currency: 'USD',

@@ -36,27 +36,6 @@ const features = [
   },
 ]
 
-const testimonials = [
-  {
-    name: 'María González',
-    business: 'Boutique de Moda',
-    quote: 'Hanna me ahorra 3 horas diarias en responder clientes y crear contenido.',
-    avatar: '👩‍💼',
-  },
-  {
-    name: 'Carolina Ruiz',
-    business: 'Consultora de Negocios',
-    quote: 'Es como tener una asistente que nunca duerme y siempre tiene ideas frescas.',
-    avatar: '👩‍💻',
-  },
-  {
-    name: 'Ana Martínez',
-    business: 'Tienda Online',
-    quote: 'Mis respuestas a clientes son ahora más rápidas y profesionales.',
-    avatar: '👩‍🔧',
-  },
-]
-
 const plans = [
   {
     name: 'Gratis',
@@ -71,22 +50,44 @@ const plans = [
     cta: 'Comenzar Gratis',
     ctaLink: '/hanna/signup',
     popular: false,
+    color: '#36B3AE',
   },
   {
     name: 'Pro',
-    price: '19',
+    price: '19.99',
     period: 'mes',
     description: 'Para empresarias serias',
     features: [
       'Mensajes ilimitados',
       'Historial completo',
       'Perfil de negocio personalizado',
-      'Voz (hablar con Hanna)',
-      'Respuestas adaptadas a tu marca',
+      'Voz activada',
+      'Modelos IA Flash (rápidos)',
+      'Soporte por email',
     ],
     cta: 'Comenzar con Pro',
     ctaLink: '/hanna/signup?plan=pro',
+    popular: false,
+    color: '#C7517E',
+  },
+  {
+    name: 'Business',
+    price: '49',
+    period: 'mes',
+    description: 'Para negocios en crecimiento',
+    features: [
+      'Todo lo de Pro',
+      'Modelos IA Premium (Gemini Pro + Claude)',
+      'Análisis de negocio avanzado',
+      'Estrategia de marketing IA',
+      'Memoria de negocio extendida',
+      'Soporte prioritario',
+      'Exportar conversaciones',
+    ],
+    cta: 'Comenzar con Business',
+    ctaLink: '/hanna/signup?plan=business',
     popular: true,
+    color: '#2CB6D7',
   },
 ]
 
@@ -118,9 +119,9 @@ export default function HannaLandingPage() {
             <a href="#pricing" className="text-white/70 hover:text-white transition-colors">
               Precios
             </a>
-            <a href="#testimonials" className="text-white/70 hover:text-white transition-colors">
-              Testimonios
-            </a>
+            <Link href="/hanna/login" className="text-white/70 hover:text-white transition-colors">
+              Iniciar Sesión
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -284,48 +285,9 @@ export default function HannaLandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4 bg-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Lo que dicen nuestras clientas
-            </h2>
-            <p className="text-white/60 text-lg">
-              Empresarias reales, resultados reales.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={testimonial.name}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#C7517E] to-[#200F5D] flex items-center justify-center text-2xl">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <h4 className="text-white font-medium">{testimonial.name}</h4>
-                    <p className="text-white/50 text-sm">{testimonial.business}</p>
-                  </div>
-                </div>
-                <p className="text-white/80 italic">"{testimonial.quote}"</p>
-                <div className="flex gap-1 mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Planes simples, sin sorpresas
@@ -335,25 +297,25 @@ export default function HannaLandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {plans.map((plan, index) => (
+          <div className="grid md:grid-cols-3 gap-6">
+            {plans.map((plan) => (
               <div
                 key={plan.name}
                 className={`relative rounded-2xl p-8 ${
                   plan.popular
-                    ? 'bg-gradient-to-br from-[#C7517E]/20 to-[#200F5D]/20 border-2 border-[#C7517E]'
+                    ? 'bg-gradient-to-br from-[#2CB6D7]/10 to-[#200F5D]/20 border-2 border-[#2CB6D7] scale-[1.02]'
                     : 'bg-white/5 border border-white/10'
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white text-sm font-medium rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white text-sm font-bold rounded-full">
                     Más Popular
                   </div>
                 )}
 
                 <div className="mb-6">
                   <h3 className="text-white text-xl font-bold mb-2">{plan.name}</h3>
-                  <p className="text-white/60">{plan.description}</p>
+                  <p className="text-white/60 text-sm">{plan.description}</p>
                 </div>
 
                 <div className="mb-6">
@@ -363,8 +325,8 @@ export default function HannaLandingPage() {
 
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-3 text-white/80">
-                      <Check className="w-5 h-5 text-[#2CB6D7]" />
+                    <li key={feature} className="flex items-center gap-3 text-white/80 text-sm">
+                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: plan.color }} />
                       {feature}
                     </li>
                   ))}
@@ -374,8 +336,10 @@ export default function HannaLandingPage() {
                   href={plan.ctaLink}
                   className={`block w-full py-3 px-4 text-center font-semibold rounded-xl transition-all ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white hover:from-[#d4608d] hover:to-[#C7517E]'
-                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+                      ? 'bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white hover:from-[#36C5E6] hover:to-[#2CB6D7]'
+                      : plan.name === 'Pro'
+                        ? 'bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white hover:from-[#d4608d] hover:to-[#C7517E]'
+                        : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
                   }`}
                 >
                   {plan.cta}

@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { sanitizeRedirect } from '@/lib/auth-guard'
@@ -17,14 +17,17 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
+          getAll() {
+            return cookieStore.getAll()
           },
-          set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options })
-          },
-          remove(name: string, options: CookieOptions) {
-            cookieStore.delete(name)
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {
+              // setAll can fail in Server Components - safe to ignore with middleware
+            }
           },
         },
       }
@@ -44,9 +47,9 @@ export async function GET(request: NextRequest) {
           .eq('id', user.id)
           .single()
 
-        // Create profile if it doesn't exist
+        // Create profile if it doesn't exist (use admin client to bypass RLS)
         if (!profile) {
-          await supabase.from('profiles').insert({
+          const { error: insertError } = await supabaseAdmin.from('profiles').insert({
             id: user.id,
             email: user.email,
             full_name: user.user_metadata?.full_name || user.user_metadata?.name,
@@ -55,6 +58,11 @@ export async function GET(request: NextRequest) {
             subscription_status: 'active',
             messages_today: 0,
           })
+
+          if (insertError) {
+            console.error('Profile creation failed:', insertError)
+            return NextResponse.redirect(`${origin}/hanna/login?error=auth_failed&detail=profile_creation`)
+          }
         }
 
         // Track if coupon was redeemed (determines redirect)
