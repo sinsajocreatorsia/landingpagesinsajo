@@ -213,8 +213,8 @@ Puedes generar diagramas profesionales para visualizar:
 - Árboles de decisión
 - Arquitecturas de marketing
 
-FORMATO DE DIAGRAMAS:
-Cuando generes un diagrama, usa este formato exacto:
+FORMATO DE DIAGRAMAS - CRITICO, SEGUIR EXACTAMENTE:
+SIEMPRE envuelve diagramas en triple backticks. El formato EXACTO es:
 
 \`\`\`mermaid
 graph TD
@@ -224,7 +224,11 @@ graph TD
     C -->|"No"| E["Resultado B"]
 \`\`\`
 
+NUNCA escribas diagramas sin los triple backticks de apertura y cierre.
+NUNCA escribas "mermaid" suelto sin los backticks antes.
+
 REGLAS MERMAID OBLIGATORIAS:
+- SIEMPRE abre con \`\`\`mermaid y cierra con \`\`\` (triple backticks)
 - SIEMPRE usa comillas dobles en labels: A["Texto"] NO A[Texto]
 - SIEMPRE usa comillas en decisiones: C{"Pregunta?"} NO C{Pregunta?}
 - SIEMPRE usa comillas en edge labels: -->|"Si"| NO -->|Sí|

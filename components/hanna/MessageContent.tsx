@@ -13,19 +13,76 @@ type ContentPart =
   | { type: 'mermaid'; content: string }
   | { type: 'code'; language: string; content: string }
 
+// Mermaid diagram start keywords
+const MERMAID_STARTS = /^(graph\s+(TD|TB|BT|LR|RL)|flowchart\s+(TD|TB|BT|LR|RL)|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|journey|gitgraph|mindmap|timeline)/
+
+// Detect if a line looks like mermaid diagram content (nodes, edges, etc.)
+function isMermaidLine(line: string): boolean {
+  const trimmed = line.trim()
+  if (!trimmed) return true // blank lines inside diagram are OK
+  // Node definitions: A[...], A(...), A{...}, A>...], A((..))
+  if (/^\w+[\[({>]/.test(trimmed)) return true
+  // Edge connections: -->, ---, -.->
+  if (/-->|---|\.-|==>|~~~/.test(trimmed)) return true
+  // Mermaid keywords
+  if (/^(subgraph|end|participant|activate|deactivate|loop|alt|else|opt|par|note|title|section|dateFormat|axisFormat)/.test(trimmed)) return true
+  // Labels and styles: style, class, click, linkStyle
+  if (/^(style|class |click|linkStyle)/.test(trimmed)) return true
+  // Edge labels: |text|
+  if (/\|[^|]+\|/.test(trimmed)) return true
+  return false
+}
+
 /**
  * Splits raw message text into typed parts: plain text, mermaid diagrams, and code blocks.
+ * Handles three scenarios:
+ * 1. Fenced code blocks: ```mermaid\n...\n```
+ * 2. Unfenced with keyword: "mermaid\ngraph TD\n..."
+ * 3. Direct mermaid start: "graph TD\n..." at start of line
  */
 function parseContent(raw: string): ContentPart[] {
-  // Match both mermaid and generic fenced code blocks
+  // Step 1: Normalize unfenced mermaid blocks by wrapping them in fences
+  // This handles cases where the AI forgets the backticks
+  let normalized = raw
+
+  // Pattern 2: "mermaid\n" followed by a mermaid start keyword (AI wrote "mermaid" without backticks)
+  normalized = normalized.replace(
+    /(?:^|\n)mermaid\n((?:graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|journey|gitgraph|mindmap|timeline)[\s\S]*?)(?=\n\n[A-ZÁÉÍÓÚÑa-záéíóúñ¿¡]|\n\n$|$)/gm,
+    (match, diagramCode) => {
+      // Verify it actually looks like mermaid content
+      const lines = diagramCode.trim().split('\n')
+      if (lines.length >= 2 && MERMAID_STARTS.test(lines[0].trim())) {
+        return `\n\`\`\`mermaid\n${diagramCode.trim()}\n\`\`\``
+      }
+      return match
+    }
+  )
+
+  // Pattern 3: Direct mermaid diagram start at beginning of line without "mermaid" keyword
+  // Only if not already inside a code fence
+  if (!normalized.includes('```mermaid')) {
+    normalized = normalized.replace(
+      /(?:^|\n)((?:graph|flowchart)\s+(?:TD|TB|BT|LR|RL)\n(?:[ \t]*\w+[\[({][\s\S]*?)?)(?=\n\n[A-ZÁÉÍÓÚÑa-záéíóúñ¿¡]|\n\n$|$)/gm,
+      (match, diagramCode) => {
+        const lines = diagramCode.trim().split('\n')
+        // Must have at least the graph declaration + 2 lines of content
+        if (lines.length >= 3 && lines.slice(1).some(l => isMermaidLine(l))) {
+          return `\n\`\`\`mermaid\n${diagramCode.trim()}\n\`\`\``
+        }
+        return match
+      }
+    )
+  }
+
+  // Step 2: Parse fenced code blocks (now including our normalized ones)
   const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g
   const parts: ContentPart[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
 
-  while ((match = codeBlockRegex.exec(raw)) !== null) {
+  while ((match = codeBlockRegex.exec(normalized)) !== null) {
     if (match.index > lastIndex) {
-      parts.push({ type: 'text', content: raw.substring(lastIndex, match.index) })
+      parts.push({ type: 'text', content: normalized.substring(lastIndex, match.index) })
     }
 
     const language = match[1].toLowerCase()
@@ -40,12 +97,12 @@ function parseContent(raw: string): ContentPart[] {
     lastIndex = match.index + match[0].length
   }
 
-  if (lastIndex < raw.length) {
-    parts.push({ type: 'text', content: raw.substring(lastIndex) })
+  if (lastIndex < normalized.length) {
+    parts.push({ type: 'text', content: normalized.substring(lastIndex) })
   }
 
   if (parts.length === 0) {
-    parts.push({ type: 'text', content: raw })
+    parts.push({ type: 'text', content: normalized })
   }
 
   return parts
