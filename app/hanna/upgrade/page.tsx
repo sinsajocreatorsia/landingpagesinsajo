@@ -13,7 +13,8 @@ import {
   Sparkles,
   Zap,
   Building2,
-  Flame,
+  Heart,
+  Timer,
 } from "lucide-react";
 
 type PlanType = "pro" | "business";
@@ -48,12 +49,10 @@ function UpgradeContent() {
       .then((data: LaunchData) => {
         if (data.active) {
           setLaunch(data);
-          setCouponCode("FUNDADOR");
+          setCouponCode("HANNAPRO");
           setCouponValid(true);
           setCouponMessage(
-            selectedPlan === "business"
-              ? "59% de descuento en tu primer mes"
-              : "50% de descuento en tu primer mes"
+            "50% de descuento en tu primer mes"
           );
         }
       })
@@ -62,12 +61,10 @@ function UpgradeContent() {
 
   // Update coupon message when plan changes during launch
   useEffect(() => {
-    if (launch?.active && couponCode.toUpperCase() === "FUNDADOR") {
+    if (launch?.active && couponCode.toUpperCase() === "HANNAPRO") {
       setCouponValid(true);
       setCouponMessage(
-        selectedPlan === "business"
-          ? "59% de descuento en tu primer mes"
-          : "50% de descuento en tu primer mes"
+        "50% de descuento en tu primer mes"
       );
     }
   }, [selectedPlan, launch, couponCode]);
@@ -187,26 +184,35 @@ function UpgradeContent() {
         </motion.div>
       )}
 
-      {/* Launch Banner */}
+      {/* March Promo Banner */}
       {isLaunchActive && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-4 mb-8 text-center"
+          className="bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-pink-500/20 border border-pink-400/30 rounded-2xl p-5 mb-8 text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Flame className="w-5 h-5 text-amber-400" />
-            <span className="text-amber-300 font-bold text-lg">
-              OFERTA DE LANZAMIENTO
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Heart className="w-5 h-5 text-pink-400" />
+            <span className="text-pink-300 font-bold text-lg uppercase tracking-wide">
+              Oferta Especial de Marzo
             </span>
-            <Flame className="w-5 h-5 text-amber-400" />
+            <Heart className="w-5 h-5 text-pink-400" />
           </div>
-          <p className="text-white/80 text-sm">
-            Solo para los primeros {launch?.total} fundadores.{" "}
-            <span className="text-amber-300 font-semibold">
-              Quedan {launch?.remaining} spots
-            </span>
+          <p className="text-white/90 text-sm mb-3">
+            Celebramos el <span className="text-pink-300 font-semibold">Dia Internacional de la Mujer</span>.
+            {" "}Las mujeres emprendedoras con codigo de descuento obtienen{" "}
+            <span className="text-pink-300 font-bold">50% OFF</span> en su primer mes.
           </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-pink-400/30 rounded-full">
+            <Timer className="w-4 h-4 text-pink-300" />
+            <span className="text-white/90 text-sm">
+              Cupos con descuento disponibles:{" "}
+              <span className="text-pink-300 font-bold text-base">
+                {launch?.remaining}
+              </span>
+              <span className="text-white/50"> / {launch?.total}</span>
+            </span>
+          </div>
         </motion.div>
       )}
 
@@ -282,7 +288,7 @@ function UpgradeContent() {
                     </span>
                     <span className="text-white/50 text-sm">/mes</span>
                     <p className="text-white/40 text-xs mt-1">
-                      Primer mes, luego ${plan.price}/mes
+                      Promo marzo, luego ${plan.price}/mes
                     </p>
                   </>
                 ) : (
@@ -349,8 +355,8 @@ function UpgradeContent() {
                   ${displayPrice}
                 </span>
                 <span className="text-white/50">/mes</span>
-                <p className="text-green-400/70 text-xs mt-1">
-                  Precio fundador - primer mes
+                <p className="text-pink-400/70 text-xs mt-1">
+                  Promo marzo - primer mes
                 </p>
               </>
             ) : (
@@ -368,7 +374,7 @@ function UpgradeContent() {
         <div className="mb-6">
           <label className="block text-sm font-medium text-white/80 mb-2">
             <Gift className="inline w-4 h-4 mr-1" />
-            {isLaunchActive ? "Cupón de lanzamiento aplicado" : "¿Tienes un cupón?"}
+            {isLaunchActive ? "Cupon de marzo aplicado" : "¿Tienes un cupon?"}
           </label>
           <div className="flex gap-2">
             <input
@@ -380,14 +386,14 @@ function UpgradeContent() {
                 setCouponMessage(null);
               }}
               placeholder="INGRESA TU CÓDIGO"
-              readOnly={isLaunchActive && couponCode.toUpperCase() === "FUNDADOR"}
+              readOnly={isLaunchActive && couponCode.toUpperCase() === "HANNAPRO"}
               className={`flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase text-sm ${
-                isLaunchActive && couponCode.toUpperCase() === "FUNDADOR"
+                isLaunchActive && couponCode.toUpperCase() === "HANNAPRO"
                   ? "border-green-500/30 bg-green-500/10"
                   : ""
               }`}
             />
-            {!(isLaunchActive && couponCode.toUpperCase() === "FUNDADOR") && (
+            {!(isLaunchActive && couponCode.toUpperCase() === "HANNAPRO") && (
               <button
                 onClick={validateCoupon}
                 className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white/80 hover:bg-white/20 transition-all text-sm"
@@ -444,9 +450,9 @@ function UpgradeContent() {
                 <Crown className="w-5 h-5" />
               )}
               {isLaunchActive
-                ? `Ser Fundador ${selectedPlanData.name}`
+                ? `Aprovechar Promo ${selectedPlanData.name}`
                 : couponValid
-                  ? "Continuar con cupón"
+                  ? "Continuar con cupon"
                   : `Actualizar a ${selectedPlanData.name}`}
             </>
           )}
