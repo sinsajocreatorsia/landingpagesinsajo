@@ -9,7 +9,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Sparkles
+  Sparkles,
+  ClipboardList,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -41,7 +42,12 @@ const navigation = [
     icon: BarChart3,
   },
   {
-    name: 'Configuración',
+    name: 'Audit Log',
+    href: '/admin/audit',
+    icon: ClipboardList,
+  },
+  {
+    name: 'Configuracion',
     href: '/admin/settings',
     icon: Settings,
   },

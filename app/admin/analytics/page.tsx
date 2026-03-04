@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Zap,
   Target,
+  AlertTriangle,
 } from 'lucide-react'
 
 interface AnalyticsData {
@@ -48,6 +49,18 @@ interface AnalyticsData {
     plan: Record<string, number>
     category: Record<string, number>
     model: Record<string, number>
+  }
+  errors: {
+    totalErrors: number
+    errorRate: number
+    errorsByModel: Record<string, number>
+    errorsPerDay: Record<string, number>
+    recentErrors: Array<{
+      model: string
+      error_message: string
+      user_plan: string
+      created_at: string
+    }>
   }
   profitability: {
     proUsers: number
@@ -484,6 +497,74 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
+
+      {/* Error Metrics */}
+      {data.errors && (data.errors.totalErrors > 0 || true) && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-500" />
+            Errores de API
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-red-50 rounded-lg p-4">
+              <p className="text-sm text-red-600 mb-1">Total errores</p>
+              <p className="text-2xl font-bold text-red-700">{data.errors.totalErrors}</p>
+            </div>
+            <div className="bg-orange-50 rounded-lg p-4">
+              <p className="text-sm text-orange-600 mb-1">Error rate</p>
+              <p className="text-2xl font-bold text-orange-700">{data.errors.errorRate}%</p>
+            </div>
+            <div className="bg-green-50 rounded-lg p-4">
+              <p className="text-sm text-green-600 mb-1">Requests exitosos</p>
+              <p className="text-2xl font-bold text-green-700">
+                {data.usage.totalMessages - data.errors.totalErrors}
+              </p>
+            </div>
+          </div>
+
+          {Object.keys(data.errors.errorsByModel).length > 0 && (
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-700 mb-2">Errores por modelo</p>
+              <div className="space-y-2">
+                {Object.entries(data.errors.errorsByModel)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([model, count]) => (
+                    <div key={model} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600 truncate max-w-[60%]" title={model}>
+                        {model.split('/').pop() || model}
+                      </span>
+                      <span className="text-red-600 font-medium">{count} errores</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {data.errors.recentErrors.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Errores recientes</p>
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {data.errors.recentErrors.map((err, i) => (
+                  <div key={i} className="flex items-start gap-3 text-sm p-2 bg-gray-50 rounded-lg">
+                    <span className="text-gray-400 whitespace-nowrap">
+                      {new Date(err.created_at).toLocaleDateString('es-ES', {
+                        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+                      })}
+                    </span>
+                    <span className="text-gray-500 whitespace-nowrap">
+                      {(err.model as string)?.split('/').pop() || 'N/A'}
+                    </span>
+                    <span className="text-red-600 truncate" title={err.error_message}>
+                      {err.error_message}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Feedback Detail */}
       {data.quality.totalFeedback > 0 && (

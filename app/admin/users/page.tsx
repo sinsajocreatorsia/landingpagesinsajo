@@ -29,6 +29,9 @@ interface User {
   messages_today: number
   created_at: string
   avatar_url: string | null
+  total_cost: number
+  total_messages: number
+  last_api_use: string | null
 }
 
 interface UsersResponse {
@@ -754,6 +757,8 @@ export default function UsersPage() {
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Mensajes Hoy</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Costo Total</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Msgs Total</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Registro</th>
                     <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                   </tr>
@@ -790,6 +795,10 @@ export default function UsersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 tabular-nums">{user.messages_today}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600 tabular-nums">
+                        {user.total_cost > 0 ? `$${user.total_cost.toFixed(4)}` : '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 tabular-nums">{user.total_messages || '-'}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {new Date(user.created_at).toLocaleDateString('es-ES', {
                           day: '2-digit',

@@ -14,6 +14,9 @@ interface UserListItem {
   created_at: string | undefined
   last_sign_in_at: string | undefined
   is_admin: boolean
+  total_cost: number
+  total_messages: number
+  last_api_use: string | null
 }
 
 /**
@@ -78,9 +81,30 @@ export async function GET(request: Request) {
       }
     }
 
-    // 4. Merge auth + profile + admin data
+    // 4. Fetch aggregated API usage costs per user
+    const { data: usageLogs } = await (supabaseAdmin
+      .from('api_usage_logs') as ReturnType<typeof supabaseAdmin.from>)
+      .select('user_id, total_cost, created_at')
+      .in('user_id', userIds)
+
+    const costMap = new Map<string, { total_cost: number; total_messages: number; last_api_use: string | null }>()
+    if (usageLogs) {
+      for (const log of usageLogs as Record<string, unknown>[]) {
+        const uid = log.user_id as string
+        const existing = costMap.get(uid) || { total_cost: 0, total_messages: 0, last_api_use: null }
+        existing.total_cost += (log.total_cost as number) || 0
+        existing.total_messages += 1
+        const logDate = log.created_at as string
+        if (!existing.last_api_use || logDate > existing.last_api_use) {
+          existing.last_api_use = logDate
+        }
+        costMap.set(uid, existing)
+      }
+    }
+
     let users: UserListItem[] = authUsers.map((authUser) => {
       const profile = profileMap.get(authUser.id)
+      const costs = costMap.get(authUser.id)
       return {
         id: authUser.id,
         email: authUser.email,
@@ -91,6 +115,9 @@ export async function GET(request: Request) {
         created_at: authUser.created_at,
         last_sign_in_at: authUser.last_sign_in_at,
         is_admin: adminMap.has(authUser.id),
+        total_cost: costs ? Math.round(costs.total_cost * 10000) / 10000 : 0,
+        total_messages: costs?.total_messages ?? 0,
+        last_api_use: costs?.last_api_use ?? null,
       }
     })
 

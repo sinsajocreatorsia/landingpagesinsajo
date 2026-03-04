@@ -102,6 +102,33 @@ export async function GET(request: Request) {
       modelDistribution[model] = (modelDistribution[model] || 0) + 1
     }
 
+    // --- Error Metrics ---
+    const failedRecords = records.filter(r => r.was_successful === false)
+    const totalErrors = failedRecords.length
+    const errorRate = totalMessages > 0 ? (totalErrors / totalMessages) * 100 : 0
+
+    const errorsByModel: Record<string, number> = {}
+    for (const r of failedRecords) {
+      const model = (r.model as string) || 'unknown'
+      errorsByModel[model] = (errorsByModel[model] || 0) + 1
+    }
+
+    const errorsPerDay: Record<string, number> = {}
+    for (const r of failedRecords) {
+      const day = (r.created_at as string).split('T')[0]
+      errorsPerDay[day] = (errorsPerDay[day] || 0) + 1
+    }
+
+    const recentErrors = failedRecords
+      .sort((a, b) => new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime())
+      .slice(0, 20)
+      .map(r => ({
+        model: r.model,
+        error_message: r.error_message || 'Error desconocido',
+        user_plan: r.user_plan,
+        created_at: r.created_at,
+      }))
+
     // --- Profitability ---
     // Fetch Pro subscription count for revenue estimate
     const { count: proUsers } = await supabaseAdmin
@@ -145,6 +172,13 @@ export async function GET(request: Request) {
         plan: planDistribution,
         category: categoryDistribution,
         model: modelDistribution,
+      },
+      errors: {
+        totalErrors,
+        errorRate: Math.round(errorRate * 100) / 100,
+        errorsByModel,
+        errorsPerDay,
+        recentErrors,
       },
       profitability: {
         proUsers: proUsers || 0,

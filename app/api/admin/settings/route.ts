@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase'
+import { logAdminAction } from '@/lib/security/audit'
 
 export async function GET() {
   const { error } = await requireAdmin()
@@ -62,7 +63,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { role, error } = await requireAdmin()
+  const { user: adminCaller, role, error } = await requireAdmin()
   if (error) return error
 
   if (role !== 'super_admin') {
@@ -89,6 +90,13 @@ export async function POST(request: Request) {
         throw insertError
       }
 
+      await logAdminAction({
+        adminUserId: adminCaller!.id,
+        action: 'add_admin_email',
+        targetType: 'admin_email',
+        details: { email: email.toLowerCase().trim() },
+      })
+
       return NextResponse.json({ success: true, message: `${email} agregado a la lista de admins` })
     }
 
@@ -101,6 +109,13 @@ export async function POST(request: Request) {
         .from('admin_emails') as ReturnType<typeof supabaseAdmin.from>)
         .delete()
         .eq('email', email.toLowerCase().trim())
+
+      await logAdminAction({
+        adminUserId: adminCaller!.id,
+        action: 'remove_admin_email',
+        targetType: 'admin_email',
+        details: { email: email.toLowerCase().trim() },
+      })
 
       return NextResponse.json({ success: true, message: `${email} removido de la lista de admins` })
     }
