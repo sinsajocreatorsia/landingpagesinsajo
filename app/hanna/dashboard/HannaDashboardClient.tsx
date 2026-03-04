@@ -95,7 +95,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [interimTranscript, setInterimTranscript] = useState('')
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const recognitionRef = useRef<VoiceRecognition | null>(null)
 
   const supabase = createBrowserClient(
@@ -896,7 +896,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
             <div className="flex-1 relative">
               <textarea
-                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                ref={inputRef}
                 value={inputText}
                 onChange={(e) => {
                   setInputText(e.target.value)
