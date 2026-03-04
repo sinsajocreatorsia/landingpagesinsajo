@@ -857,11 +857,24 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             )}
 
             <div className="flex-1 relative">
-              <input
-                ref={inputRef}
-                type="text"
+              <textarea
+                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => {
+                  setInputText(e.target.value)
+                  // Auto-resize textarea
+                  e.target.style.height = 'auto'
+                  e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    if (inputText.trim() && !isLoading) {
+                      const form = e.currentTarget.closest('form')
+                      if (form) form.requestSubmit()
+                    }
+                  }
+                }}
                 placeholder={
                   isListening
                     ? 'Escuchando...'
@@ -870,7 +883,8 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                     : 'Actualiza a Pro para continuar...'
                 }
                 disabled={isLoading || isListening || (profile.plan === 'free' && messagesRemaining <= 0)}
-                className="w-full px-5 py-4 rounded-full border focus:outline-none focus:ring-2 disabled:opacity-50"
+                rows={1}
+                className="w-full px-5 py-4 rounded-3xl border focus:outline-none focus:ring-2 disabled:opacity-50 resize-none overflow-hidden"
                 style={{ backgroundColor: theme.colors.inputBg, borderColor: theme.colors.inputBorder, color: theme.colors.textPrimary, '--tw-ring-color': theme.colors.accent + '33' } as React.CSSProperties}
               />
             </div>
