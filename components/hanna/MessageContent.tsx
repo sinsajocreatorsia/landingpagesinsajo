@@ -66,7 +66,7 @@ function parseContent(raw: string): ContentPart[] {
       (match, diagramCode) => {
         const lines = diagramCode.trim().split('\n')
         // Must have at least the graph declaration + 2 lines of content
-        if (lines.length >= 3 && lines.slice(1).some(l => isMermaidLine(l))) {
+        if (lines.length >= 3 && lines.slice(1).some((l: string) => isMermaidLine(l))) {
           return `\n\`\`\`mermaid\n${diagramCode.trim()}\n\`\`\``
         }
         return match
