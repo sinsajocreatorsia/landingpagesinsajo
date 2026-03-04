@@ -49,15 +49,17 @@ export async function GET(request: NextRequest) {
 
         // Create profile if it doesn't exist (use admin client to bypass RLS)
         if (!profile) {
-          const { error: insertError } = await supabaseAdmin.from('profiles').insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name,
-            avatar_url: user.user_metadata?.avatar_url,
-            plan: 'free',
-            subscription_status: 'active',
-            messages_today: 0,
-          })
+          const { error: insertError } = await (supabaseAdmin
+            .from('profiles') as ReturnType<typeof supabaseAdmin.from>)
+            .insert({
+              id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+              avatar_url: user.user_metadata?.avatar_url,
+              plan: 'free',
+              subscription_status: 'active',
+              messages_today: 0,
+            } as Record<string, unknown>)
 
           if (insertError) {
             console.error('Profile creation failed:', insertError)
