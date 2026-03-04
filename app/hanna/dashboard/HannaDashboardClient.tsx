@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -74,12 +74,14 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const { theme, themeId, setTheme, themes: allThemes } = useTheme()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [messagesRemaining, setMessagesRemaining] = useState(profile.messagesRemaining)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [loadingSession, setLoadingSession] = useState(false)
 
   // Tone configuration
   const [showToneConfig, setShowToneConfig] = useState(false)
@@ -168,9 +170,10 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
   }, [user.fullName, toneConfig])
 
-  // Initial greeting (after tone config)
+  // Initial greeting (after tone config) - skip if loading a session from URL
   useEffect(() => {
     if (toneConfig === null && !showToneConfig) return // Wait for config
+    if (searchParams.get('session')) return // Skip greeting when resuming a session
 
     setMessages([{
       id: 'initial',
@@ -178,7 +181,35 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       content: getGreeting(),
       timestamp: new Date(),
     }])
-  }, [user.fullName, toneConfig, showToneConfig, getGreeting])
+  }, [user.fullName, toneConfig, showToneConfig, getGreeting, searchParams])
+
+  // Load existing session from URL query param (?session=SESSION_ID)
+  useEffect(() => {
+    const resumeSessionId = searchParams.get('session')
+    if (!resumeSessionId) return
+
+    async function loadSession() {
+      setLoadingSession(true)
+      try {
+        const res = await fetch(`/api/hanna/sessions/${resumeSessionId}`)
+        const data = await res.json()
+        if (data.success && data.messages?.length > 0) {
+          setSessionId(resumeSessionId)
+          setMessages(data.messages.map((msg: { id: string; role: string; content: string; createdAt: string }) => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+            timestamp: new Date(msg.createdAt),
+          })))
+        }
+      } catch (error) {
+        console.error('Error loading session:', error)
+      } finally {
+        setLoadingSession(false)
+      }
+    }
+    loadSession()
+  }, [searchParams])
 
   // Auto-scroll
   useEffect(() => {
@@ -218,6 +249,8 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     setSessionId(null)
     setMessages([])
     setSidebarOpen(false)
+    // Clear session query param from URL without reload
+    window.history.replaceState(null, '', '/hanna/dashboard')
     setMessages([{
       id: 'initial',
       role: 'assistant',
@@ -675,6 +708,11 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {loadingSession && (
+            <div className="flex justify-center py-10">
+              <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.colors.accent }} />
+            </div>
+          )}
           <AnimatePresence>
             {messages.map((message) => (
               <motion.div

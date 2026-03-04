@@ -12,6 +12,7 @@ import {
   Loader2,
   Search,
   History as HistoryIcon,
+  ArrowRight,
 } from 'lucide-react'
 
 interface Session {
@@ -219,37 +220,50 @@ export default function HistoryPage() {
             </div>
 
             {/* Message Preview */}
-            <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden flex flex-col">
               {loadingMessages ? (
                 <div className="flex justify-center py-20">
                   <Loader2 className="w-6 h-6 text-[#2CB6D7] animate-spin" />
                 </div>
               ) : selectedSession && sessionMessages.length > 0 ? (
-                <div className="max-h-[70vh] overflow-y-auto p-4 space-y-4">
-                  <AnimatePresence>
-                    {sessionMessages.map((msg) => (
-                      <motion.div
-                        key={msg.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
-                            msg.role === 'user'
-                              ? 'bg-[#C7517E] text-white rounded-tr-sm'
-                              : 'bg-white/10 text-white/90 rounded-tl-sm border border-white/10'
-                          }`}
+                <>
+                  <div className="flex-1 max-h-[60vh] overflow-y-auto p-4 space-y-4">
+                    <AnimatePresence>
+                      {sessionMessages.map((msg) => (
+                        <motion.div
+                          key={msg.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                          <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-white/50' : 'text-white/30'}`}>
-                            {new Date(msg.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                              msg.role === 'user'
+                                ? 'bg-[#C7517E] text-white rounded-tr-sm'
+                                : 'bg-white/10 text-white/90 rounded-tl-sm border border-white/10'
+                            }`}
+                          >
+                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                            <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-white/50' : 'text-white/30'}`}>
+                              {new Date(msg.createdAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                  {/* Continue conversation button */}
+                  <div className="p-4 border-t border-white/10">
+                    <Link
+                      href={`/hanna/dashboard?session=${selectedSession}`}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-medium rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
+                    >
+                      <MessageSquare className="w-5 h-5" />
+                      Continuar conversación
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-white/30">
                   <MessageSquare className="w-12 h-12 mb-3" />
