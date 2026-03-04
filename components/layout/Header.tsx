@@ -17,7 +17,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Hide this header on pages that have their own header/navigation
-  if (pathname?.startsWith('/academy/workshop') || pathname?.startsWith('/hanna')) {
+  if (pathname?.startsWith('/academy/workshop') || pathname?.startsWith('/hanna') || pathname?.startsWith('/admin')) {
     return null
   }
 
