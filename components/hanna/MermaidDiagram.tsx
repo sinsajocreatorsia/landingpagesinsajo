@@ -35,7 +35,11 @@ function initMermaid() {
     flowchart: {
       htmlLabels: true,
       curve: 'basis',
-      padding: 12,
+      padding: 15,
+      useMaxWidth: true,
+      wrappingWidth: 180,
+      nodeSpacing: 30,
+      rankSpacing: 40,
     },
   })
   mermaidInitialized = true
@@ -72,7 +76,43 @@ function sanitizeMermaidCode(raw: string): string {
   code = code.replace(/\[""/g, '["').replace(/""\]/g, '"]')
   code = code.replace(/\{""/g, '{"').replace(/""\}/g, '"}')
 
+  // Break long labels into multiple lines using <br/> for better readability
+  // Applies to labels inside [] and {} that are longer than 25 chars
+  code = code.replace(/\["([^"]{26,})"\]/g, (match, label) => {
+    return `["${wrapText(label, 25)}"]`
+  })
+  code = code.replace(/\[([^\]"]{26,})\]/g, (match, label) => {
+    return `["${wrapText(label, 25)}"]`
+  })
+  code = code.replace(/\{"([^"]{26,})"\}/g, (match, label) => {
+    return `{"${wrapText(label, 25)}"}`
+  })
+  code = code.replace(/\{([^}"]{26,})\}/g, (match, label) => {
+    return `{"${wrapText(label, 25)}"}`
+  })
+
   return code
+}
+
+/**
+ * Wrap text at word boundaries using <br/> for Mermaid HTML labels.
+ */
+function wrapText(text: string, maxWidth: number): string {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (const word of words) {
+    if (currentLine.length + word.length + 1 > maxWidth && currentLine) {
+      lines.push(currentLine)
+      currentLine = word
+    } else {
+      currentLine = currentLine ? `${currentLine} ${word}` : word
+    }
+  }
+  if (currentLine) lines.push(currentLine)
+
+  return lines.join('<br/>')
 }
 
 interface MermaidDiagramProps {
@@ -166,7 +206,7 @@ export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
         {/* SVG container */}
         <div
           ref={containerRef}
-          className="p-4 bg-gradient-to-br from-slate-900/50 to-slate-800/50 overflow-x-auto [&_svg]:mx-auto [&_svg]:max-w-full"
+          className="p-4 bg-gradient-to-br from-slate-900/50 to-slate-800/50 overflow-x-auto [&_svg]:mx-auto [&_svg]:max-w-full [&_svg]:h-auto [&_.nodeLabel]:whitespace-normal [&_.nodeLabel]:text-xs [&_.nodeLabel]:leading-tight"
           dangerouslySetInnerHTML={{ __html: svg }}
         />
       </div>
