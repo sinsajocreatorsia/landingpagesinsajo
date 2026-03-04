@@ -49,11 +49,6 @@ function UpgradeContent() {
       .then((data: LaunchData) => {
         if (data.active) {
           setLaunch(data);
-          setCouponCode("HANNAPRO");
-          setCouponValid(true);
-          setCouponMessage(
-            "50% de descuento en tu primer mes"
-          );
         }
       })
       .catch(() => {});
@@ -61,13 +56,12 @@ function UpgradeContent() {
 
   // Update coupon message when plan changes during launch
   useEffect(() => {
-    if (launch?.active && couponCode.toUpperCase() === "HANNAPRO") {
-      setCouponValid(true);
+    if (launch?.active && couponValid && couponCode) {
       setCouponMessage(
         "50% de descuento en tu primer mes"
       );
     }
-  }, [selectedPlan, launch, couponCode]);
+  }, [selectedPlan, launch, couponCode, couponValid]);
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
@@ -374,7 +368,7 @@ function UpgradeContent() {
         <div className="mb-6">
           <label className="block text-sm font-medium text-white/80 mb-2">
             <Gift className="inline w-4 h-4 mr-1" />
-            {isLaunchActive ? "Cupon de marzo aplicado" : "¿Tienes un cupon?"}
+            ¿Tienes un cupon de descuento?
           </label>
           <div className="flex gap-2">
             <input
@@ -386,14 +380,9 @@ function UpgradeContent() {
                 setCouponMessage(null);
               }}
               placeholder="INGRESA TU CÓDIGO"
-              readOnly={isLaunchActive && couponCode.toUpperCase() === "HANNAPRO"}
-              className={`flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase text-sm ${
-                isLaunchActive && couponCode.toUpperCase() === "HANNAPRO"
-                  ? "border-green-500/30 bg-green-500/10"
-                  : ""
-              }`}
+              className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#2CB6D7] uppercase text-sm"
             />
-            {!(isLaunchActive && couponCode.toUpperCase() === "HANNAPRO") && (
+            {!couponValid && (
               <button
                 onClick={validateCoupon}
                 className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white/80 hover:bg-white/20 transition-all text-sm"
