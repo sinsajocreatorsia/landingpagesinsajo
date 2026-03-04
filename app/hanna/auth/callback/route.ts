@@ -47,11 +47,11 @@ export async function GET(request: NextRequest) {
           .eq('id', user.id)
           .single()
 
-        // Create profile if it doesn't exist (use admin client to bypass RLS)
+        // Ensure profile exists (use admin client to bypass RLS, upsert to handle existing)
         if (!profile) {
-          const { error: insertError } = await (supabaseAdmin
+          const { error: upsertError } = await (supabaseAdmin
             .from('profiles') as ReturnType<typeof supabaseAdmin.from>)
-            .insert({
+            .upsert({
               id: user.id,
               email: user.email,
               full_name: user.user_metadata?.full_name || user.user_metadata?.name,
@@ -59,11 +59,11 @@ export async function GET(request: NextRequest) {
               plan: 'free',
               subscription_status: 'active',
               messages_today: 0,
-            } as Record<string, unknown>)
+            } as Record<string, unknown>, { onConflict: 'id', ignoreDuplicates: true })
 
-          if (insertError) {
-            console.error('Profile creation failed:', insertError)
-            return NextResponse.redirect(`${origin}/hanna/login?error=auth_failed&detail=profile_creation`)
+          if (upsertError) {
+            console.error('Profile upsert failed:', upsertError)
+            // Don't block login - profile might already exist via trigger
           }
         }
 
