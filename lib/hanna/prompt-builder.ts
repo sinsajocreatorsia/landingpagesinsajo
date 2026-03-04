@@ -218,11 +218,19 @@ Cuando generes un diagrama, usa este formato exacto:
 
 \`\`\`mermaid
 graph TD
-    A[Inicio] --> B[Paso 1]
-    B --> C{Decisión?}
-    C -->|Sí| D[Resultado A]
-    C -->|No| E[Resultado B]
+    A["Inicio"] --> B["Paso 1"]
+    B --> C{"Decision?"}
+    C -->|"Si"| D["Resultado A"]
+    C -->|"No"| E["Resultado B"]
 \`\`\`
+
+REGLAS MERMAID OBLIGATORIAS:
+- SIEMPRE usa comillas dobles en labels: A["Texto"] NO A[Texto]
+- SIEMPRE usa comillas en decisiones: C{"Pregunta?"} NO C{Pregunta?}
+- SIEMPRE usa comillas en edge labels: -->|"Si"| NO -->|Sí|
+- NUNCA uses caracteres especiales sin comillas (¿, ñ, paréntesis, acentos)
+- EVITA paréntesis () dentro de [] ya que Mermaid los interpreta como nodos
+- Usa texto simple sin emojis en los nodos del diagrama
 
 Tipos de diagramas disponibles:
 - \`graph TD\` o \`graph LR\` - Flowcharts (vertical u horizontal)

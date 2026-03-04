@@ -41,6 +41,40 @@ function initMermaid() {
   mermaidInitialized = true
 }
 
+/**
+ * Sanitize Mermaid code to fix common syntax errors from AI-generated diagrams.
+ * - Wraps node labels containing special chars in quotes
+ * - Fixes parentheses inside square brackets (Mermaid interprets () as round nodes)
+ * - Handles Spanish characters (¿, ñ, accents)
+ */
+function sanitizeMermaidCode(raw: string): string {
+  let code = raw
+    .replace(/\r\n/g, '\n')
+    .replace(/\t/g, '    ')
+    .trim()
+
+  // Fix node labels in square brackets [] that contain parentheses
+  // e.g., A[Descartar contacto (por ahora)] → A["Descartar contacto (por ahora)"]
+  code = code.replace(/\[([^\]]*\([^\]]*\)[^\]]*)\]/g, '["$1"]')
+
+  // Fix decision nodes in curly braces {} that contain special chars like ¿
+  // e.g., C{¿Respuesta?} → C{"¿Respuesta?"}
+  code = code.replace(/\{([^}]*[¿¡áéíóúñÁÉÍÓÚÑ][^}]*)\}/g, '{"$1"}')
+
+  // Fix edge labels with special chars: -->|Sí| → -->|"Sí"|
+  // Only quote if not already quoted and contains special chars
+  code = code.replace(/-->\|([^|]*[¿¡áéíóúñÁÉÍÓÚÑ][^|]*)\|/g, (match, label) => {
+    if (label.startsWith('"')) return match
+    return `-->|"${label}"|`
+  })
+
+  // Avoid double-quoting: ["["text"]"] → ["text"]
+  code = code.replace(/\[""/g, '["').replace(/""\]/g, '"]')
+  code = code.replace(/\{""/g, '{"').replace(/""\}/g, '"}')
+
+  return code
+}
+
 interface MermaidDiagramProps {
   chart: string
   className?: string
@@ -61,11 +95,7 @@ export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
     initMermaid()
 
     try {
-      // Clean up chart code - normalize whitespace and remove problematic characters
-      const cleanChart = chart
-        .replace(/\r\n/g, '\n')
-        .replace(/\t/g, '    ')
-        .trim()
+      const cleanChart = sanitizeMermaidCode(chart)
 
       const id = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       const { svg: renderedSvg } = await mermaid.render(id, cleanChart)
@@ -94,24 +124,23 @@ export function MermaidDiagram({ chart, className = '' }: MermaidDiagramProps) {
     )
   }
 
-  // Error state
+  // Error state - show as formatted code block instead of ugly error
   if (error) {
     return (
-      <div className={`my-3 rounded-xl overflow-hidden border border-red-500/20 ${className}`}>
-        <div className="px-4 py-3 bg-red-500/10 flex items-center justify-between">
-          <p className="text-sm text-red-300">Error al renderizar diagrama</p>
+      <div className={`my-3 rounded-xl overflow-hidden border border-white/10 ${className}`}>
+        <div className="px-3 py-1.5 bg-white/5 flex items-center justify-between border-b border-white/5">
+          <span className="text-[10px] text-white/30 uppercase tracking-wider font-medium">Diagrama</span>
           <button
             onClick={renderDiagram}
-            className="p-1 text-red-300 hover:text-red-200 transition-colors"
-            title="Reintentar"
+            className="p-1 text-white/30 hover:text-white/60 transition-colors"
+            title="Reintentar renderizado"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
-        <details className="px-4 py-2 bg-black/20">
-          <summary className="text-xs text-white/30 cursor-pointer hover:text-white/50">Ver código fuente</summary>
-          <pre className="mt-2 text-xs text-white/50 font-mono overflow-x-auto whitespace-pre-wrap">{chart}</pre>
-        </details>
+        <pre className="p-4 bg-black/20 overflow-x-auto">
+          <code className="text-xs font-mono text-white/60 leading-relaxed whitespace-pre-wrap">{chart}</code>
+        </pre>
       </div>
     )
   }
