@@ -66,7 +66,17 @@ export async function GET() {
     const profile = profileData as ProfileData | null
 
     if (!profile) {
-      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 })
+      // Return default free plan data instead of error
+      return NextResponse.json({
+        plan: 'free',
+        subscription_status: 'none',
+        plan_started_at: null,
+        plan_expires_at: null,
+        current_period_end: null,
+        cancel_at_period_end: false,
+        payment_method: null,
+        invoices: [],
+      })
     }
 
     // Base response

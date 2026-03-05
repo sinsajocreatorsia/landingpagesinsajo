@@ -171,7 +171,9 @@ export default function BillingPage() {
     )
   }
 
+  const isPaid = data?.plan === 'pro' || data?.plan === 'business'
   const isPro = data?.plan === 'pro'
+  const isBusiness = data?.plan === 'business'
   const isCancelling = data?.cancel_at_period_end === true
 
   return (
@@ -214,17 +216,23 @@ export default function BillingPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl font-bold text-white">
-                  {isPro ? 'Hanna Pro' : 'Hanna Free'}
+                  {isBusiness ? 'Hanna Business' : isPro ? 'Hanna Pro' : 'Hanna Free'}
                 </span>
                 <StatusBadge status={data?.subscription_status || 'none'} />
               </div>
-              {isPro && (
+              {isBusiness && (
                 <p className="text-white/60 text-sm">
-                  $19/mes
+                  $49/mes - Modelos premium + soporte prioritario
                   {data?.plan_started_at && ` - Miembro desde ${formatDate(data.plan_started_at)}`}
                 </p>
               )}
-              {!isPro && (
+              {isPro && (
+                <p className="text-white/60 text-sm">
+                  $19/mes - Mensajes ilimitados
+                  {data?.plan_started_at && ` - Miembro desde ${formatDate(data.plan_started_at)}`}
+                </p>
+              )}
+              {!isPaid && (
                 <p className="text-white/60 text-sm">5 mensajes por dia</p>
               )}
             </div>
@@ -244,8 +252,8 @@ export default function BillingPage() {
           )}
         </motion.div>
 
-        {/* Subscription Details (Pro only) */}
-        {isPro && (
+        {/* Subscription Details (Paid plans) */}
+        {isPaid && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -304,7 +312,7 @@ export default function BillingPage() {
         )}
 
         {/* Actions */}
-        {isPro && (
+        {isPaid && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -326,33 +334,59 @@ export default function BillingPage() {
           </motion.div>
         )}
 
-        {/* Upgrade CTA (Free only) */}
-        {!isPro && (
+        {/* Upgrade CTA (Free or Pro users) */}
+        {!isBusiness && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-2xl p-6 mb-6"
+            className="space-y-4 mb-6"
           >
-            <div className="flex items-center gap-3 mb-3">
-              <Sparkles className="w-6 h-6 text-[#C7517E]" />
-              <h3 className="text-white font-bold text-lg">Actualiza a Hanna Pro</h3>
+            {!isPaid && (
+              <div className="bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-2xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <Crown className="w-6 h-6 text-[#C7517E]" />
+                  <h3 className="text-white font-bold text-lg">Hanna Pro</h3>
+                </div>
+                <p className="text-white/60 mb-4">
+                  Mensajes ilimitados, voz, perfil de negocio personalizado y modelos IA Flash.
+                </p>
+                <Link
+                  href="/hanna/upgrade"
+                  className="inline-flex items-center gap-2 py-3 px-6 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
+                >
+                  <Crown className="w-5 h-5" />
+                  Actualizar a Pro - $19/mes
+                </Link>
+              </div>
+            )}
+
+            <div className="bg-gradient-to-r from-[#2CB6D7]/20 to-[#200F5D]/20 border border-[#2CB6D7]/30 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <Sparkles className="w-6 h-6 text-[#2CB6D7]" />
+                <h3 className="text-white font-bold text-lg">Hanna Business</h3>
+                {!isPaid && (
+                  <span className="px-2 py-0.5 bg-[#2CB6D7]/20 text-[#2CB6D7] text-xs font-bold rounded-full">
+                    RECOMENDADO
+                  </span>
+                )}
+              </div>
+              <p className="text-white/60 mb-4">
+                Modelos IA Premium (Gemini Pro + Claude), analisis avanzado, estrategia de marketing IA y soporte prioritario.
+              </p>
+              <Link
+                href="/hanna/upgrade"
+                className="inline-flex items-center gap-2 py-3 px-6 bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white font-semibold rounded-xl hover:from-[#36c5e6] hover:to-[#2CB6D7] transition-all"
+              >
+                <Sparkles className="w-5 h-5" />
+                {isPro ? 'Upgrade a Business - $49/mes' : 'Actualizar a Business - $49/mes'}
+              </Link>
             </div>
-            <p className="text-white/60 mb-4">
-              Mensajes ilimitados, voz, perfil de negocio personalizado y mas por solo $19/mes.
-            </p>
-            <Link
-              href="/hanna/upgrade"
-              className="inline-flex items-center gap-2 py-3 px-6 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
-            >
-              <Crown className="w-5 h-5" />
-              Actualizar a Pro - $19/mes
-            </Link>
           </motion.div>
         )}
 
-        {/* Invoice History (Pro only) */}
-        {isPro && data?.invoices && data.invoices.length > 0 && (
+        {/* Invoice History (Paid plans) */}
+        {isPaid && data?.invoices && data.invoices.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
