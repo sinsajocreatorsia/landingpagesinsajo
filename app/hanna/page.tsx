@@ -11,6 +11,18 @@ import {
   TrendingUp,
   Users,
   Star,
+  UserCircle,
+  Gift,
+  Megaphone,
+  PenTool,
+  Palette,
+  GitBranch,
+  Brain,
+  BarChart3,
+  Bell,
+  ChevronRight,
+  Zap,
+  ShieldCheck,
 } from 'lucide-react'
 
 const features = [
@@ -33,6 +45,80 @@ const features = [
     icon: TrendingUp,
     title: 'Aprende de Ti',
     description: 'Se adapta a tu marca, tono y estilo de comunicación.',
+  },
+]
+
+const capabilities = [
+  {
+    icon: UserCircle,
+    title: 'Define tu Cliente Ideal',
+    subtitle: 'Avatar de Negocio',
+    description: 'Hanna te ayuda a descubrir exactamente quién es tu comprador: qué lo frustra, qué desea, cómo decide comprar y qué lenguaje lo activa. Deja de venderle a "todo el mundo" y enfócate en quien realmente paga.',
+    result: 'Sabrás exactamente a quién hablarle y cómo',
+    color: '#C7517E',
+  },
+  {
+    icon: Gift,
+    title: 'Crea tu Oferta Irresistible',
+    subtitle: 'Estructura de Venta',
+    description: 'Estructura tu producto o servicio para que el valor percibido sea tan alto que el precio parezca ridículo. Hanna usa la ecuación de valor de Hormozi: resultado x probabilidad / tiempo x esfuerzo.',
+    result: 'Una oferta que se vende sola',
+    color: '#2CB6D7',
+  },
+  {
+    icon: Megaphone,
+    title: 'Domina tu Mensaje',
+    subtitle: 'Comunicación y Posicionamiento',
+    description: 'Define tu mensaje central, tu posicionamiento único y las frases que tu audiencia va a recordar. Hanna te ayuda a encontrar tu voz, tu enemigo común y los hooks que enganchan.',
+    result: 'Un mensaje que te diferencia de la competencia',
+    color: '#36B3AE',
+  },
+  {
+    icon: PenTool,
+    title: 'Estrategia de Contenido',
+    subtitle: 'Qué publicar, dónde y cuándo',
+    description: 'Planifica qué tipo de contenido crear, en qué plataformas, con qué frecuencia y con qué estructura. Hanna genera ideas, calendarios y textos listos para publicar.',
+    result: 'Nunca más te quedarás sin saber qué publicar',
+    color: '#C7517E',
+  },
+  {
+    icon: Palette,
+    title: 'Identidad de Marca',
+    subtitle: 'Branding Visual y Verbal',
+    description: 'Define cómo se ve y se siente tu marca: colores, tono, personalidad, arquetipos. Hanna te guía para que todo tu marketing sea reconocible y consistente.',
+    result: 'Una marca profesional y memorable',
+    color: '#2CB6D7',
+  },
+  {
+    icon: GitBranch,
+    title: 'Embudo de Conversión',
+    subtitle: 'De desconocido a cliente',
+    description: 'Diseña el camino completo: cómo te descubren, cómo los capturas, cómo los nutres y cómo compran. Con diagramas visuales, métricas por etapa y estrategias de retención.',
+    result: 'Un sistema de ventas que trabaja por ti 24/7',
+    color: '#36B3AE',
+  },
+]
+
+const proFeatures = [
+  {
+    icon: Brain,
+    title: 'Perfil de Negocio Personalizado',
+    description: 'Hanna conoce tu marca, audiencia, productos y tono. Cada respuesta está hecha para TU negocio.',
+  },
+  {
+    icon: BarChart3,
+    title: 'Diagramas y Visualizaciones',
+    description: 'Genera embudos de venta, customer journeys y estrategias en diagramas profesionales automáticamente.',
+  },
+  {
+    icon: Bell,
+    title: 'Recordatorios Inteligentes',
+    description: 'Hanna detecta tus tareas con fecha y te envía recordatorios por email para que nada se te pase.',
+  },
+  {
+    icon: Mic,
+    title: 'Habla con Hanna',
+    description: 'Activa la voz y habla con ella como si fuera tu socia. Sin escribir, solo conversar.',
   },
 ]
 
@@ -115,6 +201,9 @@ export default function HannaLandingPage() {
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-white/70 hover:text-white transition-colors">
               Características
+            </a>
+            <a href="#capabilities" className="text-white/70 hover:text-white transition-colors">
+              Qué Hace
             </a>
             <a href="#pricing" className="text-white/70 hover:text-white transition-colors">
               Precios
@@ -281,6 +370,136 @@ export default function HannaLandingPage() {
                 <p className="text-white/60">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What Hanna Does - Sales Section */}
+      <section id="capabilities" className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#C7517E]/10 border border-[#C7517E]/30 rounded-full mb-6">
+              <Zap className="w-4 h-4 text-[#C7517E]" />
+              <span className="text-[#C7517E] text-sm font-medium">Arquitectura de Marketing Completa</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Hanna no es un chatbot.{' '}
+              <span className="bg-gradient-to-r from-[#2CB6D7] to-[#C7517E] bg-clip-text text-transparent">
+                Es tu consultora
+              </span>
+              <br className="hidden md:block" />
+              {' '}de marketing completa.
+            </h2>
+            <p className="text-white/60 text-lg max-w-3xl mx-auto">
+              Mientras otros chatbots dan respuestas genéricas, Hanna te guía paso a paso para construir
+              una <strong className="text-white">estrategia de marketing real</strong> para tu negocio.
+              Usa frameworks probados y se adapta a tu situación específica.
+            </p>
+          </div>
+
+          {/* Pain Point */}
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8">
+              <p className="text-white/80 text-center text-lg leading-relaxed">
+                <span className="text-white/40">Sin una arquitectura de marketing, tu negocio depende de la improvisación.</span>
+                {' '}Publicas sin estrategia, vendes sin sistema, y tu marketing no se siente profesional.
+                {' '}<span className="text-white font-semibold">Hanna cambia eso.</span>
+              </p>
+            </div>
+          </div>
+
+          {/* 6 Capabilities Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {capabilities.map((cap) => (
+              <div
+                key={cap.title}
+                className="group bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/25 transition-all duration-300 hover:bg-white/[0.07]"
+              >
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors"
+                  style={{ backgroundColor: `${cap.color}15` }}
+                >
+                  <cap.icon className="w-6 h-6" style={{ color: cap.color }} />
+                </div>
+                <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: cap.color }}>
+                  {cap.subtitle}
+                </p>
+                <h3 className="text-white font-bold text-lg mb-3">{cap.title}</h3>
+                <p className="text-white/55 text-sm leading-relaxed mb-4">{cap.description}</p>
+                <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                  <Check className="w-4 h-4 flex-shrink-0" style={{ color: cap.color }} />
+                  <span className="text-white/80 text-sm font-medium">{cap.result}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Transition CTA */}
+          <div className="text-center mb-8">
+            <p className="text-white/50 text-sm mb-2">Todo esto disponible en el plan gratuito</p>
+            <div className="flex items-center justify-center gap-2 text-white/30">
+              <div className="w-16 h-px bg-white/20" />
+              <span className="text-xs uppercase tracking-wider">Pero hay más</span>
+              <div className="w-16 h-px bg-white/20" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pro/Business Exclusive Features */}
+      <section className="py-20 px-4 bg-gradient-to-b from-transparent via-[#C7517E]/5 to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Con Pro y Business, Hanna se convierte en{' '}
+              <span className="text-[#C7517E]">tu socia</span>
+            </h2>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              Desbloquea funciones exclusivas que hacen que Hanna trabaje como si conociera tu negocio de toda la vida.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+            {proFeatures.map((feat) => (
+              <div
+                key={feat.title}
+                className="flex gap-4 bg-white/5 rounded-2xl p-6 border border-white/10"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#C7517E]/10 flex items-center justify-center flex-shrink-0">
+                  <feat.icon className="w-6 h-6 text-[#C7517E]" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-1">{feat.title}</h3>
+                  <p className="text-white/55 text-sm leading-relaxed">{feat.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Business Differentiator */}
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gradient-to-r from-[#2CB6D7]/10 via-[#200F5D]/20 to-[#2CB6D7]/10 border border-[#2CB6D7]/30 rounded-2xl p-8 text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2CB6D7]/20 rounded-full mb-4">
+                <ShieldCheck className="w-4 h-4 text-[#2CB6D7]" />
+                <span className="text-[#2CB6D7] text-xs font-bold uppercase tracking-wider">Plan Business</span>
+              </div>
+              <h3 className="text-white font-bold text-xl md:text-2xl mb-3">
+                Los cerebros de IA más potentes del mundo, trabajando para tu negocio
+              </h3>
+              <p className="text-white/60 max-w-2xl mx-auto mb-6">
+                El plan Business usa <strong className="text-white">Gemini 2.5 Pro</strong> para estrategia y análisis,
+                y <strong className="text-white">Claude Sonnet 4</strong> para contenido creativo.
+                Es como pasar de una consultora junior a una consultora senior — la diferencia en calidad de respuestas es enorme.
+              </p>
+              <Link
+                href="/hanna/signup?plan=business"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white font-semibold rounded-xl hover:from-[#36C5E6] hover:to-[#2CB6D7] transition-all"
+              >
+                Comenzar con Business
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
