@@ -74,7 +74,7 @@ function SuccessContent() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-[#2CB6D7]">3.</span>
-            {isPro ? 'Disfruta mensajes ilimitados' : 'Empieza a chatear (5 mensajes gratis/día)'}
+            {isPro ? 'Disfruta mensajes ilimitados con modelos premium' : 'Empieza a chatear con Hanna'}
           </li>
         </ul>
       </div>

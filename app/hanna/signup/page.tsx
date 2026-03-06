@@ -181,7 +181,7 @@ function SignupForm() {
         >
           <MessageSquare className="w-5 h-5 text-[#2CB6D7] mb-2" />
           <h3 className="text-white font-semibold text-sm">Gratis</h3>
-          <p className="text-white/50 text-xs mt-1">5 mensajes/día</p>
+          <p className="text-white/50 text-xs mt-1">Mensajes ilimitados</p>
           <p className="text-white font-bold mt-2">$0</p>
           {selectedPlan === 'free' && (
             <div className="absolute top-2 right-2">

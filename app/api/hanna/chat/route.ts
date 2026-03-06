@@ -519,18 +519,9 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
     profile.plan = 'free'
   }
 
-  // Pro/Business users have unlimited messages
-  if (profile.plan === 'pro' || profile.plan === 'business') {
-    return { canSend: true, messagesRemaining: 999, plan: profile.plan }
-  }
+  const plan = profile.plan || 'free'
 
-  // Free users limited to 5 messages per day
-  const limit = 5
-  if (messagesToday >= limit) {
-    return { canSend: false, messagesRemaining: 0, plan: 'free' }
-  }
-
-  // Increment message count - use type assertion for update
+  // All plans have unlimited messages - track usage for analytics
   await (supabaseAdmin
     .from('profiles') as ReturnType<typeof supabaseAdmin.from>)
     .update({
@@ -539,7 +530,7 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
     } as Record<string, unknown>)
     .eq('id', userId)
 
-  return { canSend: true, messagesRemaining: limit - messagesToday - 1, plan: 'free' }
+  return { canSend: true, messagesRemaining: 999, plan }
 }
 
 // Business profile type
@@ -781,16 +772,6 @@ export async function POST(request: Request) {
     let messageLimit = { canSend: true, messagesRemaining: 999, plan: 'unknown' }
     if (authenticatedUserId) {
       messageLimit = await checkAndUpdateMessageLimit(authenticatedUserId)
-      if (!messageLimit.canSend) {
-        return NextResponse.json(
-          {
-            error: 'Has alcanzado tu límite de mensajes gratuitos por hoy. Actualiza a Pro para mensajes ilimitados.',
-            limit_reached: true,
-            messages_remaining: 0,
-          },
-          { status: 429 }
-        )
-      }
     }
 
     // Determine which system prompt to use (NEVER accept prompts from client)

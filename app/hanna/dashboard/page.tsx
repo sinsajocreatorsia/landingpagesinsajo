@@ -40,7 +40,7 @@ export default async function HannaDashboardPage() {
         profile={{
           plan: profile?.plan || 'free',
           subscriptionStatus: profile?.subscription_status || 'active',
-          messagesRemaining: profile?.plan === 'pro' ? 999 : Math.max(0, 5 - (profile?.messages_today || 0)),
+          messagesRemaining: 999,
         }}
       />
     </Suspense>

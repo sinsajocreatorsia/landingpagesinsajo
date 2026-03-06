@@ -142,7 +142,7 @@ export interface MessageLimitResponse {
 // ============================================
 export const PLAN_LIMITS = {
   free: {
-    messages_per_day: 5,
+    messages_per_day: Infinity,
     history_days: 7,
     business_profile: false,
     voice_enabled: false,
@@ -166,7 +166,7 @@ export const PLAN_LIMITS = {
 
 export const PLAN_FEATURES = {
   free: [
-    '5 mensajes por día',
+    'Mensajes ilimitados',
     'Historial de 7 días',
     'Chat básico con Hanna',
   ],

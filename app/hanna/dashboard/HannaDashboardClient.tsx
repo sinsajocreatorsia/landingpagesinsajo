@@ -353,17 +353,6 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return
 
-    // Check message limit for free users
-    if (profile.plan === 'free' && messagesRemaining <= 0) {
-      setMessages(prev => [...prev, {
-        id: `limit-${Date.now()}`,
-        role: 'assistant',
-        content: '¡Has alcanzado tu límite de mensajes gratuitos por hoy! Actualiza a Hanna Pro para mensajes ilimitados.',
-        timestamp: new Date(),
-      }])
-      return
-    }
-
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
@@ -769,16 +758,6 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             </div>
           </div>
 
-          {/* Message Counter (Free users) */}
-          {profile.plan === 'free' && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: theme.colors.cardBg }}>
-              <Sparkles className="w-4 h-4" style={{ color: theme.colors.accent }} />
-              <span className="text-sm" style={{ color: theme.colors.textSecondary }}>
-                {messagesRemaining} / 5 mensajes
-              </span>
-            </div>
-          )}
-
           {/* Pro Badge */}
           {profile.plan === 'pro' && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-full">
@@ -1035,32 +1014,6 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
         {/* Input Area */}
         <div className="p-4 border-t backdrop-blur-md" style={{ borderColor: theme.colors.cardBorder, backgroundColor: theme.colors.inputAreaBg }}>
-          {/* Limit Warning */}
-          {profile.plan === 'free' && messagesRemaining <= 1 && messagesRemaining > 0 && (
-            <div className="mb-3 px-4 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg text-yellow-200 text-sm flex items-center justify-between">
-              <span>Te queda {messagesRemaining} mensaje gratis hoy</span>
-              <Link href="/hanna/upgrade" className="text-yellow-100 hover:underline flex items-center gap-1">
-                Actualizar <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          )}
-
-          {/* No Messages Left */}
-          {profile.plan === 'free' && messagesRemaining <= 0 && (
-            <div className="mb-3 px-4 py-3 bg-[#C7517E]/20 border border-[#C7517E]/30 rounded-lg flex items-center justify-between" style={{ color: theme.colors.textPrimary }}>
-              <div>
-                <p className="font-medium">¡Límite alcanzado!</p>
-                <p className="text-sm" style={{ color: theme.colors.textMuted }}>Actualiza a Pro para mensajes ilimitados</p>
-              </div>
-              <Link
-                href="/hanna/upgrade"
-                className="px-4 py-2 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white text-sm font-medium rounded-lg hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
-              >
-                Actualizar
-              </Link>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="flex items-center gap-3">
             {/* Voice Input Button (Pro only) */}
             {profile.plan === 'pro' && voiceSupport.stt && (
@@ -1101,11 +1054,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 placeholder={
                   isListening
                     ? 'Escuchando...'
-                    : messagesRemaining > 0 || profile.plan === 'pro'
-                    ? 'Escribe tu mensaje...'
-                    : 'Actualiza a Pro para continuar...'
+                    : 'Escribe tu mensaje...'
                 }
-                disabled={isLoading || isListening || (profile.plan === 'free' && messagesRemaining <= 0)}
+                disabled={isLoading || isListening}
                 rows={1}
                 className="w-full px-5 py-4 rounded-3xl border focus:outline-none focus:ring-2 disabled:opacity-50 resize-none overflow-hidden"
                 style={{ backgroundColor: theme.colors.inputBg, borderColor: theme.colors.inputBorder, color: theme.colors.textPrimary, '--tw-ring-color': theme.colors.accent + '33' } as React.CSSProperties}
@@ -1114,7 +1065,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
             <button
               type="submit"
-              disabled={!inputText.trim() || isLoading || (profile.plan === 'free' && messagesRemaining <= 0)}
+              disabled={!inputText.trim() || isLoading}
               className="p-4 rounded-full bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white hover:from-[#d4608d] hover:to-[#C7517E] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#C7517E]/20"
             >
               {isLoading ? (

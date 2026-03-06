@@ -79,16 +79,6 @@ export function DashboardHeader({
         </div>
       </div>
 
-      {/* Message Counter (Free users) */}
-      {plan === 'free' && (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: theme.colors.cardBg }}>
-          <Sparkles className="w-4 h-4" style={{ color: theme.colors.accent }} />
-          <span className="text-sm" style={{ color: theme.colors.textSecondary }}>
-            {messagesRemaining} / 15 mensajes
-          </span>
-        </div>
-      )}
-
       {/* Pro Badge */}
       {(plan === 'pro' || plan === 'business') && (
         <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-full">

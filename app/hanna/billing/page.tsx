@@ -233,7 +233,7 @@ export default function BillingPage() {
                 </p>
               )}
               {!isPaid && (
-                <p className="text-white/60 text-sm">5 mensajes por dia</p>
+                <p className="text-white/60 text-sm">Mensajes ilimitados - Modelo básico</p>
               )}
             </div>
           </div>

@@ -43,7 +43,7 @@ const plans = [
     period: 'siempre',
     description: 'Perfecto para probar Hanna',
     features: [
-      '5 mensajes por día',
+      'Mensajes ilimitados',
       'Historial de 7 días',
       'Chat básico con IA',
     ],

@@ -464,7 +464,8 @@ function Step1Satisfaction({ formData, updateField, toggleArrayField }: StepProp
           onChange={(e) => updateField('suggestions', e.target.value)}
           rows={3}
           placeholder="Comparte tus sugerencias..."
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 focus:border-[#2CB6D7] focus:outline-none transition-colors resize-none"
+          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors resize-none"
+          style={{ color: '#111827' }}
         />
       </div>
     </div>
@@ -496,7 +497,8 @@ function Step2FutureInterest({ formData, updateField, toggleArrayField }: StepPr
             value={formData.futureTopicsOther}
             onChange={(e) => updateField('futureTopicsOther', e.target.value)}
             placeholder="Especifica el tema..."
-            className="mt-2 w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 focus:border-[#2CB6D7] focus:outline-none transition-colors"
+            className="mt-2 w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
+            style={{ color: '#111827' }}
           />
         )}
       </div>
@@ -659,7 +661,8 @@ function Step4Contact({ formData, updateField }: StepProps) {
           value={formData.fullName}
           onChange={(e) => updateField('fullName', e.target.value)}
           placeholder="Tu nombre"
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 focus:border-[#2CB6D7] focus:outline-none transition-colors"
+          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
+          style={{ color: '#111827' }}
         />
       </div>
 
@@ -673,7 +676,8 @@ function Step4Contact({ formData, updateField }: StepProps) {
           value={formData.email}
           onChange={(e) => updateField('email', e.target.value)}
           placeholder="tu@email.com"
-          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm text-gray-900 focus:border-[#2CB6D7] focus:outline-none transition-colors"
+          className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
+          style={{ color: '#111827' }}
         />
         <p className="text-xs text-gray-400 mt-1">
           Aqui te enviaremos tu codigo de descuento
