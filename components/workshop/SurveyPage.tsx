@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Send,
-  Copy,
   Check,
   ExternalLink,
   Loader2,
@@ -54,7 +53,7 @@ export default function SurveyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [result, setResult] = useState<SurveySubmitResponse | null>(null)
   const [error, setError] = useState('')
-  const [copied, setCopied] = useState(false)
+
   const [direction, setDirection] = useState(1)
 
   function updateField<K extends keyof SurveyFormData>(key: K, value: SurveyFormData[K]) {
@@ -135,18 +134,16 @@ export default function SurveyPage() {
       }
 
       setResult(data)
+
+      // If 5 stars → redirect to Google Reviews immediately
+      if (data.shouldRedirectToGoogle && data.googleReviewUrl) {
+        window.open(data.googleReviewUrl, '_blank')
+      }
     } catch {
       setError('Error de conexion. Intenta de nuevo.')
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  async function handleCopy() {
-    if (!result?.couponCode) return
-    await navigator.clipboard.writeText(result.couponCode)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
   }
 
   // Completed state
@@ -168,42 +165,24 @@ export default function SurveyPage() {
           </div>
 
           <div className="p-8 space-y-6">
-            {/* Coupon display */}
+            {/* Email notice */}
             <div className="text-center">
-              <p className="text-sm text-gray-500 uppercase tracking-wider mb-3">
-                Tu codigo de 1 mes gratis:
-              </p>
-              <div className="bg-orange-50 border-2 border-dashed border-[#C7517E] rounded-xl p-5 inline-block">
-                <span className="text-3xl font-extrabold font-mono tracking-[4px] text-[#C7517E]">
-                  {result.couponCode}
-                </span>
+              <div className="bg-orange-50 border border-[#C7517E]/30 rounded-xl p-6">
+                <p className="text-gray-700 font-medium mb-2">
+                  Revisa tu correo electronico
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Te enviamos tu codigo de descuento para activar tu primer mes 100% gratis de Hanna Estratega Pro.
+                </p>
               </div>
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-2 mx-auto mt-3 text-sm text-[#2CB6D7] hover:text-[#36B3AE] transition-colors"
-              >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copied ? 'Copiado!' : 'Copiar codigo'}
-              </button>
             </div>
 
-            {/* CTA to signup */}
-            <a
-              href={`/hanna/signup?coupon=${result.couponCode}`}
-              className="block w-full text-center bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white font-semibold py-4 rounded-xl hover:opacity-90 transition-opacity"
-            >
-              Activar Mi Mes Gratis
-            </a>
-
-            <p className="text-center text-sm text-gray-500">
-              Revisa tu email - te enviamos el codigo tambien
-            </p>
-
-            {/* Google Review section */}
-            {result.shouldRedirectToGoogle && result.googleReviewUrl ? (
+            {/* Google Review - only shows if 5 stars and redirected */}
+            {result.shouldRedirectToGoogle && result.googleReviewUrl && (
               <div className="bg-blue-50 rounded-xl p-5 text-center border border-blue-100">
                 <p className="text-gray-700 mb-3">
-                  Nos encantaria que compartieras tu experiencia en Google
+                  Se abrio una nueva pestana para dejar tu resena en Google.
+                  Si no se abrio, haz click aqui:
                 </p>
                 <a
                   href={result.googleReviewUrl}
@@ -215,19 +194,11 @@ export default function SurveyPage() {
                   Dejar resena en Google
                 </a>
               </div>
-            ) : result.shouldRedirectToGoogle && !result.googleReviewUrl ? (
-              <div className="bg-blue-50 rounded-xl p-5 text-center border border-blue-100">
-                <p className="text-gray-600 text-sm">
-                  Gracias por tu excelente calificacion! Pronto habilitaremos las resenas en Google.
-                </p>
-              </div>
-            ) : (
-              <div className="bg-green-50 rounded-xl p-5 text-center border border-green-100">
-                <p className="text-gray-600 text-sm">
-                  Gracias por compartir tu experiencia! Tu feedback nos ayuda a mejorar cada taller.
-                </p>
-              </div>
             )}
+
+            <p className="text-center text-sm text-gray-400">
+              Gracias por compartir tu experiencia! Tu feedback nos ayuda a mejorar cada taller.
+            </p>
           </div>
         </motion.div>
       </div>
