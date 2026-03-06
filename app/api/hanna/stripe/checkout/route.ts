@@ -142,10 +142,12 @@ export async function POST(request: Request) {
             trial_period_days: coupon.free_months * 30,
           }
         } else if (coupon.discount_type === 'percentage' || coupon.discount_type === 'fixed') {
-          // Launch coupon FUNDADOR: map to plan-specific Stripe coupon
-          const stripeCouponId = upperCode === 'FUNDADOR'
-            ? (plan === 'business' ? 'FUNDADOR-BIZ-59' : 'FUNDADOR-PRO-50')
-            : null
+          // Map known coupon codes to their Stripe coupon IDs
+          const STRIPE_COUPON_MAP: Record<string, string> = {
+            'HANNAPRO': 'HannaPro',
+            'CHICASPRO2026': 'CHICASPRO2026',
+          }
+          const stripeCouponId = STRIPE_COUPON_MAP[upperCode] || null
 
           if (stripeCouponId) {
             // Use the mapped launch coupon directly by ID

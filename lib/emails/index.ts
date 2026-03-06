@@ -9,6 +9,8 @@ import ProfileReminder from './templates/ProfileReminder'
 import ProfileSummary from './templates/ProfileSummary'
 import AdminProfileNotification from './templates/AdminProfileNotification'
 import WaitlistConfirmation from './templates/WaitlistConfirmation'
+import SurveyCouponEmail from './templates/SurveyCouponEmail'
+import HannaReminderEmail from './templates/HannaReminderEmail'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Admin email for notifications
@@ -40,6 +42,8 @@ export type EmailType =
   | 'profile_reminder'
   | 'profile_summary'
   | 'waitlist_confirmation'
+  | 'survey_coupon'
+  | 'hanna_reminder'
 
 interface SendEmailParams {
   to: string
@@ -143,6 +147,23 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
     templateFn: (data) => WaitlistConfirmation({
       customerName: data.customerName || 'Empresaria',
       position: parseInt(data.position || '1'),
+    }),
+  },
+  survey_coupon: {
+    subject: 'Tu mes gratis de Hanna Estratega Pro - Sinsajo Creators',
+    templateFn: (data) => SurveyCouponEmail({
+      customerName: data.customerName || 'Empresaria',
+      couponCode: data.couponCode || '',
+      signupUrl: data.signupUrl || 'https://www.screatorsai.com/hanna/signup',
+      expirationDate: data.expirationDate || '',
+    }),
+  },
+  hanna_reminder: {
+    subject: 'Hanna te recuerda: Tienes tareas pendientes',
+    templateFn: (data) => HannaReminderEmail({
+      customerName: data.customerName || 'Empresaria',
+      reminders: data.reminders ? JSON.parse(data.reminders) : [],
+      dashboardUrl: data.dashboardUrl || 'https://www.screatorsai.com/hanna/dashboard',
     }),
   },
 }
@@ -617,4 +638,30 @@ export async function sendAdminProfileNotification({
     console.error('Admin notification error:', error)
     return { success: false, error: errorMessage }
   }
+}
+
+/**
+ * Send Hanna reminder email with pending tasks
+ */
+export async function sendHannaReminderEmail({
+  to,
+  customerName,
+  reminders,
+  userId,
+}: {
+  to: string
+  customerName: string
+  reminders: Array<{ task: string; due: string; strategic_context?: string; approach_suggestion?: string }>
+  userId: string
+}): Promise<EmailResult> {
+  return sendEmail({
+    to,
+    type: 'hanna_reminder',
+    data: {
+      customerName,
+      reminders: JSON.stringify(reminders),
+      dashboardUrl: 'https://www.screatorsai.com/hanna/dashboard',
+    },
+    registrationId: userId,
+  })
 }

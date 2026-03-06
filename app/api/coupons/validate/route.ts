@@ -83,9 +83,10 @@ export async function POST(request: Request) {
     let discountPct = coupon.discount_value
     let finalPrice = basePrice
 
-    // FUNDADOR uses different Stripe coupons per plan (59% for business, 50% for pro)
-    if (coupon.code === 'FUNDADOR' && plan === 'business') {
-      discountPct = 59
+    // HannaPro is 50% off for any plan
+    // CHICASPRO2026 is 100% off for workshop participants
+    if (coupon.code === 'HannaPro') {
+      discountPct = 50
     }
 
     if (coupon.discount_type === 'percentage') {

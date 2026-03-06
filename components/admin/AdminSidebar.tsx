@@ -11,6 +11,9 @@ import {
   LogOut,
   Sparkles,
   ClipboardList,
+  ClipboardCheck,
+  Bell,
+  Brain,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -35,6 +38,21 @@ const navigation = [
     name: 'Usuarios',
     href: '/admin/users',
     icon: Users,
+  },
+  {
+    name: 'Encuestas',
+    href: '/admin/surveys',
+    icon: ClipboardCheck,
+  },
+  {
+    name: 'Hanna Insights',
+    href: '/admin/hanna-insights',
+    icon: Brain,
+  },
+  {
+    name: 'Recordatorios',
+    href: '/admin/reminders',
+    icon: Bell,
   },
   {
     name: 'Analytics',

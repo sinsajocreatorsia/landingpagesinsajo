@@ -73,6 +73,7 @@ export default function VoiceHanna({ onClose, initialMessage }: VoiceHannaProps)
         body: JSON.stringify({
           message: text.trim(),
           mode: 'workshop',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           history: messages.slice(-10).map(m => ({
             role: m.role,
             content: m.content,

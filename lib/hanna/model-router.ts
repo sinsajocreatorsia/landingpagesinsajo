@@ -23,7 +23,7 @@ export const MODELS = {
 export type ModelId = typeof MODELS[keyof typeof MODELS]
 
 // Query categories for classification and analytics
-export type QueryCategory = 'strategy' | 'marketing' | 'content' | 'analytics' | 'general'
+export type QueryCategory = 'strategy' | 'marketing' | 'content' | 'analytics' | 'prompt_creation' | 'general'
 
 interface RouteResult {
   model: ModelId
@@ -56,6 +56,13 @@ const ANALYTICS_PATTERNS = [
   /\b(Excel|spreadsheet|hoja\s+de\s+cálculo|gráfic|chart|tabla|porcentaje|promedio|media|mediana|crecimiento\s+porcentual|tasa\s+de|ratio)/i,
 ]
 
+const PROMPT_CREATION_PATTERNS = [
+  /\b(prompt|prompts|imagen\s+(?:con\s+)?(?:ia|ai)|generar?\s+imagen|generaci[oó]n\s+de\s+im[aá]genes?|ai\s+(?:art|image)|crear?\s+imagen)/i,
+  /\b(midjourney|dall-?e|stable\s+diffusion|nano\s+banana|leonardo|firefly|ideogram|flux)/i,
+  /\b(estilo\s+(?:fotogr[aá]fico|anime|3d|pixel|acuarela|cin[eé]|realista)|composici[oó]n|iluminaci[oó]n|textura|renderizado|fotorrealista|hiperrealista)/i,
+  /\b(refinar?\s+(?:el\s+)?prompt|mejorar?\s+(?:el\s+)?prompt|prompt\s+(?:de\s+)?imagen|biblioteca\s+de\s+prompts)/i,
+]
+
 /**
  * Classify a user query into a category based on keyword matching.
  */
@@ -72,6 +79,7 @@ export function classifyQuery(message: string, history: Array<{ role: string; co
     marketing: 0,
     content: 0,
     analytics: 0,
+    prompt_creation: 0,
     general: 0,
   }
 
@@ -93,6 +101,11 @@ export function classifyQuery(message: string, history: Array<{ role: string; co
   for (const pattern of ANALYTICS_PATTERNS) {
     if (pattern.test(contextWindow)) scores.analytics += 2
     if (pattern.test(message)) scores.analytics += 1
+  }
+
+  for (const pattern of PROMPT_CREATION_PATTERNS) {
+    if (pattern.test(contextWindow)) scores.prompt_creation += 2
+    if (pattern.test(message)) scores.prompt_creation += 1
   }
 
   // Find highest scoring category
@@ -123,12 +136,13 @@ export function routeProQuery(
     case 'analytics':
     case 'content':
     case 'marketing':
+    case 'prompt_creation':
       // All specialized queries → Gemini 2.5 Flash (best Flash-tier model)
       return {
         model: MODELS.flashPro,
         fallbackModel: MODELS.flash,
         category,
-        temperature: category === 'content' ? 0.85 : 0.7,
+        temperature: (category === 'content' || category === 'prompt_creation') ? 0.85 : 0.7,
         maxTokens: 1500,
       }
 
@@ -168,7 +182,8 @@ export function routeBusinessQuery(
       }
 
     case 'content':
-      // Creative writing → Claude Sonnet 4
+    case 'prompt_creation':
+      // Creative writing & prompt crafting → Claude Sonnet 4
       return {
         model: MODELS.creative,
         fallbackModel: MODELS.flashPro,

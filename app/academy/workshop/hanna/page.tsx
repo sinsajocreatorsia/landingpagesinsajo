@@ -73,6 +73,7 @@ Este workshop es **PRESENCIAL** (nada de Zoom aburrido 😉) y 100% en **Españo
         body: JSON.stringify({
           message: text.trim(),
           mode: 'workshop',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           history: messages.slice(-10).map(m => ({
             role: m.role,
             content: m.content,

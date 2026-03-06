@@ -15,6 +15,7 @@ import {
   Palette,
   Brain,
   LayoutGrid,
+  ImageIcon,
 } from 'lucide-react'
 import type { ThemeId } from '@/lib/theme-context'
 
@@ -119,6 +120,14 @@ export function DashboardSidebar({
         >
           <History className="w-4 h-4" />
           Historial
+        </Link>
+        <Link
+          href="/hanna/prompts"
+          className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm`}
+          style={{ color: theme.colors.textSecondary }}
+        >
+          <ImageIcon className="w-4 h-4" />
+          Biblioteca de Prompts
         </Link>
         <Link
           href="/hanna/profile"

@@ -10,74 +10,64 @@ if (!STRIPE_SECRET_KEY) {
 
 const stripe = new Stripe(STRIPE_SECRET_KEY)
 
-const LAUNCH_COUPONS = [
+// These coupons should already exist in Stripe dashboard
+// This script verifies they are properly configured
+const EXPECTED_COUPONS = [
   {
-    id: 'FUNDADOR-PRO-50',
-    name: 'FUNDADOR-PRO-50',
-    percent_off: 50,
-    duration: 'once',
-    max_redemptions: 30,
-    metadata: { campaign: 'launch-2026', plan: 'pro' },
+    id: 'HannaPro',
+    description: '50% off first month - any plan',
+    expectedPercentOff: 50,
   },
   {
-    id: 'FUNDADOR-BIZ-59',
-    name: 'FUNDADOR-BIZ-59',
-    percent_off: 59,
-    duration: 'once',
-    max_redemptions: 20,
-    metadata: { campaign: 'launch-2026', plan: 'business' },
+    id: 'CHICASPRO2026',
+    description: '100% off first month - workshop participants',
+    expectedPercentOff: 100,
   },
 ]
 
-async function setup() {
-  console.log('Setting up Hanna launch coupons in Stripe...\n')
+async function verify() {
+  console.log('Verifying Hanna coupons in Stripe...\n')
 
-  for (const coupon of LAUNCH_COUPONS) {
-    console.log(`--- ${coupon.name} ---`)
+  let allGood = true
 
-    // Check if coupon already exists
+  for (const expected of EXPECTED_COUPONS) {
+    console.log(`--- ${expected.id} ---`)
+    console.log(`  Expected: ${expected.description}`)
+
     try {
-      const existing = await stripe.coupons.retrieve(coupon.id)
-      if (existing) {
-        console.log(`Coupon already exists: ${existing.id} (${existing.percent_off}% off)`)
-        console.log('')
-        continue
+      const coupon = await stripe.coupons.retrieve(expected.id)
+      console.log(`  Status: EXISTS`)
+      console.log(`  Percent off: ${coupon.percent_off}%`)
+      console.log(`  Duration: ${coupon.duration}`)
+      console.log(`  Redemptions: ${coupon.times_redeemed}/${coupon.max_redemptions || 'unlimited'}`)
+
+      if (coupon.percent_off !== expected.expectedPercentOff) {
+        console.log(`  WARNING: Expected ${expected.expectedPercentOff}% but got ${coupon.percent_off}%`)
+        allGood = false
       }
     } catch {
-      // Coupon doesn't exist, create it
+      console.log(`  Status: NOT FOUND - needs to be created in Stripe dashboard`)
+      allGood = false
     }
-
-    const created = await stripe.coupons.create({
-      id: coupon.id,
-      name: coupon.name,
-      percent_off: coupon.percent_off,
-      duration: coupon.duration,
-      max_redemptions: coupon.max_redemptions,
-      metadata: coupon.metadata,
-    })
-
-    console.log(`Coupon created: ${created.id} (${created.percent_off}% off, max ${created.max_redemptions} uses)`)
     console.log('')
   }
 
   console.log('========================================')
-  console.log('Launch coupons ready!')
+  if (allGood) {
+    console.log('All coupons verified!')
+  } else {
+    console.log('Some coupons need attention - see above')
+  }
   console.log('========================================')
   console.log('')
-  console.log('Coupons created:')
-  console.log('  FUNDADOR-PRO-50: 50% off first month for Pro ($19.99 -> $9.99)')
-  console.log('  FUNDADOR-BIZ-59: 59% off first month for Business ($49 -> ~$19.99)')
+  console.log('Coupon mapping:')
+  console.log('  HannaPro       -> 50% off first month (promo general)')
+  console.log('  CHICASPRO2026  -> 100% off first month (workshop survey reward)')
   console.log('')
-  console.log('User-facing coupon code: FUNDADOR')
-  console.log('The backend routes the correct Stripe coupon based on selected plan.')
-  console.log('')
-  console.log('Next steps:')
-  console.log('1. Run the Supabase migration: 015_launch_coupons.sql')
-  console.log('2. Deploy the updated checkout and webhook routes')
-  console.log('3. Verify on /hanna/upgrade that launch pricing shows')
+  console.log('DB coupon codes must match Stripe coupon IDs exactly.')
 }
 
-setup().catch((err) => {
+verify().catch((err) => {
   console.error('Error:', err.message)
   process.exit(1)
 })

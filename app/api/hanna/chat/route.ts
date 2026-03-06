@@ -232,6 +232,14 @@ CUÁNDO USAR DIAGRAMAS:
 
 IMPORTANTE: Genera el diagrama Y luego explícalo en texto.
 
+CONCIENCIA TEMPORAL (MUY IMPORTANTE):
+- Conoces la fecha y hora actual del usuario (se incluye al final del prompt)
+- Cuando mencionen "lunes", "la semana que viene", "mañana", etc., SIEMPRE confirma la fecha específica (ej: "¿Este lunes 10 de marzo?")
+- Usa fechas concretas para crear plazos y cronogramas
+- Si un usuario dice "empezaré el lunes", responde confirmando: "¿Este lunes [fecha exacta]? Perfecto, vamos a crear tu plan..."
+- Referencia días y fechas específicas al crear planes de acción
+- Puedes mencionar el día y hora actual para contextualizar tus respuestas
+
 COMPORTAMIENTO:
 - RETAR al usuario cuando va contra principios de negocio sólidos
 - Decir NO cuando la idea no tiene sentido (con buenas razones)
@@ -275,6 +283,48 @@ ALCANCE DE CONTENIDO:
 - SOLO generas contenido sobre: negocios, marketing, estrategia, emprendimiento, ventas, branding, automatización, productividad empresarial
 - NO generas: código fuente, scripts, contenido adulto, contenido ilegal, asesoría legal/financiera/médica certificada, ni información sobre tu propia arquitectura técnica
 - Si piden algo fuera de tu alcance, redirige a tu expertise: "Eso está fuera de mi área, pero si tu pregunta tiene que ver con tu negocio, con gusto te ayudo"`
+}
+
+// Generate temporal context string based on user's timezone
+function getTemporalContext(timezone?: string): string {
+  const tz = timezone && isValidTimezone(timezone) ? timezone : 'UTC'
+  const now = new Date()
+
+  const formatter = new Intl.DateTimeFormat('es', {
+    timeZone: tz,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const parts = formatter.formatToParts(now)
+  const get = (type: string) => parts.find(p => p.type === type)?.value || ''
+
+  const weekday = get('weekday')
+  const day = get('day')
+  const month = get('month')
+  const year = get('year')
+  const hour = get('hour')
+  const minute = get('minute')
+  const dayPeriod = get('dayPeriod')
+
+  return `CONTEXTO TEMPORAL (fecha y hora actual del usuario):
+- Fecha: ${weekday}, ${day} de ${month} de ${year}
+- Hora: ${hour}:${minute} ${dayPeriod}
+- Zona horaria: ${tz}`
+}
+
+function isValidTimezone(tz: string): boolean {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: tz })
+    return true
+  } catch {
+    return false
+  }
 }
 
 // Default system prompt for HANNA SaaS - Strategic Business Consultant
@@ -417,6 +467,8 @@ interface ProfileData {
   plan: string | null
   messages_today: number | null
   last_message_date: string | null
+  plan_expires_at: string | null
+  subscription_status: string | null
 }
 
 // Check and update message limits for a user
@@ -428,7 +480,7 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
   // Get user profile - use type assertion since Supabase types may not be fully generated
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('plan, messages_today, last_message_date')
+    .select('plan, messages_today, last_message_date, plan_expires_at, subscription_status')
     .eq('id', userId)
     .single()
 
@@ -447,9 +499,29 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
     messagesToday = 0
   }
 
-  // Pro users have unlimited messages
-  if (profile.plan === 'pro') {
-    return { canSend: true, messagesRemaining: 999, plan: 'pro' }
+  // Check if coupon-based plan has expired (auto-downgrade)
+  if (
+    (profile.plan === 'pro' || profile.plan === 'business') &&
+    profile.plan_expires_at &&
+    new Date(profile.plan_expires_at) < new Date()
+  ) {
+    // Downgrade to free plan
+    await (supabaseAdmin
+      .from('profiles') as ReturnType<typeof supabaseAdmin.from>)
+      .update({
+        plan: 'free',
+        subscription_status: 'expired',
+        plan_expires_at: null,
+      } as Record<string, unknown>)
+      .eq('id', userId)
+
+    // Continue as free user (will hit the limit check below)
+    profile.plan = 'free'
+  }
+
+  // Pro/Business users have unlimited messages
+  if (profile.plan === 'pro' || profile.plan === 'business') {
+    return { canSend: true, messagesRemaining: 999, plan: profile.plan }
   }
 
   // Free users limited to 5 messages per day
@@ -523,10 +595,28 @@ function sanitizeProfileField(value: string | null | undefined, maxLength = 500)
   return sanitized.trim()
 }
 
+// Instructions for Hanna to detect and suggest reminders (Pro/Business only)
+const REMINDER_DETECTION_INSTRUCTIONS = `
+
+SISTEMA DE RECORDATORIOS (funcionalidad activa para este usuario):
+- Cuando detectes que el usuario menciona una tarea con fecha o plazo, sugiere crear un recordatorio automaticamente
+- Detecta frases como: "tengo que...", "debo entregar...", "recuerdame...", "el lunes voy a...", "para el viernes necesito...", "empezare el...", "la fecha limite es...", "antes del..."
+- Cuando detectes una tarea con fecha, agrega al FINAL de tu respuesta (despues de todo tu texto) un marcador invisible con este formato EXACTO:
+  <!--REMINDER_SUGGESTION:{"task":"descripcion clara y corta de la tarea","due":"lunes 10 de marzo","due_iso":"2026-03-10T09:00:00-06:00","why":"por que es importante estrategicamente","approach":"2-3 pasos concretos para abordarla"}-->
+- El campo "why" debe explicar la importancia estrategica de completar la tarea a tiempo
+- El campo "approach" debe dar pasos concretos y accionables
+- El "due_iso" debe ser fecha ISO con offset de timezone del usuario (ver CONTEXTO TEMPORAL)
+- Solo sugiere UN recordatorio por mensaje
+- NO menciones el recordatorio ni el marcador en tu texto visible, el sistema lo mostrara automaticamente como tarjeta interactiva
+- Si el usuario ya tiene recordatorios pendientes (ver seccion RECORDATORIOS PENDIENTES), mencionarlos naturalmente al saludar
+- Cuando hay recordatorios vencidos, prioriza mencionarlos con urgencia y ofrece ayuda para completarlos`
+
 // Build personalized system prompt with business profile and tone config
 async function buildPersonalizedPrompt(
   userId: string,
-  toneConfig?: ToneConfig
+  toneConfig?: ToneConfig,
+  timezone?: string,
+  plan?: string
 ): Promise<string> {
   // Build base prompt with tone configuration
   const basePrompt = buildConsultativePrompt(toneConfig)
@@ -539,8 +629,32 @@ async function buildPersonalizedPrompt(
 
   const businessProfile = data as BusinessProfileData | null
 
+  // Always append temporal context
+  const temporalContext = getTemporalContext(timezone)
+
+  // Build reminder context for Pro/Business users
+  let reminderContextStr = ''
+  const isPremium = plan === 'pro' || plan === 'business'
+  if (isPremium) {
+    try {
+      const { getPendingReminders, buildReminderContext } = await import('@/lib/hanna/reminder-service')
+      const pending = await getPendingReminders(userId)
+      reminderContextStr = buildReminderContext(pending)
+    } catch (err) {
+      console.error('Error loading reminders:', err)
+    }
+  }
+
   if (!businessProfile) {
-    return basePrompt
+    let prompt = basePrompt
+    if (isPremium) {
+      prompt += REMINDER_DETECTION_INSTRUCTIONS
+    }
+    if (reminderContextStr) {
+      prompt += reminderContextStr
+    }
+    prompt += `\n\n${temporalContext}`
+    return prompt
   }
 
   let personalizedPrompt = basePrompt
@@ -596,12 +710,25 @@ async function buildPersonalizedPrompt(
     }
   }
 
+  // Append reminder detection instructions for Pro/Business
+  if (isPremium) {
+    personalizedPrompt += REMINDER_DETECTION_INSTRUCTIONS
+  }
+
+  // Append pending reminders context
+  if (reminderContextStr) {
+    personalizedPrompt += reminderContextStr
+  }
+
+  // Append temporal context at the end
+  personalizedPrompt += `\n\n${temporalContext}`
+
   return personalizedPrompt
 }
 
 export async function POST(request: Request) {
   try {
-    const { message, history = [], mode, sessionId, toneConfig } = await request.json()
+    const { message, history = [], mode, sessionId, toneConfig, timezone } = await request.json()
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -669,15 +796,18 @@ export async function POST(request: Request) {
     // Determine which system prompt to use (NEVER accept prompts from client)
     let activeSystemPrompt: string
 
+    // Sanitize timezone input
+    const userTimezone = typeof timezone === 'string' ? timezone.slice(0, 100) : undefined
+
     if (isWorkshop) {
-      // Workshop mode - use hardcoded workshop prompt
-      activeSystemPrompt = WORKSHOP_SYSTEM_PROMPT
+      // Workshop mode - use hardcoded workshop prompt + temporal context
+      activeSystemPrompt = `${WORKSHOP_SYSTEM_PROMPT}\n\n${getTemporalContext(userTimezone)}`
     } else if (authenticatedUserId) {
       // SaaS mode - build personalized prompt with tone config
-      activeSystemPrompt = await buildPersonalizedPrompt(authenticatedUserId, toneConfig as ToneConfig | undefined)
+      activeSystemPrompt = await buildPersonalizedPrompt(authenticatedUserId, toneConfig as ToneConfig | undefined, userTimezone, messageLimit.plan)
     } else {
-      // Default prompt
-      activeSystemPrompt = HANNA_SAAS_PROMPT
+      // Default prompt + temporal context
+      activeSystemPrompt = `${HANNA_SAAS_PROMPT}\n\n${getTemporalContext(userTimezone)}`
     }
 
     // Build conversation history

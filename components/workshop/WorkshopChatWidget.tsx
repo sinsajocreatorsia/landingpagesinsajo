@@ -122,6 +122,7 @@ export default function WorkshopChatWidget() {
         body: JSON.stringify({
           message: input,
           mode: 'workshop',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           history: [...messages, userMessage].map(m => ({
             role: m.role,
             content: m.content

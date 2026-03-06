@@ -28,6 +28,8 @@ import {
   Palette,
   ThumbsUp,
   ThumbsDown,
+  Bell,
+  Check,
 } from 'lucide-react'
 import {
   speakText,
@@ -40,6 +42,28 @@ import {
 import { MessageContent } from '@/components/hanna/MessageContent'
 import { ToneConfigDialog, type ToneConfig } from '@/components/hanna/ToneConfigDialog'
 import { ThemeProvider, useTheme, type ThemeId } from '@/lib/theme-context'
+import type { ReminderSuggestion, PendingRemindersResponse } from '@/types/reminder'
+
+// Parse reminder suggestion from AI response (hidden HTML comment marker)
+function parseReminderSuggestion(text: string): {
+  cleanText: string
+  suggestion: ReminderSuggestion | null
+} {
+  const regex = /<!--REMINDER_SUGGESTION:([\s\S]*?)-->/
+  const match = text.match(regex)
+  if (!match) return { cleanText: text, suggestion: null }
+
+  try {
+    const suggestion = JSON.parse(match[1]) as ReminderSuggestion
+    const cleanText = text.replace(regex, '').trim()
+    if (suggestion.task && suggestion.due_iso) {
+      return { cleanText, suggestion }
+    }
+    return { cleanText, suggestion: null }
+  } catch {
+    return { cleanText: text.replace(regex, '').trim(), suggestion: null }
+  }
+}
 
 interface DashboardProps {
   user: {
@@ -94,6 +118,11 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [voiceSupport, setVoiceSupport] = useState({ tts: false, stt: false })
   const [interimTranscript, setInterimTranscript] = useState('')
 
+  // Reminder states (Pro/Business only)
+  const [pendingReminderSuggestion, setPendingReminderSuggestion] = useState<ReminderSuggestion | null>(null)
+  const [pendingReminders, setPendingReminders] = useState<PendingRemindersResponse | null>(null)
+  const [reminderSaving, setReminderSaving] = useState(false)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const recognitionRef = useRef<VoiceRecognition | null>(null)
@@ -116,6 +145,24 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       stopSpeaking()
       recognitionRef.current?.abort()
     }
+  }, [profile.plan])
+
+  // Load pending reminders on mount (Pro/Business only)
+  useEffect(() => {
+    if (profile.plan === 'free') return
+
+    async function loadReminders() {
+      try {
+        const res = await fetch('/api/hanna/reminders?pending=true')
+        const data = await res.json()
+        if (data.success) {
+          setPendingReminders(data.reminders)
+        }
+      } catch {
+        // Non-critical
+      }
+    }
+    loadReminders()
   }, [profile.plan])
 
   // Open sidebar by default on desktop
@@ -157,7 +204,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     loadToneConfig()
   }, [user.id, supabase.auth])
 
-  // Generate greeting based on tone config
+  // Generate greeting based on tone config + pending reminders
   const getGreeting = useCallback((): string => {
     const styleGreeting: Record<string, string> = {
       energetic: '¡Hola! 🔥 Soy Hanna, y estoy aquí para ayudarte a ROMPERLA en tu negocio.',
@@ -165,10 +212,32 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       professional: 'Buen día. Soy Hanna, consultora estratégica de negocios. Será un placer asesorarte.',
       friendly: `¡Hola ${user.fullName.split(' ')[0]}! 💙 Soy Hanna, tu amiga consultora de negocios.`,
     }
-    return toneConfig
+    let greeting = toneConfig
       ? styleGreeting[toneConfig.style]
       : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
-  }, [user.fullName, toneConfig])
+
+    // Append pending reminders for Pro/Business users
+    if (pendingReminders) {
+      const { overdue, today } = pendingReminders
+      if (overdue.length > 0) {
+        greeting += `\n\n⚠️ **Tienes ${overdue.length} recordatorio${overdue.length > 1 ? 's' : ''} vencido${overdue.length > 1 ? 's' : ''}:**`
+        for (const r of overdue.slice(0, 3)) {
+          greeting += `\n- ${r.task}`
+        }
+      }
+      if (today.length > 0) {
+        greeting += `\n\n📋 **Para hoy:**`
+        for (const r of today.slice(0, 3)) {
+          greeting += `\n- ${r.task}`
+        }
+      }
+      if (overdue.length > 0 || today.length > 0) {
+        greeting += '\n\n¿Quieres que te ayude a abordar alguna de estas tareas?'
+      }
+    }
+
+    return greeting
+  }, [user.fullName, toneConfig, pendingReminders])
 
   // Initial greeting (after tone config) - skip if loading a session from URL
   useEffect(() => {
@@ -209,6 +278,27 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       }
     }
     loadSession()
+  }, [searchParams])
+
+  // Load prompt reference from gallery (?prompt_ref=PROMPT_ID)
+  useEffect(() => {
+    const promptRef = searchParams.get('prompt_ref')
+    if (!promptRef) return
+
+    async function loadPromptRef() {
+      try {
+        const res = await fetch(`/api/hanna/prompts/${promptRef}`)
+        const data = await res.json()
+        if (data.success && data.prompt) {
+          const promptContent = data.prompt.content
+          const prefill = `Quiero refinar este prompt para generacion de imagenes con IA:\n\n\`\`\`\n${promptContent}\n\`\`\`\n\nAyudame a mejorarlo y personalizarlo.`
+          setInputText(prefill)
+        }
+      } catch {
+        // Silently fail
+      }
+    }
+    loadPromptRef()
   }, [searchParams])
 
   // Auto-scroll
@@ -303,6 +393,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           message: text.trim(),
           sessionId: currentSessionId,
           toneConfig: toneConfig,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           history: messages.slice(-historyLimit).map(m => ({
             role: m.role,
             content: m.content,
@@ -313,14 +404,22 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       const data = await response.json()
 
       if (data.success && data.response) {
+        // Parse reminder suggestion from AI response (Pro/Business only)
+        const { cleanText, suggestion } = parseReminderSuggestion(data.response)
+
         const assistantMessage: Message = {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: data.response,
+          content: cleanText,
           timestamp: new Date(),
         }
 
         setMessages(prev => [...prev, assistantMessage])
+
+        // Show reminder confirmation card if suggestion detected
+        if (suggestion && profile.plan !== 'free') {
+          setPendingReminderSuggestion(suggestion)
+        }
 
         // Update remaining messages
         if (data.messages_remaining !== undefined) {
@@ -329,10 +428,10 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           setMessagesRemaining(prev => Math.max(0, prev - 1))
         }
 
-        // Text-to-speech for Pro users
+        // Text-to-speech for Pro users (use clean text without marker)
         if (profile.plan === 'pro' && voiceEnabled && voiceSupport.tts) {
           speakText(
-            data.response,
+            cleanText,
             () => setIsSpeaking(true),
             () => setIsSpeaking(false)
           )
@@ -371,6 +470,40 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     await supabase.auth.signOut()
     router.push('/hanna')
     router.refresh()
+  }
+
+  // Reminder handlers (Pro/Business only)
+  const handleConfirmReminder = async (suggestion: ReminderSuggestion) => {
+    setReminderSaving(true)
+    try {
+      const res = await fetch('/api/hanna/reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task: suggestion.task,
+          strategic_context: suggestion.why,
+          approach_suggestion: suggestion.approach,
+          due_iso: suggestion.due_iso,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          session_id: sessionId,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setPendingReminderSuggestion(null)
+        // Add confirmation message
+        setMessages(prev => [...prev, {
+          id: `reminder-confirmed-${Date.now()}`,
+          role: 'assistant',
+          content: `✅ Recordatorio creado: **${suggestion.task}** para el ${suggestion.due}. ¡Te avisare cuando se acerque la fecha!`,
+          timestamp: new Date(),
+        }])
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setReminderSaving(false)
+    }
   }
 
   // Voice input handlers (Pro only)
@@ -841,6 +974,58 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             >
               <div className="max-w-[85%] rounded-2xl px-5 py-4 bg-[#C7517E]/30 text-white rounded-tr-sm">
                 <p className="text-sm italic">{interimTranscript}...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Reminder Suggestion Card (Pro/Business only) */}
+          {pendingReminderSuggestion && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start pl-13"
+            >
+              <div
+                className="rounded-xl px-4 py-3 border max-w-[85%]"
+                style={{
+                  backgroundColor: theme.colors.cardBg,
+                  borderColor: '#2CB6D7' + '40',
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Bell className="w-4 h-4" style={{ color: '#2CB6D7' }} />
+                  <span className="text-sm font-medium" style={{ color: theme.colors.textPrimary }}>
+                    ¿Crear recordatorio?
+                  </span>
+                </div>
+                <p className="text-sm mb-1" style={{ color: theme.colors.textSecondary }}>
+                  {pendingReminderSuggestion.task}
+                </p>
+                <p className="text-xs mb-3" style={{ color: theme.colors.textMuted }}>
+                  Para: {pendingReminderSuggestion.due}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleConfirmReminder(pendingReminderSuggestion)}
+                    disabled={reminderSaving}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-white flex items-center gap-1 transition-opacity hover:opacity-90 disabled:opacity-50"
+                    style={{ backgroundColor: '#2CB6D7' }}
+                  >
+                    {reminderSaving ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Check className="w-3 h-3" />
+                    )}
+                    Crear recordatorio
+                  </button>
+                  <button
+                    onClick={() => setPendingReminderSuggestion(null)}
+                    className="px-3 py-1.5 rounded-lg text-xs transition-opacity hover:opacity-70"
+                    style={{ color: theme.colors.textMuted }}
+                  >
+                    No, gracias
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
