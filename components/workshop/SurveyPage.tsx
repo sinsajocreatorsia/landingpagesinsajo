@@ -264,7 +264,7 @@ export default function SurveyPage() {
         </div>
 
         {/* Form card */}
-        <div className="bg-[#FCFEFB] rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-[#FCFEFB] rounded-3xl shadow-2xl overflow-hidden survey-input">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -577,7 +577,7 @@ function Step1Satisfaction({ formData, updateField, toggleArrayField }: StepProp
           rows={3}
           placeholder="Comparte tus sugerencias..."
           className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors resize-none"
-          style={{ color: '#111827' }}
+
         />
       </div>
     </div>
@@ -745,7 +745,7 @@ function Step4FutureInterest({ formData, updateField, toggleArrayField }: StepPr
             onChange={(e) => updateField('futureTopicsOther', e.target.value)}
             placeholder="Especifica el tema..."
             className="mt-2 w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
-            style={{ color: '#111827' }}
+  
           />
         )}
       </div>
@@ -906,7 +906,7 @@ function Step6ContactGoogle({ formData, updateField }: StepProps) {
           onChange={(e) => updateField('fullName', e.target.value)}
           placeholder="Tu nombre"
           className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
-          style={{ color: '#111827' }}
+
         />
       </div>
 
@@ -921,7 +921,7 @@ function Step6ContactGoogle({ formData, updateField }: StepProps) {
           onChange={(e) => updateField('email', e.target.value)}
           placeholder="tu@email.com"
           className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-[#2CB6D7] focus:outline-none transition-colors"
-          style={{ color: '#111827' }}
+
         />
         <p className="text-xs text-gray-400 mt-1">
           Aqui te enviaremos tu codigo de descuento

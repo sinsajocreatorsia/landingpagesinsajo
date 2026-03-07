@@ -107,6 +107,8 @@ export type FutureTopicOption =
   | 'ai_business_strategy'
   | 'ai_automation'
   | 'ai_branding'
+  | 'ai_software'
+  | 'ai_video'
   | 'other'
 
 export type CommunityValueOption =
@@ -257,6 +259,8 @@ export const FUTURE_TOPIC_OPTIONS: { value: FutureTopicOption; label: string }[]
   { value: 'ai_business_strategy', label: 'IA para Estrategia de Negocio' },
   { value: 'ai_automation', label: 'IA para Automatizacion' },
   { value: 'ai_branding', label: 'IA para Branding' },
+  { value: 'ai_software', label: 'Crear Software para automatizar tu negocio' },
+  { value: 'ai_video', label: 'Creacion y edicion de video con IA' },
   { value: 'other', label: 'Otro' },
 ]
 

@@ -70,6 +70,30 @@ body {
   }
 }
 
+/* Survey form inputs - force dark text on light backgrounds */
+.survey-input,
+.survey-input input,
+.survey-input textarea {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+.survey-input input:-webkit-autofill,
+.survey-input input:-webkit-autofill:hover,
+.survey-input input:-webkit-autofill:focus,
+.survey-input textarea:-webkit-autofill {
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+  color: #111827 !important;
+}
+
+.survey-input input::placeholder,
+.survey-input textarea::placeholder {
+  color: #9ca3af !important;
+  -webkit-text-fill-color: #9ca3af !important;
+}
+
 /* Section Base Styles */
 section {
   padding-top: var(--section-spacing);
