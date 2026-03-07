@@ -33,9 +33,19 @@ export async function POST(request: Request) {
       likedMost,
       improvements,
       suggestions,
+      learnedSkills,
+      knowledgeBefore,
+      knowledgeAfter,
+      firstImplementation,
+      implementationBarriers,
+      expectationsMet,
+      durationFeedback,
+      scheduleFeedback,
+      preferredFormat,
       futureTopics,
       futureTopicsOther,
       continuingInterest,
+      willingnessToPay,
       npsScore,
       communityInterest,
       communityValues,
@@ -61,6 +71,30 @@ export async function POST(request: Request) {
     if (!overallRating || overallRating < 1 || overallRating > 5) {
       return NextResponse.json(
         { success: false, error: 'Calificacion general es requerida (1-5)' },
+        { status: 400 }
+      )
+    }
+    if (!knowledgeBefore || knowledgeBefore < 1 || knowledgeBefore > 5) {
+      return NextResponse.json(
+        { success: false, error: 'Nivel de conocimiento antes es requerido (1-5)' },
+        { status: 400 }
+      )
+    }
+    if (!knowledgeAfter || knowledgeAfter < 1 || knowledgeAfter > 5) {
+      return NextResponse.json(
+        { success: false, error: 'Nivel de conocimiento despues es requerido (1-5)' },
+        { status: 400 }
+      )
+    }
+    if (!expectationsMet || expectationsMet < 1 || expectationsMet > 5) {
+      return NextResponse.json(
+        { success: false, error: 'Expectativas es requerido (1-5)' },
+        { status: 400 }
+      )
+    }
+    if (!durationFeedback || !['too_short', 'just_right', 'too_long'].includes(durationFeedback)) {
+      return NextResponse.json(
+        { success: false, error: 'Feedback de duracion es requerido' },
         { status: 400 }
       )
     }
@@ -115,9 +149,19 @@ export async function POST(request: Request) {
         liked_most: likedMost || [],
         improvements: improvements || [],
         suggestions: suggestions || null,
+        learned_skills: learnedSkills || [],
+        knowledge_before: knowledgeBefore,
+        knowledge_after: knowledgeAfter,
+        first_implementation: firstImplementation || null,
+        implementation_barriers: implementationBarriers || [],
+        expectations_met: expectationsMet,
+        duration_feedback: durationFeedback,
+        schedule_feedback: scheduleFeedback || null,
+        preferred_format: preferredFormat || null,
         future_topics: futureTopics || [],
         future_topics_other: futureTopicsOther || null,
         continuing_interest: continuingInterest,
+        willingness_to_pay: willingnessToPay || null,
         nps_score: npsScore,
         community_interest: communityInterest,
         community_values: communityValues || [],

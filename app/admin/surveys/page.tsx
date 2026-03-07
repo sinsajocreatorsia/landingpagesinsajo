@@ -11,9 +11,23 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
+  BookOpen,
 } from 'lucide-react'
 import type { SurveyRecord, SurveyStats } from '@/types/survey'
-import { LIKED_OPTIONS, IMPROVEMENT_OPTIONS, FUTURE_TOPIC_OPTIONS, COMMUNITY_VALUE_OPTIONS, PLATFORM_OPTIONS } from '@/types/survey'
+import {
+  LIKED_OPTIONS,
+  IMPROVEMENT_OPTIONS,
+  FUTURE_TOPIC_OPTIONS,
+  COMMUNITY_VALUE_OPTIONS,
+  PLATFORM_OPTIONS,
+  LEARNED_SKILL_OPTIONS,
+  FIRST_IMPLEMENTATION_OPTIONS,
+  IMPLEMENTATION_BARRIER_OPTIONS,
+  DURATION_FEEDBACK_OPTIONS,
+  SCHEDULE_FEEDBACK_OPTIONS,
+  PREFERRED_FORMAT_OPTIONS,
+  WILLINGNESS_TO_PAY_OPTIONS,
+} from '@/types/survey'
 
 function StatCard({
   label,
@@ -45,6 +59,8 @@ function labelFor(value: string, options: { value: string; label: string }[]): s
 
 function SurveyRow({ survey }: { survey: SurveyRecord }) {
   const [expanded, setExpanded] = useState(false)
+
+  const knowledgeGain = (survey.knowledge_after || 0) - (survey.knowledge_before || 0)
 
   return (
     <div className="border-b border-gray-100 last:border-0">
@@ -142,6 +158,57 @@ function SurveyRow({ survey }: { survey: SurveyRecord }) {
                   <p className="text-gray-600">{survey.suggestions}</p>
                 </div>
               )}
+
+              {/* Learning Impact (NEW) */}
+              <div className="bg-indigo-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-700 mb-2">Habilidades aprendidas</h4>
+                <div className="flex flex-wrap gap-1">
+                  {(survey.learned_skills || []).map((v) => (
+                    <span key={v} className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs">
+                      {labelFor(v, LEARNED_SKILL_OPTIONS)}
+                    </span>
+                  ))}
+                  {(!survey.learned_skills || survey.learned_skills.length === 0) && <span className="text-gray-400">-</span>}
+                </div>
+              </div>
+              <div className="bg-indigo-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-700 mb-2">Impacto de conocimiento</h4>
+                <div className="space-y-1">
+                  <p className="text-gray-600">Antes: {survey.knowledge_before || '-'}/5 | Despues: {survey.knowledge_after || '-'}/5</p>
+                  {knowledgeGain > 0 && (
+                    <span className="inline-block bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
+                      +{knowledgeGain} nivel{knowledgeGain > 1 ? 'es' : ''}
+                    </span>
+                  )}
+                  {survey.first_implementation && (
+                    <p className="text-gray-500 mt-1">Implementara: {labelFor(survey.first_implementation, FIRST_IMPLEMENTATION_OPTIONS)}</p>
+                  )}
+                </div>
+              </div>
+              {(survey.implementation_barriers || []).length > 0 && (
+                <div className="bg-red-50 rounded-lg p-4 md:col-span-2">
+                  <h4 className="font-medium text-gray-700 mb-2">Barreras de implementacion</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {survey.implementation_barriers.map((v) => (
+                      <span key={v} className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs">
+                        {labelFor(v, IMPLEMENTATION_BARRIER_OPTIONS)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Logistics (NEW) */}
+              <div className="bg-amber-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-700 mb-2">Logistica</h4>
+                <div className="space-y-1 text-gray-600">
+                  <p>Expectativas: {survey.expectations_met || '-'}/5</p>
+                  {survey.duration_feedback && <p>Duracion: {labelFor(survey.duration_feedback, DURATION_FEEDBACK_OPTIONS)}</p>}
+                  {survey.schedule_feedback && <p>Horario: {labelFor(survey.schedule_feedback, SCHEDULE_FEEDBACK_OPTIONS)}</p>}
+                  {survey.preferred_format && <p>Formato: {labelFor(survey.preferred_format, PREFERRED_FORMAT_OPTIONS)}</p>}
+                </div>
+              </div>
+
               {/* Future */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-700 mb-2">Temas de interes</h4>
@@ -155,7 +222,11 @@ function SurveyRow({ survey }: { survey: SurveyRecord }) {
                 {survey.future_topics_other && (
                   <p className="text-gray-500 mt-1 text-xs">Otro: {survey.future_topics_other}</p>
                 )}
+                {survey.willingness_to_pay && (
+                  <p className="text-gray-500 mt-1 text-xs">Dispuesta a pagar: {labelFor(survey.willingness_to_pay, WILLINGNESS_TO_PAY_OPTIONS)}</p>
+                )}
               </div>
+
               {/* Community */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-700 mb-2">Comunidad</h4>
@@ -177,8 +248,9 @@ function SurveyRow({ survey }: { survey: SurveyRecord }) {
                   </p>
                 )}
               </div>
+
               {/* Google + Coupon */}
-              <div className="bg-gray-50 rounded-lg p-4 md:col-span-2 flex gap-6">
+              <div className="bg-gray-50 rounded-lg p-4 flex gap-6">
                 <div>
                   <h4 className="font-medium text-gray-700 mb-1">Google Rating</h4>
                   <div className="flex items-center gap-1">
@@ -248,7 +320,11 @@ export default function AdminSurveysPage() {
     const headers = [
       'Nombre', 'Email', 'Rating', 'NPS', 'Interes Continuo',
       'Lo que gusto', 'Mejoras', 'Sugerencias',
-      'Temas futuros', 'Comunidad', 'Valores comunidad', 'Plataforma',
+      'Habilidades aprendidas', 'Conocimiento antes', 'Conocimiento despues',
+      'Primera implementacion', 'Barreras',
+      'Expectativas', 'Duracion', 'Horario', 'Formato preferido',
+      'Temas futuros', 'Dispuesta a pagar',
+      'Comunidad', 'Valores comunidad', 'Plataforma',
       'Google Rating', 'Cupon', 'Fecha',
     ]
     const rows = surveys.map((s) => [
@@ -260,7 +336,17 @@ export default function AdminSurveysPage() {
       s.liked_most.join('; '),
       s.improvements.join('; '),
       s.suggestions || '',
+      (s.learned_skills || []).join('; '),
+      s.knowledge_before || '',
+      s.knowledge_after || '',
+      s.first_implementation || '',
+      (s.implementation_barriers || []).join('; '),
+      s.expectations_met || '',
+      s.duration_feedback || '',
+      s.schedule_feedback || '',
+      s.preferred_format || '',
       s.future_topics.join('; '),
+      s.willingness_to_pay || '',
       s.community_interest,
       s.community_values.join('; '),
       s.preferred_platform || '',
@@ -304,7 +390,7 @@ export default function AdminSurveysPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <StatCard
             label="Total Respuestas"
             value={stats.totalResponses}
@@ -328,6 +414,12 @@ export default function AdminSurveysPage() {
             value={`${stats.totalResponses > 0 ? Math.round(((stats.communityYes + stats.communityMaybe) / stats.totalResponses) * 100) : 0}%`}
             icon={Users}
             color="bg-teal-500"
+          />
+          <StatCard
+            label="Interes Continuo"
+            value={`${stats.avgContinuingInterest.toFixed(1)} / 5`}
+            icon={BookOpen}
+            color="bg-indigo-500"
           />
         </div>
       )}
