@@ -152,10 +152,24 @@ export async function POST(request: Request) {
           if (stripeCouponId) {
             // Use the mapped launch coupon directly by ID
             try {
-              await stripe.coupons.retrieve(stripeCouponId)
+              const retrieved = await stripe.coupons.retrieve(stripeCouponId)
+              console.log('Stripe coupon found:', retrieved.id, 'percent_off:', retrieved.percent_off, 'valid:', retrieved.valid)
               sessionParams.discounts = [{ coupon: stripeCouponId }]
-            } catch {
-              console.log('Launch coupon not found in Stripe:', stripeCouponId)
+            } catch (e) {
+              console.error('STRIPE COUPON NOT FOUND:', stripeCouponId, e)
+              // Coupon doesn't exist in Stripe - create it on the fly
+              try {
+                const newCoupon = await stripe.coupons.create({
+                  id: stripeCouponId,
+                  percent_off: coupon.discount_value,
+                  duration: 'once',
+                  name: stripeCouponId,
+                })
+                console.log('Created Stripe coupon:', newCoupon.id)
+                sessionParams.discounts = [{ coupon: newCoupon.id }]
+              } catch (createErr) {
+                console.error('Failed to create Stripe coupon:', createErr)
+              }
             }
           } else {
             // Regular coupon: find Stripe coupon by name
