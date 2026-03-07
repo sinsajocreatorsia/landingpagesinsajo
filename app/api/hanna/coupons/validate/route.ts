@@ -51,12 +51,17 @@ export async function POST(request: Request) {
 
     // Build success message
     let message = ''
+    const discountValue = coupon.discount_value
     if (coupon.discount_type === 'free_months') {
       message = `${coupon.free_months} meses gratis de Hanna Pro`
     } else if (coupon.discount_type === 'percentage') {
-      message = `${coupon.discount_value}% de descuento`
+      if (discountValue >= 100) {
+        message = 'Primer mes GRATIS'
+      } else {
+        message = `${discountValue}% de descuento en tu primer mes`
+      }
     } else {
-      message = `$${coupon.discount_value} de descuento`
+      message = `$${discountValue} de descuento en tu primer mes`
     }
 
     return NextResponse.json({
