@@ -95,10 +95,10 @@ export async function POST(request: Request) {
     }
 
     // Prepare checkout session params
+    // NOTE: Do NOT use payment_method_types when using discounts - they conflict in Stripe API
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
       mode: 'subscription',
-      payment_method_types: ['card'],
       line_items: [
         {
           price: plan === 'business'
@@ -135,14 +135,21 @@ export async function POST(request: Request) {
       const coupon = couponData as CouponData | null
 
       if (coupon) {
-        // For free_months coupons, we handle differently - apply trial period
+        // For free_months coupons, apply trial period
         if (coupon.discount_type === 'free_months' && coupon.free_months && coupon.free_months > 0) {
           sessionParams.subscription_data = {
             ...sessionParams.subscription_data,
             trial_period_days: coupon.free_months * 30,
           }
+        } else if (coupon.discount_type === 'percentage' && coupon.discount_value >= 100) {
+          // 100% off = free first month via trial period (most reliable in Stripe)
+          sessionParams.subscription_data = {
+            ...sessionParams.subscription_data,
+            trial_period_days: 30,
+          }
+          console.log('Applied 100% coupon as 30-day trial:', upperCode)
         } else if (coupon.discount_type === 'percentage' || coupon.discount_type === 'fixed') {
-          // Map known coupon codes to their Stripe coupon IDs
+          // Partial discount - use Stripe coupon
           const STRIPE_COUPON_MAP: Record<string, string> = {
             'HANNAPRO': 'HannaPro',
             'CHICASPRO2026': 'CHICASPRO2026',
@@ -150,14 +157,12 @@ export async function POST(request: Request) {
           const stripeCouponId = STRIPE_COUPON_MAP[upperCode] || null
 
           if (stripeCouponId) {
-            // Use the mapped launch coupon directly by ID
             try {
-              const retrieved = await stripe.coupons.retrieve(stripeCouponId)
-              console.log('Stripe coupon found:', retrieved.id, 'percent_off:', retrieved.percent_off, 'valid:', retrieved.valid)
+              await stripe.coupons.retrieve(stripeCouponId)
               sessionParams.discounts = [{ coupon: stripeCouponId }]
-            } catch (e) {
-              console.error('STRIPE COUPON NOT FOUND:', stripeCouponId, e)
-              // Coupon doesn't exist in Stripe - create it on the fly
+              console.log('Applied Stripe coupon:', stripeCouponId)
+            } catch {
+              // Coupon doesn't exist in Stripe - create it
               try {
                 const newCoupon = await stripe.coupons.create({
                   id: stripeCouponId,
@@ -165,8 +170,8 @@ export async function POST(request: Request) {
                   duration: 'once',
                   name: stripeCouponId,
                 })
-                console.log('Created Stripe coupon:', newCoupon.id)
                 sessionParams.discounts = [{ coupon: newCoupon.id }]
+                console.log('Created and applied Stripe coupon:', newCoupon.id)
               } catch (createErr) {
                 console.error('Failed to create Stripe coupon:', createErr)
               }
