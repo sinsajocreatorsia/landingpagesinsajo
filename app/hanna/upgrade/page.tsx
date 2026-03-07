@@ -54,14 +54,6 @@ function UpgradeContent() {
       .catch(() => {});
   }, []);
 
-  // Update coupon message when plan changes during launch
-  useEffect(() => {
-    if (launch?.active && couponValid && couponCode) {
-      setCouponMessage(
-        "50% de descuento en tu primer mes"
-      );
-    }
-  }, [selectedPlan, launch, couponCode, couponValid]);
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return;
