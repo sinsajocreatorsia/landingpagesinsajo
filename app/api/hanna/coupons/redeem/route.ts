@@ -23,17 +23,18 @@ export async function POST(request: Request) {
   if (authError) return authError
 
   try {
-    const { code, userId } = await request.json()
+    const { code, userId: requestedUserId } = await request.json()
 
-    if (!code || !userId) {
+    if (!code) {
       return NextResponse.json(
-        { success: false, error: 'Código y usuario requeridos' },
+        { success: false, error: 'Código de cupón requerido' },
         { status: 400 }
       )
     }
 
-    // Verify the authenticated user matches the requested userId
-    if (user!.id !== userId) {
+    // Use authenticated user's ID, or verify requested userId matches
+    const userId = requestedUserId || user!.id
+    if (userId !== user!.id) {
       return NextResponse.json(
         { success: false, error: 'No autorizado para redimir cupones para otro usuario' },
         { status: 403 }
@@ -60,11 +61,16 @@ export async function POST(request: Request) {
       )
     }
 
-    // Calculate plan expiry for free months
+    // Calculate plan expiry based on coupon type
     let planExpiresAt: string | null = null
     if (coupon.discount_type === 'free_months' && coupon.free_months && coupon.free_months > 0) {
       const expiryDate = new Date()
       expiryDate.setMonth(expiryDate.getMonth() + coupon.free_months)
+      planExpiresAt = expiryDate.toISOString()
+    } else if (coupon.discount_type === 'percentage' && coupon.discount_value >= 100) {
+      // 100% off = 30 days free trial
+      const expiryDate = new Date()
+      expiryDate.setDate(expiryDate.getDate() + 30)
       planExpiresAt = expiryDate.toISOString()
     }
 
@@ -93,11 +99,17 @@ export async function POST(request: Request) {
     // Increment coupon usage
     await couponsTable.incrementUses(coupon.id, coupon.current_uses)
 
+    // Build success message
+    let message = 'Cupon aplicado correctamente'
+    if (coupon.free_months && coupon.free_months > 0) {
+      message = `Felicidades! Tienes ${coupon.free_months} meses gratis de Hanna Pro`
+    } else if (coupon.discount_value >= 100) {
+      message = 'Felicidades! Tu primer mes de Hanna Pro es GRATIS'
+    }
+
     return NextResponse.json({
       success: true,
-      message: coupon.free_months
-        ? `¡Felicidades! Tienes ${coupon.free_months} meses gratis de Hanna Pro`
-        : 'Cupón aplicado correctamente',
+      message,
       plan_expires_at: planExpiresAt,
     })
   } catch (error) {

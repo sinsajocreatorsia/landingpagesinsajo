@@ -231,8 +231,8 @@ export default function HannaInsightsPage() {
       {/* User Base Overview */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <StatCard icon={Users} label="Total Usuarios" value={data.userBase.total} color="blue" />
-        <StatCard icon={Crown} label="Pro" value={data.userBase.pro} subtitle={`$${(data.userBase.pro * 19.99).toFixed(0)}/mes`} color="purple" />
-        <StatCard icon={Zap} label="Business" value={data.userBase.business} subtitle={`$${(data.userBase.business * 49).toFixed(0)}/mes`} color="teal" />
+        <StatCard icon={Crown} label="Pro" value={data.userBase.pro} subtitle={`$${(data.userBase.pro * 15).toFixed(0)}/mes`} color="purple" />
+        <StatCard icon={Zap} label="Business" value={data.userBase.business} subtitle={`$${(data.userBase.business * 29).toFixed(0)}/mes`} color="teal" />
         <StatCard icon={Users} label="Free" value={data.userBase.free} subtitle="potencial conversion" color="orange" />
         <StatCard icon={UserCheck} label="Activos" value={data.engagement.activeUsers} subtitle={`${data.engagement.engagementRate}% engagement`} color="green" />
       </div>

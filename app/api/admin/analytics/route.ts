@@ -137,7 +137,7 @@ export async function GET(request: Request) {
       .eq('plan', 'pro')
       .eq('subscription_status', 'active')
 
-    const monthlyRevenue = (proUsers || 0) * 19.99
+    const monthlyRevenue = (proUsers || 0) * 15
     const projectedMonthlyCost = (totalCost / periodDays) * 30
     const projectedMonthlyMargin = monthlyRevenue - projectedMonthlyCost
 

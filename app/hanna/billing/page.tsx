@@ -222,13 +222,13 @@ export default function BillingPage() {
               </div>
               {isBusiness && (
                 <p className="text-white/60 text-sm">
-                  $49/mes - Modelos premium + soporte prioritario
+                  $29/mes - IA Premium + Voz HD + soporte prioritario
                   {data?.plan_started_at && ` - Miembro desde ${formatDate(data.plan_started_at)}`}
                 </p>
               )}
               {isPro && (
                 <p className="text-white/60 text-sm">
-                  $19/mes - Mensajes ilimitados
+                  $15/mes - IA estratégica + voz + recordatorios
                   {data?.plan_started_at && ` - Miembro desde ${formatDate(data.plan_started_at)}`}
                 </p>
               )}
@@ -356,7 +356,7 @@ export default function BillingPage() {
                   className="inline-flex items-center gap-2 py-3 px-6 bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white font-semibold rounded-xl hover:from-[#d4608d] hover:to-[#C7517E] transition-all"
                 >
                   <Crown className="w-5 h-5" />
-                  Actualizar a Pro - $19/mes
+                  Actualizar a Pro - $15/mes
                 </Link>
               </div>
             )}
@@ -372,14 +372,14 @@ export default function BillingPage() {
                 )}
               </div>
               <p className="text-white/60 mb-4">
-                Modelos IA Premium (Gemini Pro + Claude), analisis avanzado, estrategia de marketing IA y soporte prioritario.
+                IA Premium (Claude + Gemini Pro), voz HD, 20 recordatorios, resumen semanal y soporte prioritario.
               </p>
               <Link
                 href="/hanna/upgrade"
                 className="inline-flex items-center gap-2 py-3 px-6 bg-gradient-to-r from-[#2CB6D7] to-[#36B3AE] text-white font-semibold rounded-xl hover:from-[#36c5e6] hover:to-[#2CB6D7] transition-all"
               >
                 <Sparkles className="w-5 h-5" />
-                {isPro ? 'Upgrade a Business - $49/mes' : 'Actualizar a Business - $49/mes'}
+                {isPro ? 'Upgrade a Business - $29/mes' : 'Actualizar a Business - $29/mes'}
               </Link>
             </div>
           </motion.div>

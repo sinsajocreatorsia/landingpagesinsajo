@@ -113,17 +113,30 @@ export async function GET(request: NextRequest) {
 
                 if (!existingRedemption) {
                   // Apply coupon benefits
+                  let planExpiresAt: string | null = null
+
                   if (couponRecord.discount_type === 'free_months' && couponRecord.free_months) {
                     const freeMonths = couponRecord.free_months as number
                     const expiresAt = new Date()
                     expiresAt.setMonth(expiresAt.getMonth() + freeMonths)
+                    planExpiresAt = expiresAt.toISOString()
+                  } else if (
+                    couponRecord.discount_type === 'percentage' &&
+                    (couponRecord.discount_value as number) >= 100
+                  ) {
+                    // 100% off = 30 days free trial
+                    const expiresAt = new Date()
+                    expiresAt.setDate(expiresAt.getDate() + 30)
+                    planExpiresAt = expiresAt.toISOString()
+                  }
 
+                  if (planExpiresAt) {
                     await (supabaseAdmin.from('profiles') as ReturnType<typeof supabaseAdmin.from>)
                       .update({
                         plan: 'pro',
                         subscription_status: 'active',
                         plan_started_at: new Date().toISOString(),
-                        plan_expires_at: expiresAt.toISOString(),
+                        plan_expires_at: planExpiresAt,
                       } as Record<string, unknown>)
                       .eq('id', user.id)
 

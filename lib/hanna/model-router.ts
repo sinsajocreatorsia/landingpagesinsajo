@@ -3,8 +3,8 @@
  *
  * Dynamically selects the best AI model via OpenRouter based on query type and plan.
  * - Free users: Always use Gemini 2.0 Flash (fast, economical)
- * - Pro users: Flash-tier routing (Gemini 2.0 Flash + 2.5 Flash)
- * - Business users: Premium routing (Gemini 2.5 Pro + Claude Sonnet 4)
+ * - Pro users: Smart routing (Gemini 2.5 Flash + 2.5 Pro for strategic queries)
+ * - Business users: Premium routing (Claude Sonnet 4 primary + Gemini 2.5 Pro)
  * - Fallback: If primary model fails, retry with a fallback model
  */
 
@@ -123,7 +123,7 @@ export function classifyQuery(message: string, history: Array<{ role: string; co
 
 /**
  * Select optimal model for a Pro user based on query classification.
- * Pro tier uses Flash-only models (economical, fast).
+ * Pro tier uses Gemini 2.5 Flash + Gemini 2.5 Pro for strategic queries.
  */
 export function routeProQuery(
   message: string,
@@ -134,15 +134,24 @@ export function routeProQuery(
   switch (category) {
     case 'strategy':
     case 'analytics':
+      // Complex reasoning → Gemini 2.5 Pro (premium strategic responses)
+      return {
+        model: MODELS.pro,
+        fallbackModel: MODELS.flashPro,
+        category,
+        temperature: 0.7,
+        maxTokens: 1500,
+      }
+
     case 'content':
-    case 'marketing':
     case 'prompt_creation':
-      // All specialized queries → Gemini 2.5 Flash (best Flash-tier model)
+    case 'marketing':
+      // Creative & marketing → Gemini 2.5 Flash (balanced)
       return {
         model: MODELS.flashPro,
         fallbackModel: MODELS.flash,
         category,
-        temperature: (category === 'content' || category === 'prompt_creation') ? 0.85 : 0.7,
+        temperature: (category === 'content' || category === 'prompt_creation') ? 0.85 : 0.8,
         maxTokens: 1500,
       }
 
@@ -161,7 +170,8 @@ export function routeProQuery(
 
 /**
  * Select optimal model for a Business user based on query classification.
- * Business tier has access to premium models (Gemini 2.5 Pro, Claude Sonnet 4).
+ * Business tier uses Claude Sonnet 4 as primary + Gemini 2.5 Pro for reasoning.
+ * Business differentiator: Claude Sonnet 4 for most queries (superior quality).
  */
 export function routeBusinessQuery(
   message: string,
@@ -172,10 +182,10 @@ export function routeBusinessQuery(
   switch (category) {
     case 'strategy':
     case 'analytics':
-      // Complex reasoning → Gemini 2.5 Pro
+      // Complex reasoning → Claude Sonnet 4 (premium strategic analysis)
       return {
-        model: MODELS.pro,
-        fallbackModel: MODELS.flashPro,
+        model: MODELS.creative,
+        fallbackModel: MODELS.pro,
         category,
         temperature: 0.7,
         maxTokens: 2500,
@@ -193,21 +203,21 @@ export function routeBusinessQuery(
       }
 
     case 'marketing':
-      // Marketing → Gemini 2.5 Flash (balanced)
+      // Marketing → Gemini 2.5 Pro (deep marketing analysis)
       return {
-        model: MODELS.flashPro,
-        fallbackModel: MODELS.flash,
+        model: MODELS.pro,
+        fallbackModel: MODELS.flashPro,
         category,
         temperature: 0.8,
-        maxTokens: 2000,
+        maxTokens: 2500,
       }
 
     case 'general':
     default:
-      // Quick/simple → Gemini 2.0 Flash (speed)
+      // General → Gemini 2.5 Flash (fast but still premium tier)
       return {
-        model: MODELS.flash,
-        fallbackModel: MODELS.flashPro,
+        model: MODELS.flashPro,
+        fallbackModel: MODELS.flash,
         category,
         temperature: 0.7,
         maxTokens: 1500,

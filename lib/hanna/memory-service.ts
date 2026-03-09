@@ -55,11 +55,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   action_item: 'Acciones Pendientes',
   preference: 'Preferencias',
   challenge: 'Retos',
+  communication_style: 'Estilo de Comunicacion',
 }
 
 const VALID_CATEGORY_SET = new Set<string>([
   'business_info', 'goal', 'decision', 'metric',
   'insight', 'action_item', 'preference', 'challenge',
+  'communication_style',
 ])
 
 // ============================================
@@ -478,6 +480,148 @@ export async function deleteMemory(
   }
 
   return true
+}
+
+// ============================================
+// COMMUNICATION STYLE LEARNING
+// ============================================
+
+/**
+ * Extracts and stores communication style patterns from user messages.
+ * Only for Pro/Business plans. Runs in background after each message.
+ *
+ * Learns: vocabulary, formality level, emoji usage, sentence structure,
+ * preferred topics, common expressions, language quirks.
+ */
+export async function extractAndStoreStyle(
+  userId: string,
+  userMessages: string[],
+  plan: string,
+): Promise<void> {
+  // Only Pro/Business can learn style
+  if (plan !== 'pro' && plan !== 'business') return
+
+  // Need at least 3 messages to detect patterns
+  if (userMessages.length < 3) return
+
+  try {
+    // Get existing style memories to avoid duplicates
+    const { data: existing } = await getTable('hanna_user_memory')
+      .select('content')
+      .eq('user_id', userId)
+      .eq('category', 'communication_style')
+      .eq('is_active', true)
+
+    const existingStyles = ((existing as { content: string }[] | null) || [])
+      .map(m => m.content.toLowerCase())
+
+    // Plan-based limits
+    const maxPatterns = plan === 'business' ? 30 : 10
+    if (existingStyles.length >= maxPatterns) return
+
+    const client = getMemoryClient()
+
+    const messagesText = userMessages.slice(-10).join('\n---\n')
+
+    const result = await client.chat.completions.create({
+      model: MODELS.flash,
+      temperature: 0.3,
+      max_tokens: 400,
+      messages: [
+        {
+          role: 'system',
+          content: `Eres un sistema de analisis de estilo de comunicacion. Analiza estos mensajes del usuario y extrae patrones de como se comunica.
+
+Devuelve un JSON array de strings, donde cada string es un patron de comunicacion observado. Maximo 3 patrones por analisis.
+
+Tipos de patrones a detectar:
+- Nivel de formalidad (tutea, vosea, ustedea)
+- Expresiones recurrentes o muletillas
+- Uso de emojis (si/no/cuales)
+- Longitud tipica de mensajes (cortos/medianos/largos)
+- Idioma o regionalismos (mexicano, argentino, colombiano, etc.)
+- Tono general (directo, amigable, profesional, casual)
+- Vocabulario tecnico o coloquial
+
+Reglas:
+- Cada patron debe ser conciso (max 80 caracteres)
+- Solo patrones CLAROS y CONSISTENTES (no suposiciones de 1 mensaje)
+- Devuelve [] si no hay patrones claros
+- NO incluyas patrones que ya existen: ${existingStyles.join(' | ')}
+- Responde SOLO con el JSON array de strings`,
+        },
+        {
+          role: 'user',
+          content: `Mensajes del usuario:\n${messagesText.slice(0, 3000)}`,
+        },
+      ],
+    })
+
+    const rawText = result.choices[0]?.message?.content?.trim() || '[]'
+
+    let patterns: string[]
+    try {
+      const jsonStr = rawText.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()
+      patterns = JSON.parse(jsonStr)
+    } catch {
+      return
+    }
+
+    if (!Array.isArray(patterns) || patterns.length === 0) return
+
+    for (const pattern of patterns.slice(0, 3)) {
+      if (typeof pattern !== 'string' || pattern.length > 200 || pattern.length < 5) continue
+
+      if (containsInjectionPattern(normalizeText(pattern))) continue
+
+      const patternLower = pattern.toLowerCase()
+      const isDuplicate = existingStyles.some(existing =>
+        existing.includes(patternLower) ||
+        patternLower.includes(existing) ||
+        levenshteinSimilarity(existing, patternLower) > 0.7
+      )
+
+      if (isDuplicate) continue
+
+      await getTable('hanna_user_memory').insert({
+        user_id: userId,
+        category: 'communication_style',
+        content: pattern,
+        confidence: 0.7,
+      } as Record<string, unknown>)
+
+      existingStyles.push(patternLower)
+    }
+  } catch (error) {
+    console.error('Style extraction failed:', error)
+  }
+}
+
+/**
+ * Build communication style context for prompt injection.
+ * Returns formatted string with user's learned communication patterns.
+ */
+export async function buildStyleContext(userId: string, plan: string): Promise<string> {
+  if (plan !== 'pro' && plan !== 'business') return ''
+
+  const { data } = await getTable('hanna_user_memory')
+    .select('content')
+    .eq('user_id', userId)
+    .eq('category', 'communication_style')
+    .eq('is_active', true)
+    .order('confidence', { ascending: false })
+    .limit(plan === 'business' ? 30 : 10)
+
+  const styles = (data as { content: string }[] | null) || []
+  if (styles.length === 0) return ''
+
+  let context = '\n\nESTILO DE COMUNICACION DEL USUARIO (adapta tu forma de responder para coincidir con su estilo natural):'
+  for (const style of styles) {
+    context += `\n- ${style.content}`
+  }
+  context += '\nIMPORTANTE: Adapta tu vocabulario, formalidad y tono para que coincida con como el usuario se comunica. Si usa "vos", responde con "vos". Si es formal, se formal. Si usa emojis, usa emojis similares.'
+
+  return context
 }
 
 // ============================================

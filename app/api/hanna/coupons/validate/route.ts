@@ -64,9 +64,14 @@ export async function POST(request: Request) {
       message = `$${discountValue} de descuento en tu primer mes`
     }
 
+    // Determine if this coupon gives a completely free trial (no payment needed)
+    const isFullDiscount = discountValue >= 100 ||
+      (coupon.discount_type === 'free_months' && (coupon.free_months || 0) > 0)
+
     return NextResponse.json({
       valid: true,
       message,
+      isFullDiscount,
       coupon: {
         id: coupon.id,
         type: coupon.type || 'promo',

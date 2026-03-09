@@ -1,118 +1,93 @@
 /**
  * Hanna Voice Module
- * Provides text-to-speech and speech-to-text capabilities for Hanna
+ * Provides text-to-speech (Edge TTS) and speech-to-text capabilities for Hanna
  */
 
 // Type declarations for Web Speech API (browser-only APIs)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SpeechRecognitionType = any
 
-// Voice configuration for Hanna
-const HANNA_VOICE_CONFIG = {
-  lang: 'es-ES',
-  rate: 0.95, // Slightly slower for clarity
-  pitch: 1.1, // Slightly higher pitch for feminine voice
-  preferredVoices: [
-    'Microsoft Helena', // Windows Spanish
-    'Paulina', // macOS Spanish
-    'Google español de España', // Chrome
-    'Monica', // Spanish female
-  ],
-}
+// Active audio element for Edge TTS playback
+let currentAudio: HTMLAudioElement | null = null
+let currentObjectUrl: string | null = null
 
 /**
- * Get the best available Spanish female voice
+ * Speak text using Edge TTS (server-side neural voice)
+ * Falls back to Web Speech API if Edge TTS fails
  */
-export function getHannaVoice(): SpeechSynthesisVoice | null {
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    return null
-  }
-
-  const voices = window.speechSynthesis.getVoices()
-
-  // Try to find preferred voices first
-  for (const preferredName of HANNA_VOICE_CONFIG.preferredVoices) {
-    const voice = voices.find(v =>
-      v.name.toLowerCase().includes(preferredName.toLowerCase())
-    )
-    if (voice) return voice
-  }
-
-  // Fall back to any Spanish female voice
-  const spanishVoice = voices.find(v =>
-    v.lang.startsWith('es') &&
-    (v.name.toLowerCase().includes('female') ||
-     v.name.toLowerCase().includes('helena') ||
-     v.name.toLowerCase().includes('paulina') ||
-     v.name.toLowerCase().includes('monica'))
-  )
-  if (spanishVoice) return spanishVoice
-
-  // Fall back to any Spanish voice
-  const anySpanish = voices.find(v => v.lang.startsWith('es'))
-  return anySpanish || null
-}
-
-/**
- * Speak text using Web Speech API
- */
-export function speakText(
+export async function speakText(
   text: string,
   onStart?: () => void,
   onEnd?: () => void,
   onError?: (error: Error) => void
-): SpeechSynthesisUtterance | null {
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    onError?.(new Error('Speech synthesis not supported'))
-    return null
+): Promise<void> {
+  if (typeof window === 'undefined') {
+    onError?.(new Error('Not in browser'))
+    return
   }
 
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel()
+  // Stop any ongoing speech
+  stopSpeaking()
 
-  const utterance = new SpeechSynthesisUtterance(text)
+  try {
+    const response = await fetch('/api/hanna/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    })
 
-  // Set voice
-  const voice = getHannaVoice()
-  if (voice) {
-    utterance.voice = voice
+    if (!response.ok) {
+      throw new Error(`TTS API error: ${response.status}`)
+    }
+
+    const audioBlob = await response.blob()
+    const audioUrl = URL.createObjectURL(audioBlob)
+    currentObjectUrl = audioUrl
+
+    const audio = new Audio(audioUrl)
+    currentAudio = audio
+
+    audio.onplay = () => onStart?.()
+    audio.onended = () => {
+      cleanupAudio()
+      onEnd?.()
+    }
+    audio.onerror = () => {
+      cleanupAudio()
+      onError?.(new Error('Audio playback failed'))
+    }
+
+    await audio.play()
+  } catch (error) {
+    cleanupAudio()
+    onError?.(error instanceof Error ? error : new Error('TTS failed'))
   }
+}
 
-  // Set speech parameters
-  utterance.lang = HANNA_VOICE_CONFIG.lang
-  utterance.rate = HANNA_VOICE_CONFIG.rate
-  utterance.pitch = HANNA_VOICE_CONFIG.pitch
-
-  // Event handlers
-  utterance.onstart = () => onStart?.()
-  utterance.onend = () => onEnd?.()
-  utterance.onerror = (event) => {
-    onError?.(new Error(event.error))
+function cleanupAudio(): void {
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio.src = ''
+    currentAudio = null
   }
-
-  // Speak
-  window.speechSynthesis.speak(utterance)
-
-  return utterance
+  if (currentObjectUrl) {
+    URL.revokeObjectURL(currentObjectUrl)
+    currentObjectUrl = null
+  }
 }
 
 /**
  * Stop any ongoing speech
  */
 export function stopSpeaking(): void {
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel()
-  }
+  cleanupAudio()
 }
 
 /**
  * Check if speech synthesis is currently speaking
  */
 export function isSpeaking(): boolean {
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    return false
-  }
-  return window.speechSynthesis.speaking
+  return currentAudio !== null && !currentAudio.paused
 }
 
 /**
@@ -131,7 +106,7 @@ export class VoiceRecognition {
         this.recognition = new SpeechRecognitionAPI()
         this.recognition.continuous = false
         this.recognition.interimResults = true
-        this.recognition.lang = 'es-ES'
+        this.recognition.lang = 'es-MX'
       }
     }
   }
@@ -228,41 +203,16 @@ export function createVoiceRecognition(): VoiceRecognition {
 
 /**
  * Check if voice features are supported
+ * TTS is always supported (Edge TTS via API, no browser dependency)
+ * STT requires browser SpeechRecognition API
  */
 export function isVoiceSupported(): { tts: boolean; stt: boolean } {
   if (typeof window === 'undefined') {
     return { tts: false, stt: false }
   }
 
-  const tts = 'speechSynthesis' in window
+  const tts = true // Edge TTS works via server API, no browser requirement
   const stt = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
 
   return { tts, stt }
-}
-
-/**
- * Initialize voices (required for some browsers)
- */
-export function initVoices(): Promise<SpeechSynthesisVoice[]> {
-  return new Promise((resolve) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      resolve([])
-      return
-    }
-
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) {
-      resolve(voices)
-      return
-    }
-
-    window.speechSynthesis.onvoiceschanged = () => {
-      resolve(window.speechSynthesis.getVoices())
-    }
-
-    // Timeout fallback
-    setTimeout(() => {
-      resolve(window.speechSynthesis.getVoices())
-    }, 1000)
-  })
 }

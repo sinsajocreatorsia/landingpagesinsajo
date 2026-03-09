@@ -19,8 +19,8 @@ const EXPECTED_COUPONS = [
     expectedPercentOff: 50,
   },
   {
-    id: 'CHICASPRO2026',
-    description: '100% off first month - workshop participants',
+    id: 'qNHiMnQ0',
+    description: '100% off first month - workshop participants (CHICASPRO2026)',
     expectedPercentOff: 100,
   },
 ]
@@ -62,9 +62,9 @@ async function verify() {
   console.log('')
   console.log('Coupon mapping:')
   console.log('  HannaPro       -> 50% off first month (promo general)')
-  console.log('  CHICASPRO2026  -> 100% off first month (workshop survey reward)')
+  console.log('  qNHiMnQ0       -> 100% off first month (CHICASPRO2026, workshop survey reward)')
   console.log('')
-  console.log('DB coupon codes must match Stripe coupon IDs exactly.')
+  console.log('DB coupon codes -> Stripe coupon IDs (mapped in checkout route).')
 }
 
 verify().catch((err) => {

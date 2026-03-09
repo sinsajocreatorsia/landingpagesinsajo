@@ -103,7 +103,7 @@ export async function GET() {
         .eq('status', 'active')
 
       const proSubs = subscriptions?.filter((s) => s.stripe_plan_id === 'pro').length || 0
-      const mrr = proSubs * 19.99
+      const mrr = proSubs * 15
 
       const { data: allSubs } = await supabaseAdmin
         .from('subscriptions')
@@ -114,7 +114,7 @@ export async function GET() {
           if (sub.stripe_plan_id === 'pro') {
             const monthsActive =
               (Date.now() - new Date(sub.created_at).getTime()) / (30 * 24 * 60 * 60 * 1000)
-            return sum + monthsActive * 19.99
+            return sum + monthsActive * 15
           }
           return sum
         }, 0) || 0

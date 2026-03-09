@@ -7,6 +7,7 @@ export type MemoryCategory =
   | 'action_item'
   | 'preference'
   | 'challenge'
+  | 'communication_style'
 
 export interface UserMemoryItem {
   id: string
@@ -55,6 +56,7 @@ export interface ExtractedMemory {
 export const VALID_CATEGORIES: MemoryCategory[] = [
   'business_info', 'goal', 'decision', 'metric',
   'insight', 'action_item', 'preference', 'challenge',
+  'communication_style',
 ]
 
 export const MEMORY_CATEGORY_META: Record<MemoryCategory, {
@@ -70,4 +72,5 @@ export const MEMORY_CATEGORY_META: Record<MemoryCategory, {
   action_item: { label: 'Acci\u00F3n', emoji: '\u2705', color: '#10B981' },
   preference: { label: 'Preferencia', emoji: '\u{1F49C}', color: '#8B5CF6' },
   challenge: { label: 'Reto', emoji: '\u{1F525}', color: '#EF4444' },
+  communication_style: { label: 'Estilo', emoji: '\u{1F4AC}', color: '#6366F1' },
 }

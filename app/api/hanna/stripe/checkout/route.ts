@@ -124,60 +124,74 @@ export async function POST(request: Request) {
     // Apply coupon if provided
     if (couponCode) {
       const upperCode = couponCode.toUpperCase()
+      console.log('[Checkout] Processing coupon:', upperCode)
 
       // Check if valid in our database (using discount_coupons table)
-      const { data: couponData } = await getTable('discount_coupons')
+      const { data: couponData, error: couponError } = await getTable('discount_coupons')
         .select('*')
         .eq('code', upperCode)
         .eq('is_active', true)
         .single()
 
+      console.log('[Checkout] DB coupon lookup:', couponData ? 'FOUND' : 'NOT FOUND', couponError ? `Error: ${couponError.message}` : '')
+
       const coupon = couponData as CouponData | null
 
       if (coupon) {
-        // For free_months coupons, apply trial period
-        if (coupon.discount_type === 'free_months' && coupon.free_months && coupon.free_months > 0) {
+        // Map of coupon codes to Stripe coupon IDs - these always use Stripe discounts
+        const STRIPE_COUPON_MAP: Record<string, string> = {
+          'HANNAPRO': 'HannaPro',
+          'CHICASPRO2026': 'qNHiMnQ0',
+        }
+        const stripeCouponId = STRIPE_COUPON_MAP[upperCode] || null
+
+        // Priority 1: If code is mapped to a Stripe coupon, use it directly (visible on checkout)
+        if (stripeCouponId) {
+          try {
+            await stripe.coupons.retrieve(stripeCouponId)
+            sessionParams.discounts = [{ coupon: stripeCouponId }]
+            console.log('Applied Stripe coupon:', stripeCouponId)
+          } catch {
+            // Coupon doesn't exist in Stripe - create it
+            try {
+              const percentOff = coupon.discount_value >= 100 ? 100 : coupon.discount_value
+              const newCoupon = await stripe.coupons.create({
+                id: stripeCouponId,
+                percent_off: percentOff,
+                duration: 'once',
+                name: `${stripeCouponId} - ${percentOff}% off first month`,
+              })
+              sessionParams.discounts = [{ coupon: newCoupon.id }]
+              console.log('Created and applied Stripe coupon:', newCoupon.id)
+            } catch (createErr) {
+              console.error('Failed to create Stripe coupon:', createErr)
+              // Fallback: 100% off as trial
+              if (coupon.discount_value >= 100) {
+                sessionParams.subscription_data = {
+                  ...sessionParams.subscription_data,
+                  trial_period_days: 30,
+                }
+                console.log('Fallback: applied 100% coupon as 30-day trial')
+              }
+            }
+          }
+        // Priority 2: free_months coupons - apply trial period
+        } else if (coupon.discount_type === 'free_months' && coupon.free_months && coupon.free_months > 0) {
           sessionParams.subscription_data = {
             ...sessionParams.subscription_data,
             trial_period_days: coupon.free_months * 30,
           }
-        } else if (coupon.discount_type === 'percentage' && coupon.discount_value >= 100) {
-          // 100% off = free first month via trial period (most reliable in Stripe)
-          sessionParams.subscription_data = {
-            ...sessionParams.subscription_data,
-            trial_period_days: 30,
-          }
-          console.log('Applied 100% coupon as 30-day trial:', upperCode)
+        // Priority 3: percentage/fixed discount - find matching Stripe coupon
         } else if (coupon.discount_type === 'percentage' || coupon.discount_type === 'fixed') {
-          // Partial discount - use Stripe coupon
-          const STRIPE_COUPON_MAP: Record<string, string> = {
-            'HANNAPRO': 'HannaPro',
-            'CHICASPRO2026': 'CHICASPRO2026',
-          }
-          const stripeCouponId = STRIPE_COUPON_MAP[upperCode] || null
-
-          if (stripeCouponId) {
-            try {
-              await stripe.coupons.retrieve(stripeCouponId)
-              sessionParams.discounts = [{ coupon: stripeCouponId }]
-              console.log('Applied Stripe coupon:', stripeCouponId)
-            } catch {
-              // Coupon doesn't exist in Stripe - create it
-              try {
-                const newCoupon = await stripe.coupons.create({
-                  id: stripeCouponId,
-                  percent_off: coupon.discount_value,
-                  duration: 'once',
-                  name: stripeCouponId,
-                })
-                sessionParams.discounts = [{ coupon: newCoupon.id }]
-                console.log('Created and applied Stripe coupon:', newCoupon.id)
-              } catch (createErr) {
-                console.error('Failed to create Stripe coupon:', createErr)
-              }
+          if (coupon.discount_value >= 100) {
+            // 100% off = free first month via trial period
+            sessionParams.subscription_data = {
+              ...sessionParams.subscription_data,
+              trial_period_days: 30,
             }
+            console.log('Applied 100% coupon as 30-day trial:', upperCode)
           } else {
-            // Regular coupon: find Stripe coupon by name
+            // Partial discount: find Stripe coupon by name
             try {
               const stripeCoupons = await stripe.coupons.list({ limit: 100 })
               const stripeCoupon = stripeCoupons.data.find(c => c.name === upperCode)
@@ -190,6 +204,11 @@ export async function POST(request: Request) {
           }
         }
       }
+    }
+
+    // If no discount was applied via our system, allow user to enter promo code on Stripe checkout
+    if (!sessionParams.discounts) {
+      sessionParams.allow_promotion_codes = true
     }
 
     // Create checkout session

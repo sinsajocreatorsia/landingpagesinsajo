@@ -30,13 +30,15 @@ import {
   ThumbsDown,
   Bell,
   Check,
+  Paperclip,
+  FileText,
+  Download,
 } from 'lucide-react'
 import {
   speakText,
   stopSpeaking,
   createVoiceRecognition,
   isVoiceSupported,
-  initVoices,
   type VoiceRecognition,
 } from '@/lib/hanna/voice'
 import { MessageContent } from '@/components/hanna/MessageContent'
@@ -73,10 +75,17 @@ interface DashboardProps {
     avatarUrl?: string
   }
   profile: {
-    plan: 'free' | 'pro'
+    plan: 'free' | 'pro' | 'business'
     subscriptionStatus: string
     messagesRemaining: number
   }
+}
+
+interface MessageAttachment {
+  name: string
+  url: string
+  mimeType: string
+  size: number
 }
 
 interface Message {
@@ -84,6 +93,7 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  attachment?: MessageAttachment
 }
 
 export default function HannaDashboardClient(props: DashboardProps) {
@@ -123,8 +133,12 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [pendingReminders, setPendingReminders] = useState<PendingRemindersResponse | null>(null)
   const [reminderSaving, setReminderSaving] = useState(false)
 
+  // File upload states (Pro/Business only)
+  const [attachment, setAttachment] = useState<{ file: File; preview?: string } | null>(null)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const recognitionRef = useRef<VoiceRecognition | null>(null)
 
   const supabase = createBrowserClient(
@@ -132,12 +146,16 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  // Initialize voice features for Pro users
+  // Initialize voice features for all plans (TTS for all, STT for Pro/Business)
   useEffect(() => {
-    if (profile.plan === 'pro') {
-      const support = isVoiceSupported()
-      setVoiceSupport(support)
-      initVoices()
+    const support = isVoiceSupported()
+    // Free users get TTS only, Pro/Business get TTS + STT
+    const isPaidPlan = profile.plan === 'pro' || profile.plan === 'business'
+    setVoiceSupport({
+      tts: support.tts,
+      stt: isPaidPlan ? support.stt : false,
+    })
+    if (isPaidPlan) {
       recognitionRef.current = createVoiceRecognition()
     }
 
@@ -351,13 +369,54 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
   // Send message
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading) return
+    if ((!text.trim() && !attachment) || isLoading) return
+
+    // Upload file first if attached
+    let uploadedFile: MessageAttachment | undefined
+    const currentAttachment = attachment
+    if (currentAttachment) {
+      setAttachment(prev => prev ? { ...prev, uploading: true } : null)
+      try {
+        const formData = new FormData()
+        formData.append('file', currentAttachment.file)
+        if (sessionId) formData.append('sessionId', sessionId)
+
+        const uploadRes = await fetch('/api/hanna/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        const uploadData = await uploadRes.json()
+
+        if (!uploadRes.ok) {
+          alert(uploadData.error || 'Error al subir archivo')
+          setAttachment(prev => prev ? { ...prev, uploading: false } : null)
+          return
+        }
+
+        uploadedFile = {
+          name: uploadData.file.name,
+          url: uploadData.file.url,
+          mimeType: uploadData.file.mimeType,
+          size: uploadData.file.size,
+        }
+      } catch {
+        alert('Error al subir el archivo')
+        setAttachment(prev => prev ? { ...prev, uploading: false } : null)
+        return
+      }
+      // Revoke preview URL
+      if (currentAttachment.preview) URL.revokeObjectURL(currentAttachment.preview)
+      setAttachment(null)
+    }
+
+    const messageText = text.trim() || (uploadedFile ? `[Archivo adjunto: ${uploadedFile.name}]` : '')
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: text.trim(),
+      content: messageText,
       timestamp: new Date(),
+      attachment: uploadedFile,
     }
 
     setMessages(prev => [...prev, userMessage])
@@ -368,18 +427,27 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
       // Create session on first user message if none exists
       let currentSessionId = sessionId
       if (!currentSessionId) {
-        const firstWords = text.trim().substring(0, 50)
+        const firstWords = messageText.substring(0, 50)
         currentSessionId = await createSession(firstWords)
       }
 
       // Pro users send more conversation history for better context
-      const historyLimit = profile.plan === 'pro' ? 20 : 10
+      const historyLimit = profile.plan === 'business' ? 30 : profile.plan === 'pro' ? 20 : 10
+
+      // Build message with file context if attached
+      let fullMessage = messageText
+      if (uploadedFile) {
+        const isImage = uploadedFile.mimeType.startsWith('image/')
+        fullMessage = isImage
+          ? `[El usuario adjuntó una imagen: ${uploadedFile.name}. URL: ${uploadedFile.url}]\n\n${messageText}`
+          : `[El usuario adjuntó un archivo: ${uploadedFile.name} (${uploadedFile.mimeType}). URL: ${uploadedFile.url}]\n\nAnaliza este archivo y ${messageText || 'dame tus observaciones.'}`
+      }
 
       const response = await fetch('/api/hanna/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: text.trim(),
+          message: fullMessage,
           sessionId: currentSessionId,
           toneConfig: toneConfig,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -417,12 +485,16 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           setMessagesRemaining(prev => Math.max(0, prev - 1))
         }
 
-        // Text-to-speech for Pro users (use clean text without marker)
-        if (profile.plan === 'pro' && voiceEnabled && voiceSupport.tts) {
+        // Text-to-speech for all plans (Edge TTS for Free/Pro, OpenAI TTS for Business)
+        if (voiceEnabled && voiceSupport.tts) {
           speakText(
             cleanText,
             () => setIsSpeaking(true),
-            () => setIsSpeaking(false)
+            () => setIsSpeaking(false),
+            (error) => {
+              console.error('TTS error:', error)
+              setIsSpeaking(false)
+            }
           )
         }
       } else if (data.error?.includes('limit')) {
@@ -497,7 +569,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
   // Voice input handlers (Pro only)
   const startListening = useCallback(() => {
-    if (!recognitionRef.current?.isSupported || isListening || profile.plan !== 'pro') return
+    if (!recognitionRef.current?.isSupported || isListening || profile.plan === 'free') return
 
     stopSpeaking() // Stop any ongoing speech
     setIsSpeaking(false)
@@ -758,7 +830,13 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
             </div>
           </div>
 
-          {/* Pro Badge */}
+          {/* Plan Badge */}
+          {profile.plan === 'business' && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#2CB6D7]/20 to-[#200F5D]/20 border border-[#2CB6D7]/30 rounded-full">
+              <Crown className="w-4 h-4 text-[#2CB6D7]" />
+              <span className="text-sm font-medium" style={{ color: theme.colors.textSecondary }}>Business</span>
+            </div>
+          )}
           {profile.plan === 'pro' && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#C7517E]/20 to-[#200F5D]/20 border border-[#C7517E]/30 rounded-full">
               <Crown className="w-4 h-4 text-[#C7517E]" />
@@ -767,7 +845,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           )}
 
           {/* Voice Toggle (Pro only) */}
-          {profile.plan === 'pro' && voiceSupport.tts && (
+          {voiceSupport.tts && (
             <button
               onClick={toggleVoice}
               className={`p-2 rounded-full transition-colors ${
@@ -1014,9 +1092,67 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
         {/* Input Area */}
         <div className="p-4 border-t backdrop-blur-md" style={{ borderColor: theme.colors.cardBorder, backgroundColor: theme.colors.inputAreaBg }}>
+          {/* File preview */}
+          {attachment && (
+            <div
+              className="mb-3 flex items-center gap-3 p-3 rounded-xl border"
+              style={{ backgroundColor: theme.colors.inputBg, borderColor: theme.colors.inputBorder }}
+            >
+              {attachment.file.type.startsWith('image/') && attachment.preview ? (
+                <img src={attachment.preview} alt={attachment.file.name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.colors.accent + '20' }}>
+                  <FileText className="w-6 h-6" style={{ color: theme.colors.accent }} />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate" style={{ color: theme.colors.textPrimary }}>{attachment.file.name}</p>
+                <p className="text-xs" style={{ color: theme.colors.textMuted }}>{(attachment.file.size / 1024).toFixed(0)} KB</p>
+              </div>
+              {(attachment as { uploading?: boolean }).uploading ? (
+                <Loader2 className="w-5 h-5 animate-spin flex-shrink-0" style={{ color: theme.colors.accent }} />
+              ) : (
+                <button type="button" onClick={() => { if (attachment.preview) URL.revokeObjectURL(attachment.preview); setAttachment(null) }} className="p-1 rounded-full hover:bg-red-500/20 transition-colors flex-shrink-0">
+                  <X className="w-4 h-4 text-red-400" />
+                </button>
+              )}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="flex items-center gap-3">
+            {/* File Upload Button (Pro/Business) */}
+            {(profile.plan === 'pro' || profile.plan === 'business') && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain,text/csv,.docx,.xlsx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      const preview = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined
+                      setAttachment({ file, preview })
+                    }
+                    e.target.value = ''
+                  }}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading || !!attachment}
+                  className={`p-4 rounded-full transition-all ${
+                    isLight ? 'bg-black/5 text-black/60 hover:bg-black/10 hover:text-black' : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                  } disabled:opacity-50`}
+                  title="Adjuntar archivo"
+                >
+                  <Paperclip className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
             {/* Voice Input Button (Pro only) */}
-            {profile.plan === 'pro' && voiceSupport.stt && (
+            {voiceSupport.stt && (
               <button
                 type="button"
                 onClick={isListening ? stopListening : startListening}
@@ -1065,7 +1201,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
             <button
               type="submit"
-              disabled={!inputText.trim() || isLoading}
+              disabled={(!inputText.trim() && !attachment) || isLoading}
               className="p-4 rounded-full bg-gradient-to-r from-[#C7517E] to-[#b8456f] text-white hover:from-[#d4608d] hover:to-[#C7517E] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#C7517E]/20"
             >
               {isLoading ? (
@@ -1077,7 +1213,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
           </form>
 
           {/* Voice Status (Pro only) */}
-          {profile.plan === 'pro' && (voiceSupport.tts || voiceSupport.stt) && (
+          {(voiceSupport.tts || voiceSupport.stt) && (
             <div className="mt-3 flex items-center justify-center gap-4 text-xs" style={{ color: theme.colors.textMuted }}>
               {voiceSupport.tts && (
                 <span className="flex items-center gap-1">

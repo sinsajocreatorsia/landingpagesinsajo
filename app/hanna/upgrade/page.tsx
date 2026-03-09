@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -26,11 +26,12 @@ interface LaunchData {
 }
 
 const LAUNCH_PRICES: Record<PlanType, number> = {
-  pro: 9.99,
-  business: 19.99,
+  pro: 7.50,
+  business: 14.50,
 };
 
 function UpgradeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const cancelled = searchParams.get("cancelled");
 
@@ -38,6 +39,7 @@ function UpgradeContent() {
   const [couponCode, setCouponCode] = useState("");
   const [couponValid, setCouponValid] = useState<boolean | null>(null);
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
+  const [isFullDiscount, setIsFullDiscount] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [launch, setLaunch] = useState<LaunchData | null>(null);
@@ -70,13 +72,16 @@ function UpgradeContent() {
       if (data.valid) {
         setCouponValid(true);
         setCouponMessage(data.message);
+        setIsFullDiscount(data.isFullDiscount || false);
       } else {
         setCouponValid(false);
         setCouponMessage(data.error || "Cupón no válido");
+        setIsFullDiscount(false);
       }
     } catch {
       setCouponValid(false);
       setCouponMessage("Error al validar cupón");
+      setIsFullDiscount(false);
     }
   };
 
@@ -84,6 +89,25 @@ function UpgradeContent() {
     setError(null);
     setIsLoading(true);
     try {
+      // If coupon gives 100% off, redeem directly without Stripe
+      if (couponValid && isFullDiscount) {
+        const response = await fetch("/api/hanna/coupons/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: couponCode.toUpperCase(),
+          }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          router.push("/hanna/upgrade/success?trial=true");
+        } else {
+          setError(data.error || "Error al aplicar cupon");
+        }
+        return;
+      }
+
+      // Normal Stripe checkout flow
       const response = await fetch("/api/hanna/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +135,7 @@ function UpgradeContent() {
     {
       id: "pro" as PlanType,
       name: "Pro",
-      price: 19.99,
+      price: 15,
       launchPrice: isLaunchActive ? LAUNCH_PRICES.pro : null,
       icon: Crown,
       color: "#C7517E",
@@ -119,16 +143,19 @@ function UpgradeContent() {
       features: [
         "Mensajes ilimitados",
         "Historial completo",
+        "IA estratégica (Gemini 2.5 Pro)",
         "Perfil de negocio personalizado",
-        "Voz activada",
-        "Modelos IA Flash (rápidos)",
+        "Hanna aprende tu estilo",
+        "Voz mejorada + micrófono",
+        "5 recordatorios activos",
+        "Subir archivos (imágenes, PDFs)",
         "Soporte por email",
       ],
     },
     {
       id: "business" as PlanType,
       name: "Business",
-      price: 49,
+      price: 29,
       launchPrice: isLaunchActive ? LAUNCH_PRICES.business : null,
       icon: Building2,
       color: "#2CB6D7",
@@ -136,13 +163,14 @@ function UpgradeContent() {
       popular: true,
       features: [
         "Todo lo de Pro",
-        "Modelos IA Premium (Gemini Pro + Claude)",
-        "Análisis de negocio avanzado",
-        "Estrategia de marketing IA",
-        "Memoria de negocio extendida",
-        "Soporte prioritario",
+        "Voz HD ultra-natural (OpenAI)",
+        "IA Premium (Claude + Gemini Pro)",
+        "Hanna aprende tu estilo completo",
+        "20 recordatorios + seguimiento diario",
+        "Resumen semanal automático",
+        "Memoria extendida (50 items)",
         "Exportar conversaciones",
-        "Acceso anticipado a nuevas funciones",
+        "Soporte prioritario",
       ],
     },
   ];
@@ -430,17 +458,21 @@ function UpgradeContent() {
               ) : (
                 <Crown className="w-5 h-5" />
               )}
-              {isLaunchActive
-                ? `Aprovechar Promo ${selectedPlanData.name}`
-                : couponValid
-                  ? "Continuar con cupon"
-                  : `Actualizar a ${selectedPlanData.name}`}
+              {couponValid && isFullDiscount
+                ? "Activar mi mes gratis"
+                : isLaunchActive
+                  ? `Aprovechar Promo ${selectedPlanData.name}`
+                  : couponValid
+                    ? "Continuar con cupon"
+                    : `Actualizar a ${selectedPlanData.name}`}
             </>
           )}
         </button>
 
         <p className="text-center text-white/40 text-xs mt-4">
-          Pago seguro con Stripe. Cancela cuando quieras.
+          {couponValid && isFullDiscount
+            ? "Sin tarjeta requerida. Tu mes gratis se activa al instante."
+            : "Pago seguro con Stripe. Cancela cuando quieras."}
         </p>
       </motion.div>
 
@@ -474,14 +506,18 @@ function UpgradeContent() {
             </thead>
             <tbody>
               {[
-                ["Mensajes/día", "5", "∞", "∞"],
+                ["Mensajes/día", "∞", "∞", "∞"],
                 ["Historial", "7 días", "Completo", "Completo"],
+                ["Voz", "Básica", "Mejorada + mic", "HD OpenAI"],
+                ["Modelo IA", "Flash", "Flash + Gemini Pro", "Claude + Gemini Pro"],
                 ["Perfil de negocio", "—", "✓", "✓"],
-                ["Voz activada", "—", "✓", "✓"],
-                ["Modelo IA", "Flash", "Flash Pro", "Gemini Pro + Claude"],
-                ["Memoria de negocio", "—", "Básica", "Avanzada"],
-                ["Soporte", "—", "Email", "Prioritario"],
+                ["Aprende tu estilo", "—", "Básico", "Avanzado"],
+                ["Recordatorios", "—", "5", "20 + diario"],
+                ["Subir archivos", "—", "5 (5MB)", "20 (25MB)"],
+                ["Memoria de negocio", "10", "30", "50"],
+                ["Resumen semanal", "—", "—", "✓"],
                 ["Exportar datos", "—", "—", "✓"],
+                ["Soporte", "—", "Email", "Prioritario"],
               ].map(([feature, free, pro, business]) => (
                 <tr key={feature} className="border-b border-white/5">
                   <td className="py-3 px-4 text-white/70 text-sm">{feature}</td>

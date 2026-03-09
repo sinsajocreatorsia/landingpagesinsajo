@@ -36,7 +36,7 @@ const painPoints = [
   { before: 'Publicas sin estrategia y sin saber si funciona', after: 'Cada post tiene un propósito y sigue tu estrategia de contenido' },
   { before: 'No sabes cómo hablarle a tu cliente ideal', after: 'Conoces exactamente quién es, qué quiere y qué lenguaje lo activa' },
   { before: 'Tu marketing se siente genérico e improvisado', after: 'Tienes un sistema profesional: embudo, mensajes y branding definidos' },
-  { before: 'Pagas $500+ por una consultora que tarda semanas', after: 'Tienes una consultora de marketing disponible 24/7 por $19.99/mes' },
+  { before: 'Pagas $500+ por una consultora que tarda semanas', after: 'Tienes una consultora de marketing disponible 24/7 por $15/mes' },
 ]
 
 const capabilities = [
@@ -156,6 +156,7 @@ const plans = [
     features: [
       'Mensajes ilimitados',
       'Arquitectura de marketing completa',
+      'Voz básica (escucha a Hanna)',
       'Historial de 7 días',
       'Modelo IA rápido (Gemini Flash)',
     ],
@@ -168,17 +169,19 @@ const plans = [
   {
     id: 'pro',
     name: 'Pro',
-    price: '19.99',
+    price: '15',
     period: 'mes',
     description: 'Tu consultora personalizada 24/7',
     features: [
       'Mensajes ilimitados',
       'Historial completo (para siempre)',
+      'IA estratégica (Gemini 2.5 Pro)',
       'Perfil de negocio personalizado',
-      'Diagramas y gráficos Mermaid',
-      'Recordatorios inteligentes + email',
-      'Voz activada',
-      'Te conoce por nombre y género',
+      'Hanna aprende tu estilo',
+      'Voz mejorada + micrófono',
+      '5 recordatorios activos',
+      'Subir archivos (imágenes, PDFs)',
+      'Diagramas y visualizaciones',
       'Soporte por email',
     ],
     cta: 'Comenzar con Pro',
@@ -190,17 +193,20 @@ const plans = [
   {
     id: 'business',
     name: 'Business',
-    price: '49',
+    price: '29',
     period: 'mes',
     description: 'El máximo poder de IA para tu negocio',
     features: [
       'Todo lo de Pro',
-      'Gemini 2.5 Pro (estrategia avanzada)',
-      'Claude Sonnet 4 (contenido creativo)',
-      'Respuestas más profundas y detalladas',
+      'Voz HD ultra-natural (OpenAI)',
+      'IA Premium (Claude + Gemini Pro)',
+      'Hanna aprende tu estilo completo',
+      '20 recordatorios + seguimiento diario',
+      'Subir hasta 20 archivos (25MB)',
+      'Resumen semanal automático',
+      'Memoria extendida (50 items)',
       'Exportar conversaciones',
       'Soporte prioritario',
-      'Acceso anticipado a nuevas funciones',
     ],
     cta: 'Comenzar con Business',
     ctaLink: '/hanna/signup?plan=business',
@@ -588,9 +594,9 @@ export default function HannaLandingPage() {
                 Los cerebros de IA más potentes del mundo, trabajando para tu negocio
               </h3>
               <p className="text-white/55 max-w-2xl mx-auto mb-6">
-                Business usa <strong className="text-white">Gemini 2.5 Pro</strong> para estrategia y análisis,
-                y <strong className="text-white">Claude Sonnet 4</strong> para contenido creativo.
-                Es como pasar de una consultora junior a una consultora senior.
+                Business usa <strong className="text-white">Claude Sonnet 4</strong> como cerebro principal
+                y <strong className="text-white">Gemini 2.5 Pro</strong> para análisis profundo.
+                Voz HD natural, 20 recordatorios, archivos y resumen semanal automático.
               </p>
               <Link
                 href="/hanna/signup?plan=business"
@@ -785,7 +791,7 @@ export default function HannaLandingPage() {
                   href="/hanna/signup?plan=pro"
                   className="px-8 py-4 bg-white/10 border border-white/20 text-white font-medium rounded-xl hover:bg-white/20 transition-all"
                 >
-                  Ir directo a Pro - $19.99/mes
+                  Ir directo a Pro - $15/mes
                 </Link>
               </div>
             </div>

@@ -3,14 +3,22 @@
 import { forwardRef } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Volume2, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Volume2, ThumbsUp, ThumbsDown, FileText, Download } from 'lucide-react'
 import { MessageContent } from '@/components/hanna/MessageContent'
 
-interface Message {
+export interface MessageAttachment {
+  name: string
+  url: string
+  mimeType: string
+  size: number
+}
+
+export interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  attachment?: MessageAttachment
 }
 
 interface MessageListThemeColors {
@@ -72,6 +80,31 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
                       : { backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder, color: theme.colors.textPrimary }
                     }
                   >
+                    {/* File attachment */}
+                    {message.attachment && (
+                      <div className="mb-2">
+                        {message.attachment.mimeType.startsWith('image/') ? (
+                          <a href={message.attachment.url} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={message.attachment.url}
+                              alt={message.attachment.name}
+                              className="max-w-[280px] max-h-[200px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                            />
+                          </a>
+                        ) : (
+                          <a
+                            href={message.attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-2 rounded-lg bg-white/10 hover:bg-white/15 transition-colors"
+                          >
+                            <FileText className="w-5 h-5 text-[#2CB6D7] flex-shrink-0" />
+                            <span className="text-sm truncate flex-1">{message.attachment.name}</span>
+                            <Download className="w-4 h-4 opacity-50 flex-shrink-0" />
+                          </a>
+                        )}
+                      </div>
+                    )}
                     <MessageContent content={message.content} />
                   </div>
 

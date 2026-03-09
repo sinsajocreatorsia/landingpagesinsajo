@@ -11,6 +11,7 @@ import AdminProfileNotification from './templates/AdminProfileNotification'
 import WaitlistConfirmation from './templates/WaitlistConfirmation'
 import SurveyCouponEmail from './templates/SurveyCouponEmail'
 import HannaReminderEmail from './templates/HannaReminderEmail'
+import TrialReminderEmail from './templates/TrialReminderEmail'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Admin email for notifications
@@ -44,6 +45,7 @@ export type EmailType =
   | 'waitlist_confirmation'
   | 'survey_coupon'
   | 'hanna_reminder'
+  | 'trial_reminder'
 
 interface SendEmailParams {
   to: string
@@ -164,6 +166,15 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       customerName: data.customerName || 'Empresaria',
       reminders: data.reminders ? JSON.parse(data.reminders) : [],
       dashboardUrl: data.dashboardUrl || 'https://www.screatorsai.com/hanna/dashboard',
+    }),
+  },
+  trial_reminder: {
+    subject: 'Tu prueba gratuita de Hanna Pro termina pronto',
+    templateFn: (data) => TrialReminderEmail({
+      customerName: data.customerName || 'Empresaria',
+      daysRemaining: data.daysRemaining || '5',
+      expirationDate: data.expirationDate || '',
+      upgradeUrl: data.upgradeUrl || 'https://www.screatorsai.com/hanna/upgrade',
     }),
   },
 }
@@ -638,6 +649,35 @@ export async function sendAdminProfileNotification({
     console.error('Admin notification error:', error)
     return { success: false, error: errorMessage }
   }
+}
+
+/**
+ * Send trial expiration reminder email
+ */
+export async function sendTrialReminderEmail({
+  to,
+  customerName,
+  daysRemaining,
+  expirationDate,
+  userId,
+}: {
+  to: string
+  customerName: string
+  daysRemaining: number
+  expirationDate: string
+  userId: string
+}): Promise<EmailResult> {
+  return sendEmail({
+    to,
+    type: 'trial_reminder',
+    data: {
+      customerName,
+      daysRemaining: String(daysRemaining),
+      expirationDate,
+      upgradeUrl: 'https://www.screatorsai.com/hanna/upgrade',
+    },
+    registrationId: userId,
+  })
 }
 
 /**

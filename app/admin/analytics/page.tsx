@@ -481,7 +481,7 @@ export default function AnalyticsPage() {
               <div className="border-t border-gray-100 pt-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Ingreso por usuario Pro</span>
-                  <span className="text-gray-700 font-medium">$19.99/mes</span>
+                  <span className="text-gray-700 font-medium">$15/mes</span>
                 </div>
                 <div className="flex items-center justify-between text-sm mt-1">
                   <span className="text-gray-500">Costo por usuario Pro (proy.)</span>
