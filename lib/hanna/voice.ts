@@ -19,7 +19,8 @@ export async function speakText(
   text: string,
   onStart?: () => void,
   onEnd?: () => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
+  onLoading?: () => void,
 ): Promise<void> {
   if (typeof window === 'undefined') {
     onError?.(new Error('Not in browser'))
@@ -30,11 +31,19 @@ export async function speakText(
   stopSpeaking()
 
   try {
+    onLoading?.()
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 45_000)
+
     const response = await fetch('/api/hanna/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
+      signal: controller.signal,
     })
+
+    clearTimeout(timeout)
 
     if (!response.ok) {
       throw new Error(`TTS API error: ${response.status}`)

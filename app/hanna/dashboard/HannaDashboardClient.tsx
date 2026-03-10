@@ -125,6 +125,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [voiceEnabled, setVoiceEnabled] = useState(true)
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isGeneratingVoice, setIsGeneratingVoice] = useState(false)
   const [voiceSupport, setVoiceSupport] = useState({ tts: false, stt: false })
   const [interimTranscript, setInterimTranscript] = useState('')
 
@@ -554,12 +555,14 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
         if (voiceEnabled && voiceSupport.tts) {
           speakText(
             cleanText,
-            () => setIsSpeaking(true),
+            () => { setIsGeneratingVoice(false); setIsSpeaking(true) },
             () => setIsSpeaking(false),
             (error) => {
               console.error('TTS error:', error)
+              setIsGeneratingVoice(false)
               setIsSpeaking(false)
-            }
+            },
+            () => setIsGeneratingVoice(true),
           )
         }
       } else if (data.error?.includes('limit')) {
@@ -1117,8 +1120,22 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
             </motion.div>
           )}
 
+          {/* Voice generation indicator (Pro/Business - Chatterbox takes longer) */}
+          {isGeneratingVoice && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center"
+            >
+              <div className="bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generando voz HD...
+              </div>
+            </motion.div>
+          )}
+
           {/* Speaking indicator */}
-          {isSpeaking && (
+          {isSpeaking && !isGeneratingVoice && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

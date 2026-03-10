@@ -3,6 +3,7 @@
 // ============================================
 
 export type Plan = 'free' | 'pro' | 'business'
+export type VoiceEngine = 'edge-tts' | 'chatterbox' | 'chatterbox-clone'
 export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due'
 export type MessageRole = 'user' | 'assistant' | 'system'
 export type CouponType = 'workshop' | 'promo' | 'referral'
@@ -168,7 +169,7 @@ export const PLAN_LIMITS = {
     max_tokens: 1500,
     business_profile: true,
     voice_enabled: true,
-    voice_engine: 'edge-tts-ssml' as const,
+    voice_engine: 'chatterbox' as const,
     stt_enabled: true,
     memory_limit: 30,
     summary_limit: 3,
@@ -189,7 +190,7 @@ export const PLAN_LIMITS = {
     max_tokens: 2500,
     business_profile: true,
     voice_enabled: true,
-    voice_engine: 'openai-tts' as const,
+    voice_engine: 'chatterbox-clone' as const,
     stt_enabled: true,
     memory_limit: 50,
     summary_limit: 5,
@@ -216,7 +217,7 @@ export const PLAN_FEATURES = {
     'Mensajes ilimitados',
     'Historial completo',
     'Perfil de negocio personalizado',
-    'Voz mejorada + micrófono',
+    'Voz HD natural (Chatterbox) + micrófono',
     'IA estratégica (Gemini 2.5 Pro)',
     'Hanna aprende tu estilo',
     '5 recordatorios activos',
@@ -227,7 +228,7 @@ export const PLAN_FEATURES = {
   ],
   business: [
     'Todo lo de Pro',
-    'Voz HD ultra-natural (OpenAI)',
+    'Voz HD + clonación de voz (Chatterbox)',
     'IA Premium (Claude + Gemini Pro)',
     'Hanna aprende tu estilo completo',
     '20 recordatorios + seguimiento diario',

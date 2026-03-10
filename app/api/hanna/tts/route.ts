@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { generateChatterboxAudio } from '@/lib/hanna/chatterbox'
 
 /**
  * Text preprocessing for natural-sounding TTS.
@@ -120,13 +121,13 @@ export async function POST(request: NextRequest) {
 
     const plan = profile?.plan || 'free'
 
-    const { text } = await request.json()
+    const { text, voiceRefUrl } = await request.json()
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 })
     }
 
-    // Plan-based text limits: Free 1000, Pro 2000, Business 3000
-    const maxChars = plan === 'business' ? 3000 : plan === 'pro' ? 2000 : 1000
+    // Plan-based text limits: Free 1000, Pro 3000, Business 5000
+    const maxChars = plan === 'business' ? 5000 : plan === 'pro' ? 3000 : 1000
     const trimmedText = text.slice(0, maxChars)
 
     // Preprocess text for natural speech
@@ -136,10 +137,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No speakable text' }, { status: 400 })
     }
 
-    // Get voice config based on plan
+    // Pro/Business: Use Chatterbox via Replicate (with Edge TTS fallback)
+    if (plan === 'pro' || plan === 'business') {
+      try {
+        const audioBuffer = await generateChatterboxAudio({
+          text: speechText,
+          language: 'es',
+          audioRef: plan === 'business' && voiceRefUrl ? voiceRefUrl : undefined,
+          exaggeration: 0.5,
+        })
+
+        return new NextResponse(new Uint8Array(audioBuffer), {
+          headers: {
+            'Content-Type': 'audio/wav',
+            'Content-Length': audioBuffer.length.toString(),
+            'Cache-Control': 'no-cache',
+          },
+        })
+      } catch (error) {
+        console.error('Chatterbox failed, falling back to Edge TTS:', error)
+        // Fall through to Edge TTS below
+      }
+    }
+
+    // Free plan (or fallback): Edge TTS
     const voiceConfig = getVoiceConfig(plan)
 
-    // Generate audio with Edge TTS
     const { Communicate } = await import('edge-tts-universal')
     const communicate = new Communicate(speechText, {
       voice: voiceConfig.voice,
