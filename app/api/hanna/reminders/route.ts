@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/hanna/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createReminder, getPendingReminders } from '@/lib/hanna/reminder-service'
 import type { CreateReminderInput } from '@/types/reminder'
+import { PLAN_LIMITS } from '@/types/hanna'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getTable = (name: string) => (supabaseAdmin as any).from(name)
@@ -86,15 +87,18 @@ export async function POST(request: Request) {
       )
     }
 
-    // Limit active reminders per user to prevent abuse
+    // Limit active reminders per user based on plan
+    const planKey = (plan === 'pro' || plan === 'business') ? plan : 'free'
+    const maxReminders = PLAN_LIMITS[planKey as keyof typeof PLAN_LIMITS].reminders_limit
+
     const { count } = await getTable('hanna_reminders')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('status', 'pending')
 
-    if ((count || 0) >= 50) {
+    if ((count || 0) >= maxReminders) {
       return NextResponse.json(
-        { error: 'Has alcanzado el limite de recordatorios activos (50)' },
+        { error: `Has alcanzado el límite de recordatorios activos (${maxReminders}) para tu plan.` },
         { status: 429 }
       )
     }

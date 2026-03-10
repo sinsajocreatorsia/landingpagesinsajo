@@ -222,17 +222,69 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     loadToneConfig()
   }, [user.id, supabase.auth])
 
-  // Generate greeting based on tone config + pending reminders
-  const getGreeting = useCallback((): string => {
+  // Check if this is the user's first time (no previous conversations)
+  const isFirstTime = useCallback((): boolean => {
+    return !localStorage.getItem(`hanna-onboarded-${user.id}`)
+  }, [user.id])
+
+  // Generate first-time onboarding greeting
+  const getFirstTimeGreeting = useCallback((): string => {
+    const firstName = user.fullName.split(' ')[0]
+    const style = toneConfig?.style || 'friendly'
+
+    const greetings: Record<string, string> = {
+      energetic: `¡Hey! 🔥 Mucho gusto, soy **Hanna**, tu consultora estratégica de negocios de Sinsajo Creators.
+
+Estoy aquí para ayudarte a llevar tu negocio al siguiente nivel con estrategias reales y accionables. Desde marketing, ventas, branding, hasta automatización... ¡lo que necesites!
+
+Antes de arrancar a toda máquina, me encantaría conocerte un poco. Así puedo darte consejos que DE VERDAD apliquen a tu situación.
+
+¿Cómo te llamas y cuál es tu negocio o proyecto? (Si ya tienes uno, genial. Si apenas estás empezando, también me encanta ayudar desde cero)`,
+
+      calm: `Hola, es un placer conocerte. Soy **Hanna**, consultora estratégica de negocios de Sinsajo Creators.
+
+Mi enfoque es acompañarte de manera reflexiva y estratégica en el crecimiento de tu negocio. Creo que las mejores decisiones se toman con claridad y buen contexto.
+
+Para poder darte la mejor asesoría posible, me gustaría conocerte un poco primero.
+
+¿Me compartes tu nombre y a qué te dedicas o qué proyecto tienes en mente?`,
+
+      professional: `Buen día. Soy **Hanna**, consultora estratégica de negocios de Sinsajo Creators.
+
+Mi rol es brindarte asesoría especializada en estrategia de negocio, marketing, ventas y crecimiento. Trabajo con un enfoque basado en datos y mejores prácticas de la industria.
+
+Para personalizar mi asesoría a tu contexto específico, necesito conocer algunos datos clave sobre ti y tu negocio.
+
+¿Podrías indicarme tu nombre y a qué se dedica tu empresa o proyecto?`,
+
+      friendly: `¡Hola! 💙 Qué alegría tenerte aquí. Soy **Hanna**, tu consultora de negocios de Sinsajo Creators.
+
+Estoy aquí para ayudarte con todo lo relacionado a tu negocio: estrategia, marketing, ventas, branding... ¡lo que necesites! Piensa en mí como esa amiga experta que siempre tiene buenos consejos.
+
+Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se adapten a ti y tu situación.
+
+¿Cómo te llamas y cuéntame un poquito sobre tu negocio o proyecto?`,
+    }
+
+    let greeting = greetings[style] || greetings.friendly
+
+    greeting += `\n\n💡 *Tip: Puedes personalizar mi personalidad y estilo en la sección de **Perfil de Negocio** del menú lateral.*`
+
+    return greeting
+  }, [user.fullName, toneConfig])
+
+  // Generate returning user greeting based on tone config + pending reminders
+  const getReturningGreeting = useCallback((): string => {
+    const firstName = user.fullName.split(' ')[0]
     const styleGreeting: Record<string, string> = {
-      energetic: '¡Hola! 🔥 Soy Hanna, y estoy aquí para ayudarte a ROMPERLA en tu negocio.',
-      calm: 'Hola, soy Hanna. Me da gusto poder acompañarte en el crecimiento estratégico de tu negocio.',
-      professional: 'Buen día. Soy Hanna, consultora estratégica de negocios. Será un placer asesorarte.',
-      friendly: `¡Hola ${user.fullName.split(' ')[0]}! 💙 Soy Hanna, tu amiga consultora de negocios.`,
+      energetic: `¡Hey ${firstName}! 🔥 ¿Lista/o para romperla hoy? Cuéntame, ¿en qué te puedo ayudar?`,
+      calm: `Hola ${firstName}, qué gusto verte de nuevo. ¿En qué tema te gustaría que trabajemos hoy?`,
+      professional: `Buen día, ${firstName}. ¿En qué área de tu negocio podemos enfocarnos hoy?`,
+      friendly: `¡Hola ${firstName}! 💙 Me da mucho gusto verte de nuevo. ¿Cómo va todo? ¿En qué te ayudo hoy?`,
     }
     let greeting = toneConfig
       ? styleGreeting[toneConfig.style]
-      : `¡Hola ${user.fullName.split(' ')[0]}! Soy Hanna, tu consultora estratégica de negocios.`
+      : `¡Hola ${firstName}! Soy Hanna, tu consultora estratégica de negocios. ¿En qué te ayudo hoy?`
 
     // Append pending reminders for Pro/Business users
     if (pendingReminders) {
@@ -256,6 +308,14 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
 
     return greeting
   }, [user.fullName, toneConfig, pendingReminders])
+
+  // Generate greeting - first time vs returning
+  const getGreeting = useCallback((): string => {
+    if (isFirstTime()) {
+      return getFirstTimeGreeting()
+    }
+    return getReturningGreeting()
+  }, [isFirstTime, getFirstTimeGreeting, getReturningGreeting])
 
   // Initial greeting (after tone config) - skip if loading a session from URL
   useEffect(() => {
@@ -370,6 +430,11 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   // Send message
   const sendMessage = useCallback(async (text: string) => {
     if ((!text.trim() && !attachment) || isLoading) return
+
+    // Mark user as onboarded after their first message
+    if (!localStorage.getItem(`hanna-onboarded-${user.id}`)) {
+      localStorage.setItem(`hanna-onboarded-${user.id}`, 'true')
+    }
 
     // Upload file first if attached
     let uploadedFile: MessageAttachment | undefined
@@ -518,7 +583,7 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, isLoading, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession])
+  }, [messages, isLoading, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession, attachment])
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -738,6 +803,34 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                   <CreditCard className="w-4 h-4" />
                   Facturación
                 </Link>
+                {profile.plan === 'business' && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/hanna/export?format=txt')
+                        if (!res.ok) {
+                          const err = await res.json()
+                          alert(err.error || 'Error al exportar')
+                          return
+                        }
+                        const blob = await res.blob()
+                        const url = URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = `hanna-conversaciones-${Date.now()}.txt`
+                        a.click()
+                        URL.revokeObjectURL(url)
+                      } catch {
+                        alert('Error al exportar conversaciones')
+                      }
+                    }}
+                    className={`flex items-center gap-2.5 px-3 py-2 ${hoverBg} rounded-lg transition-colors text-sm w-full text-left`}
+                    style={{ color: theme.colors.textSecondary }}
+                  >
+                    <Download className="w-4 h-4" />
+                    Exportar conversaciones
+                  </button>
+                )}
               </nav>
 
               {/* Bottom section - fixed */}
@@ -936,6 +1029,22 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                         : { backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder, color: theme.colors.textPrimary }
                       }
                     >
+                      {/* File attachment */}
+                      {message.attachment && (
+                        <div className="mb-2">
+                          {message.attachment.mimeType.startsWith('image/') ? (
+                            <a href={message.attachment.url} target="_blank" rel="noopener noreferrer">
+                              <img src={message.attachment.url} alt={message.attachment.name} className="max-w-[280px] max-h-[200px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity" />
+                            </a>
+                          ) : (
+                            <a href={message.attachment.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-2 rounded-lg bg-white/10 hover:bg-white/15 transition-colors">
+                              <FileText className="w-5 h-5 text-[#2CB6D7] flex-shrink-0" />
+                              <span className="text-sm truncate flex-1">{message.attachment.name}</span>
+                              <Download className="w-4 h-4 opacity-50 flex-shrink-0" />
+                            </a>
+                          )}
+                        </div>
+                      )}
                       <MessageContent content={message.content} />
                     </div>
 
@@ -1190,7 +1299,9 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
                 placeholder={
                   isListening
                     ? 'Escuchando...'
-                    : 'Escribe tu mensaje...'
+                    : attachment
+                      ? 'Describe qué quieres analizar...'
+                      : 'Escribe tu mensaje...'
                 }
                 disabled={isLoading || isListening}
                 rows={1}

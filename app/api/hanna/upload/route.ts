@@ -33,13 +33,14 @@ export async function POST(request: Request) {
     }
 
     // Get user plan
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
+    const { data: profile } = await (supabaseAdmin
+      .from('profiles') as ReturnType<typeof supabaseAdmin.from>)
       .select('plan')
       .eq('id', user.id)
       .single()
 
-    const plan = (profile?.plan || 'free') as keyof typeof PLAN_LIMITS
+    const profileData = profile as { plan: string } | null
+    const plan = (profileData?.plan || 'free') as keyof typeof PLAN_LIMITS
     const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free
 
     if (!limits.file_upload) {

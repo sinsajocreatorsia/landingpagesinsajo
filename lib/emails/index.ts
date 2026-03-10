@@ -12,6 +12,7 @@ import WaitlistConfirmation from './templates/WaitlistConfirmation'
 import SurveyCouponEmail from './templates/SurveyCouponEmail'
 import HannaReminderEmail from './templates/HannaReminderEmail'
 import TrialReminderEmail from './templates/TrialReminderEmail'
+import WeeklySummaryEmail from './templates/WeeklySummaryEmail'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Admin email for notifications
@@ -46,6 +47,7 @@ export type EmailType =
   | 'survey_coupon'
   | 'hanna_reminder'
   | 'trial_reminder'
+  | 'weekly_summary'
 
 interface SendEmailParams {
   to: string
@@ -175,6 +177,19 @@ const emailConfig: Record<EmailType, { subject: string; templateFn: (data: Recor
       daysRemaining: data.daysRemaining || '5',
       expirationDate: data.expirationDate || '',
       upgradeUrl: data.upgradeUrl || 'https://www.screatorsai.com/hanna/upgrade',
+    }),
+  },
+  weekly_summary: {
+    subject: 'Tu resumen semanal con Hanna',
+    templateFn: (data) => WeeklySummaryEmail({
+      customerName: data.customerName || 'Empresaria',
+      weekRange: data.weekRange || '',
+      totalMessages: parseInt(data.totalMessages || '0'),
+      totalSessions: parseInt(data.totalSessions || '0'),
+      topTopics: data.topTopics ? JSON.parse(data.topTopics) : [],
+      keyInsights: data.keyInsights ? JSON.parse(data.keyInsights) : [],
+      actionItems: data.actionItems ? JSON.parse(data.actionItems) : [],
+      dashboardUrl: data.dashboardUrl || 'https://www.screatorsai.com/hanna/dashboard',
     }),
   },
 }
@@ -700,6 +715,47 @@ export async function sendHannaReminderEmail({
     data: {
       customerName,
       reminders: JSON.stringify(reminders),
+      dashboardUrl: 'https://www.screatorsai.com/hanna/dashboard',
+    },
+    registrationId: userId,
+  })
+}
+
+/**
+ * Send Hanna weekly summary email (Business plan only)
+ */
+export async function sendWeeklySummaryEmail({
+  to,
+  customerName,
+  weekRange,
+  totalMessages,
+  totalSessions,
+  topTopics,
+  keyInsights,
+  actionItems,
+  userId,
+}: {
+  to: string
+  customerName: string
+  weekRange: string
+  totalMessages: number
+  totalSessions: number
+  topTopics: string[]
+  keyInsights: string[]
+  actionItems: string[]
+  userId: string
+}): Promise<EmailResult> {
+  return sendEmail({
+    to,
+    type: 'weekly_summary',
+    data: {
+      customerName,
+      weekRange,
+      totalMessages: String(totalMessages),
+      totalSessions: String(totalSessions),
+      topTopics: JSON.stringify(topTopics),
+      keyInsights: JSON.stringify(keyInsights),
+      actionItems: JSON.stringify(actionItems),
       dashboardUrl: 'https://www.screatorsai.com/hanna/dashboard',
     },
     registrationId: userId,
