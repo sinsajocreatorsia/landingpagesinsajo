@@ -507,21 +507,41 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
           : `[El usuario adjuntó un archivo: ${uploadedFile.name} (${uploadedFile.mimeType}). URL: ${uploadedFile.url}]\n\nAnaliza este archivo y ${messageText || 'dame tus observaciones.'}`
       }
 
-      const response = await fetch('/api/hanna/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: fullMessage,
-          sessionId: currentSessionId,
-          toneConfig: toneConfig,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          history: messages.slice(-historyLimit).map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
-        }),
+      const chatRequestBody = JSON.stringify({
+        message: fullMessage,
+        sessionId: currentSessionId,
+        toneConfig: toneConfig,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        history: messages.slice(-historyLimit).map(m => ({
+          role: m.role,
+          content: m.content,
+        })),
       })
 
+      // Fetch with 45s timeout and 1 automatic retry
+      const fetchChatWithTimeout = async (attempt: number): Promise<Response> => {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 45000)
+        try {
+          const res = await fetch('/api/hanna/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: chatRequestBody,
+            signal: controller.signal,
+          })
+          clearTimeout(timeoutId)
+          return res
+        } catch (err) {
+          clearTimeout(timeoutId)
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 1500))
+            return fetchChatWithTimeout(attempt + 1)
+          }
+          throw err
+        }
+      }
+
+      const response = await fetchChatWithTimeout(1)
       const data = await response.json()
 
       if (data.success && data.response) {
@@ -562,10 +582,13 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
       }
     } catch (error) {
       console.error('Chat error:', error)
+      const isTimeout = error instanceof Error && error.name === 'AbortError'
       setMessages(prev => [...prev, {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: 'Lo siento, hubo un error al procesar tu mensaje. ¿Podrías intentarlo de nuevo?',
+        content: isTimeout
+          ? 'La respuesta tardó demasiado tiempo. Por favor intenta de nuevo.'
+          : 'Hubo un problema al procesar tu mensaje. Por favor intenta de nuevo.',
         timestamp: new Date(),
       }])
     } finally {

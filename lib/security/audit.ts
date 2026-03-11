@@ -5,6 +5,7 @@
  */
 
 import { supabaseAdmin } from '@/lib/supabase'
+import { logAppEvent, type AppEventType } from '@/lib/app-events'
 
 type SecurityEventType =
   | 'injection_attempt'
@@ -23,9 +24,25 @@ interface SecurityEvent {
   severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
+const SECURITY_TYPE_TO_APP_EVENT: Record<SecurityEventType, AppEventType | null> = {
+  injection_attempt: 'security.injection',
+  rate_limit_exceeded: 'security.rate_limit',
+  auth_failure: 'security.auth_failure',
+  suspicious_activity: 'security.suspicious',
+  coupon_abuse: 'security.suspicious',
+  admin_action: null, // admin actions tienen su propio log en admin_audit_logs
+}
+
+const SEVERITY_MAP: Record<string, 'info' | 'warning' | 'error' | 'critical'> = {
+  low: 'info',
+  medium: 'warning',
+  high: 'error',
+  critical: 'critical',
+}
+
 /**
  * Log a security event in structured JSON format.
- * In production, these logs can be ingested by monitoring tools (Datadog, Sentry, etc.)
+ * Persiste a app_events en Supabase además de consola.
  */
 export function logSecurityEvent(event: SecurityEvent): void {
   const entry = {
@@ -39,6 +56,21 @@ export function logSecurityEvent(event: SecurityEvent): void {
     console.warn(`[SECURITY:${event.severity.toUpperCase()}]`, JSON.stringify(entry))
   } else {
     console.log(`[SECURITY:${event.severity}]`, JSON.stringify(entry))
+  }
+
+  // Persistir a DB (best-effort, non-blocking)
+  const appEventType = SECURITY_TYPE_TO_APP_EVENT[event.type]
+  if (appEventType) {
+    logAppEvent({
+      event_type: appEventType,
+      user_id: event.userId,
+      severity: SEVERITY_MAP[event.severity] ?? 'warning',
+      metadata: {
+        endpoint: event.endpoint,
+        ip: event.ip,
+        details: event.details.slice(0, 500),
+      },
+    }).catch(() => { /* best-effort */ })
   }
 }
 

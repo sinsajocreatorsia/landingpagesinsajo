@@ -266,6 +266,10 @@ async function checkAndUpdateMessageLimit(userId: string): Promise<{
 
 
 export async function POST(request: Request) {
+  // Hoisted for access in catch block
+  let _errorUserId: string | null = null
+  let _errorModel = 'unknown'
+
   try {
     const { message, history = [], mode, sessionId, toneConfig, timezone } = await request.json()
 
@@ -314,6 +318,7 @@ export async function POST(request: Request) {
         )
       }
       authenticatedUserId = authUser.id
+      _errorUserId = authUser.id
     }
 
     // Check message limits for authenticated SaaS users
@@ -372,6 +377,7 @@ export async function POST(request: Request) {
     )
 
     const selectedModel = route.model
+    _errorModel = selectedModel
     const queryCategory: QueryCategory = route.category
 
     // Determine which API key to use: Workshop vs SaaS
@@ -492,7 +498,28 @@ export async function POST(request: Request) {
       queryCategory,
     })
   } catch (error) {
-    console.error('Hanna chat error:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Hanna chat error:', errorMessage)
+
+    // Log failed request to api_usage_logs for monitoring
+    if (_errorUserId) {
+      await (supabaseAdmin.from('api_usage_logs') as ReturnType<typeof supabaseAdmin.from>).insert({
+        user_id: _errorUserId,
+        model: _errorModel,
+        client_type: 'saas',
+        input_tokens: 0,
+        output_tokens: 0,
+        total_tokens: 0,
+        input_cost: 0,
+        output_cost: 0,
+        total_cost: 0,
+        response_time_ms: 0,
+        was_successful: false,
+        response_length: 0,
+        query_category: 'error',
+      }).catch(() => { /* best-effort */ })
+    }
+
     return NextResponse.json(
       { error: 'Error al procesar tu mensaje. Intenta de nuevo.' },
       { status: 500 }

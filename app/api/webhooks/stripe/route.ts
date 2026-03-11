@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendConfirmationEmail } from '@/lib/emails'
+import { logAppEvent } from '@/lib/app-events'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -97,6 +98,19 @@ export async function POST(request: Request) {
       console.error('Database error:', dbError)
     }
 
+    // Log pago completado
+    logAppEvent({
+      event_type: 'payment.completed',
+      severity: 'info',
+      metadata: {
+        stripe_session_id: session.id,
+        email: session.customer_email || session.metadata?.customer_email,
+        amount: (session.amount_total || 0) / 100,
+        currency: session.currency?.toUpperCase(),
+        customer_name: session.metadata?.customer_name,
+      },
+    }).catch(() => {})
+
     console.log('Payment completed for:', session.customer_email)
   }
 
@@ -116,6 +130,19 @@ export async function POST(request: Request) {
   if (event.type === 'payment_intent.payment_failed') {
     const paymentIntent = event.data.object as Stripe.PaymentIntent
     console.log('Payment failed:', paymentIntent.id, paymentIntent.last_payment_error?.message)
+
+    // Log pago fallido
+    logAppEvent({
+      event_type: 'payment.failed',
+      severity: 'error',
+      metadata: {
+        stripe_payment_intent_id: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency?.toUpperCase(),
+        error_message: paymentIntent.last_payment_error?.message,
+        error_code: paymentIntent.last_payment_error?.code,
+      },
+    }).catch(() => {})
   }
 
   // Handle refund event
@@ -128,6 +155,18 @@ export async function POST(request: Request) {
       .from('workshop_registrations')
       .update({ payment_status: 'refunded' })
       .eq('payment_id', charge.payment_intent as string)
+
+    // Log reembolso
+    logAppEvent({
+      event_type: 'payment.refunded',
+      severity: 'warning',
+      metadata: {
+        stripe_charge_id: charge.id,
+        amount: charge.amount_refunded / 100,
+        currency: charge.currency?.toUpperCase(),
+        email: charge.billing_details?.email,
+      },
+    }).catch(() => {})
 
     console.log('Refund processed for charge:', charge.id)
   }

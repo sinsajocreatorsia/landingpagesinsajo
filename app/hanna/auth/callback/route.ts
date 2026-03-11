@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { sanitizeRedirect } from '@/lib/auth-guard'
 import { supabaseAdmin } from '@/lib/supabase'
+import { logAppEvent } from '@/lib/app-events'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -65,6 +66,30 @@ export async function GET(request: NextRequest) {
             console.error('Profile upsert failed:', upsertError)
             // Don't block login - profile might already exist via trigger
           }
+
+          // Log nuevo signup
+          logAppEvent({
+            event_type: 'user.signup',
+            user_id: user.id,
+            severity: 'info',
+            metadata: {
+              email: user.email,
+              provider: user.app_metadata?.provider ?? 'email',
+              has_pending_coupon: !!user.user_metadata?.pending_coupon_code,
+            },
+          }).catch(() => {})
+        } else {
+          // Log login de usuario existente
+          logAppEvent({
+            event_type: 'user.login',
+            user_id: user.id,
+            severity: 'info',
+            metadata: {
+              email: user.email,
+              plan: profile.plan,
+              provider: user.app_metadata?.provider ?? 'email',
+            },
+          }).catch(() => {})
         }
 
         // Track if coupon was redeemed (determines redirect)
@@ -141,6 +166,20 @@ export async function GET(request: NextRequest) {
                       .eq('id', user.id)
 
                     couponRedeemed = true
+
+                    // Log upgrade por cupón
+                    logAppEvent({
+                      event_type: 'plan.upgrade',
+                      user_id: user.id,
+                      severity: 'info',
+                      metadata: {
+                        from_plan: 'free',
+                        to_plan: 'pro',
+                        source: 'coupon',
+                        coupon_code: pendingCoupon,
+                        plan_expires_at: planExpiresAt,
+                      },
+                    }).catch(() => {})
                   }
 
                   // Record redemption
@@ -149,6 +188,18 @@ export async function GET(request: NextRequest) {
                       coupon_id: couponRecord.id,
                       user_id: user.id,
                     } as Record<string, unknown>)
+
+                  // Log cupón canjeado
+                  logAppEvent({
+                    event_type: 'coupon.redeemed',
+                    user_id: user.id,
+                    severity: 'info',
+                    metadata: {
+                      coupon_code: pendingCoupon,
+                      discount_type: couponRecord.discount_type,
+                      free_months: couponRecord.free_months,
+                    },
+                  }).catch(() => {})
 
                   // Increment coupon usage (handle both table schemas)
                   if (hannaCoupon) {

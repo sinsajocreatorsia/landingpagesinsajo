@@ -140,7 +140,7 @@ export function routeProQuery(
         fallbackModel: MODELS.flashPro,
         category,
         temperature: 0.7,
-        maxTokens: 1500,
+        maxTokens: 3000,
       }
 
     case 'content':
@@ -152,7 +152,7 @@ export function routeProQuery(
         fallbackModel: MODELS.flash,
         category,
         temperature: (category === 'content' || category === 'prompt_creation') ? 0.85 : 0.8,
-        maxTokens: 1500,
+        maxTokens: 3000,
       }
 
     case 'general':
@@ -163,7 +163,7 @@ export function routeProQuery(
         fallbackModel: MODELS.flashPro,
         category,
         temperature: 0.7,
-        maxTokens: 1000,
+        maxTokens: 2500,
       }
   }
 }
@@ -188,7 +188,7 @@ export function routeBusinessQuery(
         fallbackModel: MODELS.pro,
         category,
         temperature: 0.7,
-        maxTokens: 2500,
+        maxTokens: 4000,
       }
 
     case 'content':
@@ -199,7 +199,7 @@ export function routeBusinessQuery(
         fallbackModel: MODELS.flashPro,
         category,
         temperature: 0.85,
-        maxTokens: 2500,
+        maxTokens: 4000,
       }
 
     case 'marketing':
@@ -209,7 +209,7 @@ export function routeBusinessQuery(
         fallbackModel: MODELS.flashPro,
         category,
         temperature: 0.8,
-        maxTokens: 2500,
+        maxTokens: 4000,
       }
 
     case 'general':
@@ -220,7 +220,7 @@ export function routeBusinessQuery(
         fallbackModel: MODELS.flash,
         category,
         temperature: 0.7,
-        maxTokens: 1500,
+        maxTokens: 3000,
       }
   }
 }
@@ -242,7 +242,7 @@ export function selectModelForUser(
       fallbackModel: MODELS.flash,
       category: 'general',
       temperature: 0.8,
-      maxTokens: 500,
+      maxTokens: 1000,
     }
   }
 
@@ -262,6 +262,6 @@ export function selectModelForUser(
     fallbackModel: MODELS.flash,
     category: classifyQuery(message, history),
     temperature: 0.7,
-    maxTokens: 600,
+    maxTokens: 1200,
   }
 }

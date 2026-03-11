@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   Bell,
   Brain,
+  Activity,
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -58,6 +59,11 @@ const navigation = [
     name: 'Analytics',
     href: '/admin/analytics',
     icon: BarChart3,
+  },
+  {
+    name: 'Eventos',
+    href: '/admin/events',
+    icon: Activity,
   },
   {
     name: 'Audit Log',

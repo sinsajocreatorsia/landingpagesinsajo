@@ -46,8 +46,9 @@ function parseContent(raw: string): ContentPart[] {
   let normalized = raw
 
   // Pattern 2: "mermaid\n" followed by a mermaid start keyword (AI wrote "mermaid" without backticks)
+  // Also handles "- mermaid\n" and "* mermaid\n" (AI accidentally added a list marker before "mermaid")
   normalized = normalized.replace(
-    /(?:^|\n)mermaid\n((?:graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|journey|gitgraph|mindmap|timeline)[\s\S]*?)(?=\n\n[A-ZÁÉÍÓÚÑa-záéíóúñ¿¡]|\n\n$|$)/gm,
+    /(?:^|\n)[-*•·]?\s*mermaid\n((?:graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|journey|gitgraph|mindmap|timeline)[\s\S]*?)(?=\n\n[A-ZÁÉÍÓÚÑa-záéíóúñ¿¡]|\n\n$|$)/gm,
     (match, diagramCode) => {
       // Verify it actually looks like mermaid content
       const lines = diagramCode.trim().split('\n')
