@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Image configuration - local images in public/ folder
+  // Exclude Node.js-native packages from bundling (WebSocket, etc.)
+  serverExternalPackages: ['edge-tts-universal', 'ws', 'isomorphic-ws'],
 
   // Security headers
   async headers() {
@@ -47,6 +48,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
+              "media-src 'self' blob:",
               "connect-src 'self' https://openrouter.ai https://api.cal.com https://api.web3forms.com https://www.google-analytics.com https://*.supabase.co https://www.facebook.com https://connect.facebook.net https://js.stripe.com https://api.stripe.com https://api.paypal.com https://api-m.paypal.com https://api-m.sandbox.paypal.com https://accounts.google.com",
               "frame-src 'self' https://cal.com https://js.stripe.com https://accounts.google.com",
               "object-src 'none'",
