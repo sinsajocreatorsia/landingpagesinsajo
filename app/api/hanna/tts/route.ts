@@ -123,12 +123,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 })
     }
 
-    // Plan-based text limits: Free 1000, Pro 3000, Business 5000
-    const maxChars = plan === 'business' ? 5000 : plan === 'pro' ? 3000 : 1000
-    const trimmedText = text.slice(0, maxChars)
-
-    // Preprocess text for natural speech
-    const speechText = preprocessTextForSpeech(trimmedText)
+    // Preprocess first (removes markdown, emojis, etc. - reduces length ~30%)
+    // Then apply plan-based char limit on cleaned text: Free 1500, Pro 6000, Business 10000
+    const preprocessed = preprocessTextForSpeech(text)
+    const maxChars = plan === 'business' ? 10000 : plan === 'pro' ? 6000 : 1500
+    const speechText = preprocessed.slice(0, maxChars)
 
     if (!speechText || speechText.length < 2) {
       return NextResponse.json({ error: 'No speakable text' }, { status: 400 })
