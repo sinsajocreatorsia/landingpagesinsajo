@@ -75,7 +75,7 @@ export function DashboardSidebar({
       <div className={`px-3 py-3 border-b ${borderClass} flex items-center justify-between flex-shrink-0`}>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-            <Image src="/images/hanna-ai.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
+            <Image src="/images/hanna-profile.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
           </div>
           <div>
             <h2 className="font-semibold text-sm" style={{ color: theme.colors.textPrimary }}>Hanna</h2>

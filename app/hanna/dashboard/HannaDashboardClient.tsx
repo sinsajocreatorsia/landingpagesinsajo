@@ -738,7 +738,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
               <div className={`px-3 py-3 border-b ${borderClass} flex items-center justify-between flex-shrink-0`}>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                    <Image src="/images/hanna-ai.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
+                    <Image src="/images/hanna-profile.png" alt="Hanna" width={32} height={32} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h2 className="font-semibold text-sm" style={{ color: theme.colors.textPrimary }}>Hanna</h2>
@@ -920,7 +920,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
 
           <div className="flex-1 flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-              <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+              <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
             </div>
             <div className="min-w-0">
               <h1 className="font-bold" style={{ color: theme.colors.textPrimary }}>Hanna</h1>
@@ -1005,7 +1005,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
                     </div>
                   ) : (
                     <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden">
-                      <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+                      <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
                     </div>
                   )}
 
@@ -1107,7 +1107,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+                  <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
                 </div>
                 <div className="backdrop-blur-sm rounded-2xl px-5 py-4 rounded-tl-sm border" style={{ backgroundColor: theme.colors.bubbleAssistant, borderColor: theme.colors.bubbleAssistantBorder }}>
                   <div className="flex gap-1">

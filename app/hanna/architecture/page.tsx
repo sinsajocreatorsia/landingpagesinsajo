@@ -114,7 +114,7 @@ export default function ArchitectureDashboard() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-            <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+            <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
           </div>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-white">Arquitectura de Marketing</h1>

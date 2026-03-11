@@ -43,7 +43,7 @@ export default function HannaWidget({ initialMessage }: HannaWidgetProps) {
             >
               {/* Main Button */}
               <div className="w-16 h-16 bg-gradient-to-br from-[#C7517E] to-[#200F5D] rounded-full shadow-lg flex items-center justify-center overflow-hidden">
-                <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="object-cover" />
+                <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="object-cover" />
               </div>
 
               {/* Pulse Animation */}

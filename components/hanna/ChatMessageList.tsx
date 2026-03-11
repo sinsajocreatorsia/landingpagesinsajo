@@ -63,7 +63,7 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden">
-                    <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+                    <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
                   </div>
                 )}
 
@@ -152,7 +152,7 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
           >
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                <Image src="/images/hanna-ai.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
+                <Image src="/images/hanna-profile.png" alt="Hanna" width={40} height={40} className="w-full h-full object-cover" />
               </div>
               <div
                 className="backdrop-blur-sm rounded-2xl px-5 py-4 rounded-tl-sm border"

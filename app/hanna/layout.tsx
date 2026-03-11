@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Hanna - Tu Consultora de Negocios con IA | Sinsajo Creators',
     description: 'Consultora estratégica de negocios potenciada por IA. Estrategias personalizadas para tu negocio.',
-    images: ['/images/hanna-ai.png'],
+    images: ['/images/hanna-profile.png'],
   },
 }
 
