@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { generateChatterboxAudio } from '@/lib/hanna/chatterbox'
 
 /**
  * Text preprocessing for natural-sounding TTS.
@@ -58,29 +57,27 @@ function preprocessTextForSpeech(text: string): string {
 
 /**
  * Voice configuration per plan tier.
+ * All plans use Edge TTS (fast, consistent, natural).
+ * Chatterbox/OpenAI TTS reserved for future when quality improves.
  */
 function getVoiceConfig(plan: string) {
   switch (plan) {
     case 'business':
-      // Business: OpenAI TTS will be handled separately in the future
-      // For now, use the best Edge TTS voice with optimized settings
       return {
         voice: 'es-MX-DaliaNeural',
-        rate: '-3%',
+        rate: '+5%',
         pitch: '+3Hz',
       }
     case 'pro':
-      // Pro: Better Edge TTS with SSML-optimized settings
       return {
         voice: 'es-MX-DaliaNeural',
-        rate: '-3%',
+        rate: '+5%',
         pitch: '+3Hz',
       }
     default:
-      // Free: Standard Edge TTS with clearer settings
       return {
         voice: 'es-MX-DaliaNeural',
-        rate: '-5%',
+        rate: '+3%',
         pitch: '+2Hz',
       }
   }
@@ -121,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     const plan = profile?.plan || 'free'
 
-    const { text, voiceRefUrl } = await request.json()
+    const { text } = await request.json()
     if (!text || typeof text !== 'string') {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 })
     }
@@ -137,30 +134,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No speakable text' }, { status: 400 })
     }
 
-    // Pro/Business: Use Chatterbox via Replicate (with Edge TTS fallback)
-    if (plan === 'pro' || plan === 'business') {
-      try {
-        const audioBuffer = await generateChatterboxAudio({
-          text: speechText,
-          language: 'es',
-          audioRef: plan === 'business' && voiceRefUrl ? voiceRefUrl : undefined,
-          exaggeration: 0.5,
-        })
-
-        return new NextResponse(new Uint8Array(audioBuffer), {
-          headers: {
-            'Content-Type': 'audio/wav',
-            'Content-Length': audioBuffer.length.toString(),
-            'Cache-Control': 'no-cache',
-          },
-        })
-      } catch (error) {
-        console.error('Chatterbox failed, falling back to Edge TTS:', error)
-        // Fall through to Edge TTS below
-      }
-    }
-
-    // Free plan (or fallback): Edge TTS
+    // All plans: Edge TTS (fast, consistent, free)
+    // Chatterbox/OpenAI TTS disabled for now due to high latency and inconsistent Spanish quality
     const voiceConfig = getVoiceConfig(plan)
 
     const { Communicate } = await import('edge-tts-universal')
