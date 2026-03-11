@@ -9,7 +9,7 @@
 import Replicate from 'replicate'
 
 const CHATTERBOX_MODEL = 'resemble-ai/chatterbox-multilingual' as const
-const GENERATION_TIMEOUT_MS = 45_000
+const GENERATION_TIMEOUT_MS = 15_000
 
 interface ChatterboxOptions {
   text: string
