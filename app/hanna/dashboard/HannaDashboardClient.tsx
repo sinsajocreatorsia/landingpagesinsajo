@@ -24,7 +24,6 @@ import {
   Mic,
   MicOff,
   Volume2,
-  VolumeX,
   Palette,
   ThumbsUp,
   ThumbsDown,
@@ -121,11 +120,10 @@ function HannaDashboardInner({ user, profile }: DashboardProps) {
   const [showToneConfig, setShowToneConfig] = useState(false)
   const [toneConfig, setToneConfig] = useState<ToneConfig | null>(null)
 
-  // Voice states (Pro only)
-  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  // Voice states
   const [isListening, setIsListening] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isGeneratingVoice, setIsGeneratingVoice] = useState(false)
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null)
+  const [loadingMessageAudio, setLoadingMessageAudio] = useState<string | null>(null)
   const [voiceSupport, setVoiceSupport] = useState({ tts: false, stt: false })
   const [interimTranscript, setInterimTranscript] = useState('')
 
@@ -551,20 +549,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
           setMessagesRemaining(prev => Math.max(0, prev - 1))
         }
 
-        // Text-to-speech for all plans (Edge TTS for Free/Pro, OpenAI TTS for Business)
-        if (voiceEnabled && voiceSupport.tts) {
-          speakText(
-            cleanText,
-            () => { setIsGeneratingVoice(false); setIsSpeaking(true) },
-            () => setIsSpeaking(false),
-            (error) => {
-              console.error('TTS error:', error)
-              setIsGeneratingVoice(false)
-              setIsSpeaking(false)
-            },
-            () => setIsGeneratingVoice(true),
-          )
-        }
+        // TTS is now on-demand: user clicks speaker icon on each message
       } else if (data.error?.includes('limit')) {
         setMessages(prev => [...prev, {
           id: `limit-${Date.now()}`,
@@ -586,7 +571,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
     } finally {
       setIsLoading(false)
     }
-  }, [messages, isLoading, profile.plan, messagesRemaining, voiceEnabled, voiceSupport.tts, toneConfig, sessionId, createSession, attachment])
+  }, [messages, isLoading, profile.plan, messagesRemaining, toneConfig, sessionId, createSession, attachment])
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -640,7 +625,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
     if (!recognitionRef.current?.isSupported || isListening || profile.plan === 'free') return
 
     stopSpeaking() // Stop any ongoing speech
-    setIsSpeaking(false)
+    setPlayingMessageId(null)
 
     recognitionRef.current.start({
       onResult: (transcript, isFinal) => {
@@ -672,13 +657,30 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
     recognitionRef.current?.stop()
   }, [])
 
-  const toggleVoice = useCallback(() => {
-    if (isSpeaking) {
+  const playMessageAudio = useCallback((messageId: string, text: string) => {
+    // If already playing this message, stop it
+    if (playingMessageId === messageId) {
       stopSpeaking()
-      setIsSpeaking(false)
+      setPlayingMessageId(null)
+      setLoadingMessageAudio(null)
+      return
     }
-    setVoiceEnabled(!voiceEnabled)
-  }, [isSpeaking, voiceEnabled])
+    // Stop any other playing audio
+    stopSpeaking()
+
+    setLoadingMessageAudio(messageId)
+    speakText(
+      text,
+      () => { setLoadingMessageAudio(null); setPlayingMessageId(messageId) },
+      () => setPlayingMessageId(null),
+      (error) => {
+        console.error('TTS error:', error)
+        setLoadingMessageAudio(null)
+        setPlayingMessageId(null)
+      },
+      () => setLoadingMessageAudio(messageId),
+    )
+  }, [playingMessageId])
 
   // Feedback (thumbs up/down) tracking
   const [feedbackGiven, setFeedbackGiven] = useState<Record<string, 1 | -1>>({})
@@ -940,19 +942,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
             </div>
           )}
 
-          {/* Voice Toggle (Pro only) */}
-          {voiceSupport.tts && (
-            <button
-              onClick={toggleVoice}
-              className={`p-2 rounded-full transition-colors ${
-                voiceEnabled ? 'bg-[#2CB6D7] text-white' : hoverBg
-              }`}
-              style={voiceEnabled ? {} : { color: theme.colors.textMuted, backgroundColor: theme.colors.cardBg }}
-              title={voiceEnabled ? 'Desactivar voz' : 'Activar voz'}
-            >
-              {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-            </button>
-          )}
+          {/* Voice toggle removed - TTS is now on-demand per message */}
 
           {/* User Profile Menu */}
           <div className="relative">
@@ -1051,9 +1041,31 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
                       <MessageContent content={message.content} />
                     </div>
 
-                    {/* Feedback buttons for assistant messages (not initial greeting) */}
+                    {/* Feedback + Speaker buttons for assistant messages */}
                     {message.role === 'assistant' && message.id !== 'initial' && (
                       <div className="flex items-center gap-1 mt-1 ml-1">
+                        {/* Play audio button */}
+                        {voiceSupport.tts && (
+                          <button
+                            onClick={() => playMessageAudio(message.id, message.content)}
+                            className={`p-1 rounded transition-colors ${
+                              playingMessageId === message.id
+                                ? 'text-[#2CB6D7]'
+                                : loadingMessageAudio === message.id
+                                  ? 'text-amber-400'
+                                  : (isLight ? 'text-black/20 hover:text-black/50' : 'text-white/20 hover:text-white/50')
+                            }`}
+                            title={playingMessageId === message.id ? 'Detener audio' : 'Escuchar respuesta'}
+                          >
+                            {loadingMessageAudio === message.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : playingMessageId === message.id ? (
+                              <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                            ) : (
+                              <Volume2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
                         <button
                           onClick={() => handleFeedback(message.id, 1)}
                           className={`p-1 rounded transition-colors ${
@@ -1120,33 +1132,7 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
             </motion.div>
           )}
 
-          {/* Voice generation indicator (Pro/Business - Chatterbox takes longer) */}
-          {isGeneratingVoice && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-center"
-            >
-              <div className="bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Generando voz HD...
-              </div>
-            </motion.div>
-          )}
-
-          {/* Speaking indicator */}
-          {isSpeaking && !isGeneratingVoice && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-center"
-            >
-              <div className="bg-[#2CB6D7]/20 text-[#2CB6D7] px-4 py-2 rounded-full text-sm flex items-center gap-2">
-                <Volume2 className="w-4 h-4 animate-pulse" />
-                Hanna está hablando...
-              </div>
-            </motion.div>
-          )}
+          {/* Voice indicators removed - audio state shown per message via speaker icon */}
 
           {/* Interim transcript (voice input) */}
           {interimTranscript && (
@@ -1340,21 +1326,13 @@ Pero primero, ¡quiero conocerte! Así puedo darte consejos que realmente se ada
             </button>
           </form>
 
-          {/* Voice Status (Pro only) */}
-          {(voiceSupport.tts || voiceSupport.stt) && (
+          {/* Voice Status - STT only */}
+          {voiceSupport.stt && (
             <div className="mt-3 flex items-center justify-center gap-4 text-xs" style={{ color: theme.colors.textMuted }}>
-              {voiceSupport.tts && (
-                <span className="flex items-center gap-1">
-                  <span className={voiceEnabled ? 'text-green-500' : (isLight ? 'text-black/40' : 'text-white/40')}>●</span>
-                  Voz {voiceEnabled ? 'activada' : 'desactivada'}
-                </span>
-              )}
-              {voiceSupport.stt && (
-                <span className="flex items-center gap-1">
-                  <span className={isListening ? 'text-red-500 animate-pulse' : (isLight ? 'text-black/40' : 'text-white/40')}>●</span>
-                  {isListening ? 'Escuchando...' : 'Pulsa el micrófono para hablar'}
-                </span>
-              )}
+              <span className="flex items-center gap-1">
+                <span className={isListening ? 'text-red-500 animate-pulse' : (isLight ? 'text-black/40' : 'text-white/40')}>●</span>
+                {isListening ? 'Escuchando...' : 'Pulsa el micrófono para hablar'}
+              </span>
             </div>
           )}
         </div>
